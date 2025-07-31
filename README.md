@@ -33,7 +33,7 @@ public void ProcessData()
 
 ### 1. Meaningful Data Representation
 ```csharp
-using ProblemSolving.DebugUtils;
+using DebugUtils;
 
 var arr = new int[] {1, 2, 3, 4};
 Console.WriteLine(arr.Repr());  // 😍 "[1, 2, 3, 4]"
@@ -44,7 +44,7 @@ Console.WriteLine(dict.Repr()); // 😍 "{"a": 1, "b": 2}"
 
 ### 2. Instant Error Location Tracking
 ```csharp
-using ProblemSolving.DebugUtils;
+using DebugUtils;
 
 public void ProcessData()
 {
@@ -73,7 +73,7 @@ Add this project as a reference or copy the source files to your project.
 ## Quick Start
 
 ```csharp
-using ProblemSolving.DebugUtils;
+using DebugUtils;
 
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
