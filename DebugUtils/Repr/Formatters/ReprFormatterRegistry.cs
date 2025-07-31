@@ -117,7 +117,12 @@ public static class ReprFormatterRegistry
             return setFormatter;
         }
 
-        if (typeof(IEnumerable).IsAssignableFrom(c: type))
+        if (type.IsAssignableTo(typeof(Delegate)))
+        {
+            return Formatters[key: typeof(Delegate)];
+        }
+
+        if (type.IsAssignableTo(typeof(IEnumerable)))
         {
             return Formatters[key: typeof(IEnumerable)];
         }
