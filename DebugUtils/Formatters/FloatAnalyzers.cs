@@ -21,9 +21,10 @@ public record FloatsSpec(
     int ExpOffset
 )
 {
+#if NET5_0_OR_GREATER
     public static FloatsSpec HalfSpec =>
         new(5, 10, 16, 0x3FF, 0x3FF, 0x1F, 15);
-
+#endif
     public static FloatsSpec FloatSpec => new(8, 23, 32, 0x7FFFFF, 0x7FFFFF, 0xFF, 127);
 
     public static FloatsSpec DoubleSpec =>
@@ -48,9 +49,13 @@ public record FloatInfo(
 
 internal static class FloatAnalyzers
 {
+#if NET5_0_OR_GREATER
     private static FloatsSpec halfSpec = FloatsSpec.HalfSpec;
+#endif
     private static FloatsSpec floatSpec = FloatsSpec.FloatSpec;
     private static FloatsSpec doubleSpec = FloatsSpec.DoubleSpec;
+
+#if NET5_0_OR_GREATER
     public static FloatInfo AnalyzeHalf(this Half value)
     {
         var bits = BitConverter.HalfToInt16Bits(value);
@@ -77,6 +82,7 @@ internal static class FloatAnalyzers
             TypeName: FloatTypeKind.Half
         );
     }
+#endif
     public static FloatInfo AnalyzeFloat(this float value)
     {
         var bits = BitConverter.SingleToInt32Bits(value);
@@ -129,5 +135,4 @@ internal static class FloatAnalyzers
             TypeName: FloatTypeKind.Double
         );
     }
-
 }

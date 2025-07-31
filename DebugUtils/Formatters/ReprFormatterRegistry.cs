@@ -38,7 +38,9 @@ public static class ReprFormatterRegistry
             [typeof(short)] = intFormatter, [typeof(ushort)] = intFormatter,
             [typeof(sbyte)] = intFormatter, [typeof(byte)] = intFormatter,
             [typeof(double)] = floatFormatter, [typeof(float)] = floatFormatter,
+#if NET5_0_OR_GREATER
             [typeof(Half)] = floatFormatter,
+#endif
 #if NET7_0_OR_GREATER
             [typeof(Int128)] = intFormatter, [typeof(UInt128)] = intFormatter,
 #endif

@@ -10,7 +10,9 @@ internal class FloatFormatter : IReprFormatter
     {
         var info = obj switch
         {
+#if NET5_0_OR_GREATER
             Half h => h.AnalyzeHalf(),
+#endif
             float f => f.AnalyzeFloat(),
             double d => d.AnalyzeDouble(),
             _ => throw new ArgumentException("Invalid type")
@@ -107,8 +109,10 @@ internal static class FloatFormatterLogic
             : 0);
         return info.TypeName switch
         {
+#if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{((Half)obj).ToString(roundingFormatString)}",
+#endif
             FloatTypeKind.Float =>
                 $"{((float)obj).ToString(roundingFormatString)}",
             FloatTypeKind.Double =>
@@ -121,8 +125,10 @@ internal static class FloatFormatterLogic
     {
         return info.TypeName switch
         {
+#if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{(Half)obj}",
+#endif
             FloatTypeKind.Float =>
                 $"{(float)obj}",
             FloatTypeKind.Double =>
@@ -138,8 +144,10 @@ internal static class FloatFormatterLogic
             : 0);
         return info.TypeName switch
         {
+#if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{((Half)obj).ToString(scientificFormatString)}",
+#endif
             FloatTypeKind.Float =>
                 $"{((float)obj).ToString(scientificFormatString)}",
             FloatTypeKind.Double =>
