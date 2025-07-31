@@ -19,7 +19,7 @@ internal static class TypeInspector
         return type.IsSignedPrimitiveType() || type == typeof(byte) || type == typeof(uint) ||
                type == typeof(ulong) || type == typeof(ushort);
     }
-#if NET7_0_OR_GREATER
+    #if NET7_0_OR_GREATER
     public static bool IsSignedPrimitiveTypeAfter7(this Type type)
     {
         return type == typeof(Int128);
@@ -28,7 +28,7 @@ internal static class TypeInspector
     {
         return type == typeof(Int128) || type == typeof(UInt128);
     }
-#endif
+    #endif
     public static bool IsFloatType(this Type type)
     {
         return type == typeof(float) || type == typeof(double) || type == typeof(Half);
@@ -105,6 +105,11 @@ internal static class TypeInspector
             return false;
         }
 
+        if (type.IsAssignableTo(typeof(Delegate)))
+        {
+            return false;
+        }
+
         if (type == typeof(string) || type == typeof(char) || type == typeof(bool))
         {
             return false;
@@ -116,12 +121,12 @@ internal static class TypeInspector
             return true;
         }
 
-#if NET7_0_OR_GREATER
+        #if NET7_0_OR_GREATER
         if (type == typeof(Int128) || type == typeof(UInt128))
         {
             return true;
         }
-#endif
+        #endif
 
         if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
             type == typeof(BigInteger))
