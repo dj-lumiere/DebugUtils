@@ -310,10 +310,7 @@ internal static class IntegerFormatterLogic
             ? $"-0x{hexString}"
             : $"0x{hexString}";
     }
-}
-
-internal static class IntegerFormatterLogicExtensions
-{
+    
 #if NET7_0_OR_GREATER
     public static string FormatUInt128AsBinary(this UInt128 value)
     {
