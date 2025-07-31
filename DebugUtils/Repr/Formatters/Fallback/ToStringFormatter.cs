@@ -1,7 +1,7 @@
 ﻿using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Fallback;
 
 // The default formatter that opts for ToString. This formatter should not be used when
 // ToString method overrides object.ToString.

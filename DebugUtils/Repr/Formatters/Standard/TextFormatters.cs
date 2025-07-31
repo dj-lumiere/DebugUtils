@@ -2,7 +2,7 @@
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(string))]
 public class StringFormatter : IReprFormatter

@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Fallback;
 
 /// <summary>
 ///     The default object pointer that handles any type not specifically registered.

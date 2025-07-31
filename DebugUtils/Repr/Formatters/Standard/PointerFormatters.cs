@@ -1,8 +1,9 @@
 ﻿using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
+
 // ReSharper disable BuiltInTypeReferenceStyle
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(IntPtr))]
 public class IntPtrFormatter : IReprFormatter
