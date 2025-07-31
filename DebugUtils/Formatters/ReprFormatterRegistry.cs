@@ -41,6 +41,10 @@ public static class ReprFormatterRegistry
 #if NET5_0_OR_GREATER
             [typeof(Half)] = floatFormatter,
 #endif
+#if NET6_0_OR_GREATER
+            [typeof(DateOnly)] = new DateOnlyFormatter(),
+            [typeof(TimeOnly)] = new TimeOnlyFormatter(),
+#endif
 #if NET7_0_OR_GREATER
             [typeof(Int128)] = intFormatter, [typeof(UInt128)] = intFormatter,
 #endif
@@ -123,6 +127,21 @@ public class TimeSpanFormatter : IReprFormatter
     public string ToRepr(object o, ReprConfig c, HashSet<int>? v) =>
         $"{((TimeSpan)o).TotalSeconds:0.000}s";
 }
+
+#if NET6_0_OR_GREATER
+public class DateOnlyFormatter : IReprFormatter
+{
+    public string ToRepr(object o, ReprConfig c, HashSet<int>? v) =>
+        ((DateOnly)o).ToString("yyyy-MM-dd");
+}
+
+public class TimeOnlyFormatter : IReprFormatter
+{
+    public string ToRepr(object o, ReprConfig c, HashSet<int>? v) =>
+        ((TimeOnly)o).ToString("HH:mm:ss");
+}
+
+#endif
 
 public class EnumFormatter : IReprFormatter
 {
