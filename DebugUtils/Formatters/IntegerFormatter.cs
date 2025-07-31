@@ -33,11 +33,19 @@ internal static class IntegerFormatterLogic
         if (obj is Int128 i128)
         {
             var ui128 = (UInt128)i128;
+            // Check if the original value was negative by testing the sign bit (bit 63).
             var isNegative = i128 < 0;
+            // If it is less than 0 in signed representation, then negate using that
+            // negative number is implemented using two's complement representation.
+            // Negating all the bits means subtracting ui128 from
+            // 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF,
+            // hence the +1 offset afterward.
+            // It has to be done this way because when the value is int128(-2**67) then
+            // simple negating would cause integer overflow.
             if (isNegative)
             {
                 ui128 = ~ui128 +
-                        1; // negating all the bits means subtracting ui128 from 0xFFFF_FFFF_FFFF_FFFF, hence the +1 offset afterward.
+                        1;
             }
 
             return isNegative
@@ -95,7 +103,15 @@ internal static class IntegerFormatterLogic
         if (obj is Int128 i128)
         {
             var ui128 = (UInt128)i128;
+            // Check if the original value was negative by testing the sign bit (bit 63).
             var isNegative = i128 < 0;
+            // If it is less than 0 in signed representation, then negate using that
+            // negative number is implemented using two's complement representation.
+            // Negating all the bits means subtracting ui128 from
+            // 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF,
+            // hence the +1 offset afterward.
+            // It has to be done this way because when the value is int128(-2**67) then
+            // simple negating would cause integer overflow.
             if (isNegative)
             {
                 ui128 = ~ui128 +
@@ -116,15 +132,15 @@ internal static class IntegerFormatterLogic
             .IsSignedPrimitiveType())
         {
             // cast sbyte, short, int, long to ulong
-            // Negative values get sign-extended, filling upper bits with 1s.
+            // Negative values get sign-extended, filling upper bits with ones.
             var ul = obj.SignExtendConvertToUlong();
             // Check if the original value was negative by testing the sign bit (bit 63).
             var isNegative = ul >= 0x8000000000000000L;
             // If it is less than 0 in signed representation, then negate using that
             // negative number is implemented using two's complement representation.
-            // negating all the bits means subtracting ul from 0xFFFF_FFFF_FFFF_FFFF,
+            // Negating all the bits means subtracting ul from 0xFFFF_FFFF_FFFF_FFFF,
             // hence the +1 offset afterward.
-            // it has to be done this way because when the value is long(-2**63) then
+            // It has to be done this way because when the value is long(-2**63) then
             // simple negating would cause integer overflow.
             if (isNegative)
             {
