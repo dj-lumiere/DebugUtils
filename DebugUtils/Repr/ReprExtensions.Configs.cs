@@ -1,4 +1,6 @@
-﻿namespace DebugUtils.Repr;
+﻿using DebugUtils.Repr.Records;
+
+namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {
@@ -35,4 +37,16 @@ public static partial class ReprExtensions
         [key: typeof(string)] = "string",
         [key: typeof(bool)] = "bool"
     };
+
+    public static ReprConfig GetContainerConfig(this ReprConfig config)
+    {
+        return config.containerBehavior switch
+        {
+            ContainerBehavior.UseParentConfig => config,
+            ContainerBehavior.UseSimpleFormats => ReprConfig.ContainerDefaults,
+            ContainerBehavior.UseCustomConfig => config.CustomContainerConfig ??
+                                                 ReprConfig.ContainerDefaults,
+            _ => ReprConfig.GlobalDefaults
+        };
+    }
 }

@@ -19,6 +19,7 @@ public class RecordFormatter : IReprFormatter
         var type = obj.GetType();
         var parts = new List<string>();
         visited ??= new HashSet<int>();
+        config = config.GetContainerConfig();
 
         // Get public properties with getters
         var properties = type

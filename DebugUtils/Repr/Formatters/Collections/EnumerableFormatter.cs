@@ -10,9 +10,7 @@ public class EnumerableFormatter : IReprFormatter
     {
         var list = (IEnumerable)obj;
         // Apply container defaults if configured
-        config = config.ForceFloatModeInContainer && config.ForceIntModeInContainer
-            ? config
-            : ReprConfig.ContainerDefaults;
+        config = config.GetContainerConfig();
 
         var items = list.Cast<object>()
             .Select(selector: item => item?.Repr(config: config, visited: visited) ?? "null");

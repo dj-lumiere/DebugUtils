@@ -10,9 +10,7 @@ public class DictionaryFormatter : IReprFormatter
     {
         var dict = (IDictionary)obj;
         // Apply container defaults if configured
-        config = config.ForceFloatModeInContainer && config.ForceIntModeInContainer
-            ? config
-            : ReprConfig.ContainerDefaults;
+        config = config.GetContainerConfig();
 
         if (dict.Count == 0)
         {

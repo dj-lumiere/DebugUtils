@@ -64,6 +64,14 @@ public enum TypeReprMode
     AlwaysHide
 }
 
+public enum ContainerBehavior
+{
+    UseDefaultConfig, // Use default config
+    UseParentConfig, // Use the same config as parent
+    UseSimpleFormats, // Force simple formats (General float, Decimal int)
+    UseCustomConfig // Use explicit container config
+}
+
 /// <summary>
 ///     Configuration options for controlling how objects are represented in string form.
 /// </summary>
@@ -92,25 +100,23 @@ public enum TypeReprMode
 public record ReprConfig(
     FloatReprMode FloatMode = FloatReprMode.General,
     int FloatPrecision = 2,
-    bool ForceFloatModeInContainer = true,
     IntReprMode IntMode = IntReprMode.Decimal,
-    bool ForceIntModeInContainer = true,
+    ContainerBehavior containerBehavior = ContainerBehavior.UseSimpleFormats,
+    ReprConfig? CustomContainerConfig = null,
     TypeReprMode TypeMode = TypeReprMode.HideObvious
 )
 {
     public static ReprConfig ContainerDefaults => new(
         FloatMode: FloatReprMode.General,
         FloatPrecision: 2,
-        ForceFloatModeInContainer: true,
+        containerBehavior: ContainerBehavior.UseSimpleFormats,
         IntMode: IntReprMode.Decimal,
-        ForceIntModeInContainer: true,
         TypeMode: TypeReprMode.HideObvious);
 
     public static ReprConfig GlobalDefaults => new(
         FloatMode: FloatReprMode.Exact,
         FloatPrecision: -1,
-        ForceFloatModeInContainer: true,
+        containerBehavior: ContainerBehavior.UseDefaultConfig,
         IntMode: IntReprMode.Decimal,
-        ForceIntModeInContainer: true,
         TypeMode: TypeReprMode.HideObvious);
 }

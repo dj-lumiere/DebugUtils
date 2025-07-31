@@ -14,6 +14,7 @@ public class ReflectionFormatter : IReprFormatter
     {
         var type = obj.GetType();
         var parts = new List<string>();
+        config = config.GetContainerConfig();
 
         // Get public fields
         var fields = type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance);

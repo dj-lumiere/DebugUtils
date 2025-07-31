@@ -9,9 +9,7 @@ public class ArrayFormatter : IReprFormatter
     {
         var array = (Array)obj;
         // Apply container defaults if configured
-        config = config.ForceFloatModeInContainer && config.ForceIntModeInContainer
-            ? config
-            : ReprConfig.ContainerDefaults;
+        config = config.GetContainerConfig();
 
         var rank = array.Rank;
         var content = array.ArrayToReprRecursive(indices: new int[rank], dimension: 0,

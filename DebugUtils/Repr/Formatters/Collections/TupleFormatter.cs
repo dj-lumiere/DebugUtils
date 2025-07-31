@@ -12,9 +12,7 @@ public class TupleFormatter : IReprFormatter
         var tuple = (ITuple)obj;
         visited ??= new HashSet<int>();
         // Apply container defaults if configured
-        config = config.ForceFloatModeInContainer && config.ForceIntModeInContainer
-            ? config
-            : ReprConfig.ContainerDefaults;
+        config = config.GetContainerConfig();
 
         var sb = new StringBuilder();
         sb.Append(value: "(");
