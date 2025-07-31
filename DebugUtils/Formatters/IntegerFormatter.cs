@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Numerics;
 using System.Text;
+using DebugUtils.Records;
 
 namespace DebugUtils.Formatters;
 

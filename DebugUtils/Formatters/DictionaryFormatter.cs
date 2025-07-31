@@ -1,4 +1,5 @@
 using System.Collections;
+using DebugUtils.Records;
 
 namespace DebugUtils.Formatters;
 

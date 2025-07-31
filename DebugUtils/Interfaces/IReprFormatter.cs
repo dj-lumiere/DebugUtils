@@ -1,4 +1,6 @@
 
+using DebugUtils.Records;
+
 namespace DebugUtils.Formatters;
 
 /// <summary>

@@ -1,4 +1,6 @@
-﻿namespace DebugUtils.Formatters;
+﻿using DebugUtils.Records;
+
+namespace DebugUtils.Formatters;
 
 public class ArrayFormatter : IReprFormatter
 {

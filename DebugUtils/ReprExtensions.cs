@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using DebugUtils;
 using DebugUtils.Formatters;
+using DebugUtils.Records;
 
 namespace DebugUtils;
 public static partial class ReprExtensions

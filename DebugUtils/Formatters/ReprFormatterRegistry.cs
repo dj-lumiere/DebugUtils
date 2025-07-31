@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using DebugUtils.Records;
 
 namespace DebugUtils.Formatters;
 
@@ -70,7 +71,7 @@ public static class ReprFormatterRegistry
     }
 }
 
-// --- All Formatters now implement the same, single interface ---
+#region Formatters
 
 public class DegenerateFormatter : IReprFormatter
 {
@@ -86,6 +87,36 @@ public class CharFormatter : IReprFormatter
 {
     public string ToRepr(object o, ReprConfig c, HashSet<int>? v) =>
         CharFormatterLogic.FormatChar((char)o);
+}
+
+internal static class CharFormatterLogic
+{
+    public static string FormatChar(this char value)
+    {
+        switch (value)
+        {
+            case '\'': return "'''"; // Single quote
+            case '\"': return "'\"'"; // Double quote
+            case '\\': return @"'\\'"; // Backslash
+            case '\0': return @"'\0'"; // Null
+            case '\a': return @"'\a'"; // Alert
+            case '\b': return @"'\b'"; // Backspace
+            case '\f': return @"'\f'"; // Form feed
+            case '\n': return @"'\n'"; // Newline
+            case '\r': return @"'\r'"; // Carriage return
+            case '\t': return @"'\t'"; // Tab
+            case '\v': return @"'\v'"; // Vertical tab
+            case '\u00a0': return "'nbsp'"; // Non-breaking space
+            case '\u00ad': return "'shy'"; // Soft Hyphen
+        }
+
+        if (char.IsControl(value))
+        {
+            return $"'\\u{(int)value:X4}'";
+        }
+
+        return $"'{value}'";
+    }
 }
 
 public class BoolFormatter : IReprFormatter
@@ -192,32 +223,4 @@ public class DefaultObjectFormatter : IReprFormatter
     }
 }
 
-internal static class CharFormatterLogic
-{
-    public static string FormatChar(this char value)
-    {
-        switch (value)
-        {
-            case '\'': return "'''"; // Single quote
-            case '\"': return "'\"'"; // Double quote
-            case '\\': return @"'\\'"; // Backslash
-            case '\0': return @"'\0'"; // Null
-            case '\a': return @"'\a'"; // Alert
-            case '\b': return @"'\b'"; // Backspace
-            case '\f': return @"'\f'"; // Form feed
-            case '\n': return @"'\n'"; // Newline
-            case '\r': return @"'\r'"; // Carriage return
-            case '\t': return @"'\t'"; // Tab
-            case '\v': return @"'\v'"; // Vertical tab
-            case '\u00a0': return "'nbsp'"; // Non-breaking space
-            case '\u00ad': return "'shy'"; // Soft Hyphen
-        }
-
-        if (char.IsControl(value))
-        {
-            return $"'\\u{(int)value:X4}'";
-        }
-
-        return $"'{value}'";
-    }
-}
+#endregion
