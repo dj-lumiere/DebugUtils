@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
+using DebugUtils.Repr.Formatters;
 
 namespace DebugUtils.Repr.TypeLibraries;
 
@@ -108,6 +108,13 @@ internal static class TypeInspector
     }
     public static bool NeedsTypePrefixType(this Type type)
     {
+        // Check for the attribute first
+        var attr = type.GetCustomAttribute<ReprOptionsAttribute>();
+        if (attr != null)
+        {
+            return attr.NeedsPrefix;
+        }
+
         // Types that never need a prefix
         if (type.IsNullableStructType() || type.IsAssignableTo(targetType: typeof(Delegate)) ||
             type == typeof(string) || type == typeof(char) || type == typeof(bool) ||
@@ -121,9 +128,7 @@ internal static class TypeInspector
 
         // Types that always need a prefix
         if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
-            type == typeof(BigInteger) || type == typeof(Rune) || type == typeof(TimeSpan) ||
-            type == typeof(DateTime) || type == typeof(DateTimeOffset) || type.IsArray ||
-            type.IsRecordType())
+            type == typeof(BigInteger) || type.IsArray || type.IsRecordType())
         {
             return true;
         }
