@@ -63,6 +63,11 @@ public static class ReprFormatterRegistry
         if (type.OverridesToStringType()) return degenerateFormatter;
         return new DefaultObjectFormatter();
     }
+
+    public static void RegisterFormatter<T>(IReprFormatter formatter)
+    {
+        Formatters[typeof(T)] = formatter;
+    }
 }
 
 // --- All Formatters now implement the same, single interface ---
