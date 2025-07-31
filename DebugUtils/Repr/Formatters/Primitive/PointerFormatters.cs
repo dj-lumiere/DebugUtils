@@ -3,6 +3,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Primitive;
 
+[ReprFormatter(typeof(IntPtr))]
 public class IntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -13,6 +14,7 @@ public class IntPtrFormatter : IReprFormatter
     }
 }
 
+[ReprFormatter(typeof(UIntPtr))]
 public class UIntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

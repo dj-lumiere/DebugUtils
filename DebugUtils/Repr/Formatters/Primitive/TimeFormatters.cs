@@ -3,6 +3,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Primitive;
 
+[ReprFormatter(typeof(DateTime))]
 public class DateTimeFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -11,6 +12,7 @@ public class DateTimeFormatter : IReprFormatter
     }
 }
 
+[ReprFormatter(typeof(DateTimeOffset))]
 public class DateTimeOffsetFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -19,6 +21,7 @@ public class DateTimeOffsetFormatter : IReprFormatter
     }
 }
 
+[ReprFormatter(typeof(TimeSpan))]
 public class TimeSpanFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -28,6 +31,7 @@ public class TimeSpanFormatter : IReprFormatter
 }
 
 #if NET6_0_OR_GREATER
+[ReprFormatter(typeof(DateOnly))]
 public class DateOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -36,6 +40,7 @@ public class DateOnlyFormatter : IReprFormatter
     }
 }
 
+[ReprFormatter(typeof(TimeOnly))]
 public class TimeOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

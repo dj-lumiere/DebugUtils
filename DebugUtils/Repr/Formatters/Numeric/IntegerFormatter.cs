@@ -7,6 +7,12 @@ using DebugUtils.Repr.TypeLibraries;
 
 namespace DebugUtils.Repr.Formatters.Numeric;
 
+[ReprFormatter(typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int),
+    typeof(uint), typeof(long), typeof(ulong), typeof(BigInteger)
+#if NET7_0_OR_GREATER
+    , typeof(Int128), typeof(UInt128)
+#endif
+)]
 public class IntegerFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
@@ -117,7 +123,7 @@ internal static class IntegerFormatterLogic
             if (isNegative)
             {
                 ui128 = ~ui128 +
-                        1; 
+                        1;
             }
 
             return isNegative
@@ -393,7 +399,6 @@ internal static class IntegerFormatterLogic
         var highBytes = (ulong)(value >> 64);
         var lowBytes = (ulong)value;
         var bytes = new byte[16];
-        var index = 0;
         Array.Copy(sourceArray: BitConverter.GetBytes(value: lowBytes), sourceIndex: 0,
             destinationArray: bytes, destinationIndex: 0, length: 8);
         Array.Copy(sourceArray: BitConverter.GetBytes(value: highBytes), sourceIndex: 0,

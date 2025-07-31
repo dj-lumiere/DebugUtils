@@ -6,6 +6,13 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Numeric;
 
+[ReprFormatter(
+    typeof(float),
+    typeof(double),
+#if NET5_0_OR_GREATER
+    typeof(Half)
+#endif
+)]
 internal class FloatFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
