@@ -1,59 +1,16 @@
-﻿namespace DebugUtils.Formatters;
+﻿using DebugUtils.Records;
 
-public enum FloatTypeKind
-{
-    Half,
-    Float,
-    Double
-}
-
-/// <summary>
-/// Encapsulates IEEE 754 floating-point format specifications.
-/// Contains bit masks and offsets needed for precise floating-point analysis.
-/// </summary>
-public record FloatsSpec(
-    int ExpBitSize,
-    int MantissaBitSize,
-    int TotalSize,
-    long MantissaMask,
-    long MantissaMsbMask,
-    long ExpMask,
-    int ExpOffset
-)
-{
-#if NET5_0_OR_GREATER
-    public static FloatsSpec HalfSpec =>
-        new(5, 10, 16, 0x3FF, 0x3FF, 0x1F, 15);
-#endif
-    public static FloatsSpec FloatSpec => new(8, 23, 32, 0x7FFFFF, 0x7FFFFF, 0xFF, 127);
-
-    public static FloatsSpec DoubleSpec =>
-        new(11, 52, 64, 0xFFFFFFFFFFFFFL, 0x8000000000000L, 0x7FFL, 1023);
-}
-
-public record FloatInfo(
-    FloatsSpec Spec,
-    long Bits,
-    bool IsNegative,
-    bool IsPositiveInfinity,
-    bool IsNegativeInfinity,
-    bool IsQuietNaN,
-    bool IsSignalingNaN,
-    int RealExponent,
-    long Mantissa,
-    ulong Significand,
-    string ExpBits,
-    string MantissaBits,
-    FloatTypeKind TypeName
-);
+namespace DebugUtils.Formatters;
 
 internal static class FloatAnalyzers
 {
 #if NET5_0_OR_GREATER
-    private static FloatsSpec halfSpec = FloatsSpec.HalfSpec;
+    private static FloatSpec halfSpec = new(5, 10, 16, 0x3FF, 0x3FF, 0x1F, 15);
 #endif
-    private static FloatsSpec floatSpec = FloatsSpec.FloatSpec;
-    private static FloatsSpec doubleSpec = FloatsSpec.DoubleSpec;
+    private static FloatSpec floatSpec = new(8, 23, 32, 0x7FFFFF, 0x7FFFFF, 0xFF, 127);
+
+    private static FloatSpec doubleSpec =
+        new(11, 52, 64, 0xFFFFFFFFFFFFFL, 0x8000000000000L, 0x7FFL, 1023);
 
 #if NET5_0_OR_GREATER
     public static FloatInfo AnalyzeHalf(this Half value)
