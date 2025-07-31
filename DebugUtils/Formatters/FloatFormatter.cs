@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 using DebugUtils.Records;
+using DebugUtils.Interfaces;
 
 namespace DebugUtils.Formatters;
 

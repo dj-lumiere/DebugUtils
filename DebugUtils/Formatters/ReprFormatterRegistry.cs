@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using DebugUtils.Records;
+using DebugUtils.Interfaces;
 
 namespace DebugUtils.Formatters;
 

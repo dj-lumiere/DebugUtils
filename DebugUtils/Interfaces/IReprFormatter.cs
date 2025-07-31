@@ -1,7 +1,7 @@
 
 using DebugUtils.Records;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Interfaces;
 
 /// <summary>
 /// Defines a contract for a formatter.

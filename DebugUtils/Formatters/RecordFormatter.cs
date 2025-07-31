@@ -1,5 +1,6 @@
 using System.Reflection;
 using DebugUtils.Records;
+using DebugUtils.Interfaces;
 
 namespace DebugUtils.Formatters;
 
