@@ -126,14 +126,7 @@ public class CharFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
-        return ((char)obj).FormatChar();
-    }
-}
-
-internal static class CharFormatterLogic
-{
-    public static string FormatChar(this char value)
-    {
+        var value = (char)obj;
         switch (value)
         {
             case '\'': return "'''"; // Single quote
