@@ -8,7 +8,7 @@ namespace DebugUtils.Formatters;
 
 internal class FloatFormatter : IReprFormatter
 {
-    public string ToRepr(object obj, ReprConfig reprConfig, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
     {
         var info = obj switch
         {
@@ -17,58 +17,58 @@ internal class FloatFormatter : IReprFormatter
 #endif
             float f => f.AnalyzeFloat(),
             double d => d.AnalyzeDouble(),
-            _ => throw new ArgumentException("Invalid type")
+            _ => throw new ArgumentException(message: "Invalid type")
         };
 
         // those two repr modes prioritize bit perfect representation, so they are processed first.
-        switch (reprConfig.FloatMode)
+        switch (config.FloatMode)
         {
             case FloatReprMode.HexBytes:
                 return info.TypeName switch
                 {
                     FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                        $"0x{info.Bits.ToString($"X{(info.Spec.TotalSize + 3) / 4}")}",
-                    _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+                        $"0x{info.Bits.ToString(format: $"X{(info.Spec.TotalSize + 3) / 4}")}",
+                    _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
                 };
             case FloatReprMode.BitField:
                 return info.TypeName switch
                 {
                     FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
                         $"{(info.IsNegative ? 1 : 0)}|{info.ExpBits}|{info.MantissaBits}",
-                    _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+                    _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
                 };
         }
 
         if (info.IsPositiveInfinity)
         {
-            return reprConfig.FloatMode switch
+            return config.FloatMode switch
             {
                 FloatReprMode.Exact or FloatReprMode.Scientific or FloatReprMode.Round
                     or FloatReprMode.General =>
-                    $"Infinity",
-                _ => throw new InvalidEnumArgumentException("Invalid FloatReprMode")
+                    "Infinity",
+                _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
             };
         }
 
         if (info.IsNegativeInfinity)
         {
-            return reprConfig.FloatMode switch
+            return config.FloatMode switch
             {
                 FloatReprMode.Exact or FloatReprMode.Scientific or FloatReprMode.Round
                     or FloatReprMode.General =>
-                    $"-Infinity",
-                _ => throw new InvalidEnumArgumentException("Invalid FloatReprMode")
+                    "-Infinity",
+                _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
             };
         }
 
         if (info.IsQuietNaN)
         {
-            return reprConfig.FloatMode switch
+            return config.FloatMode switch
             {
                 FloatReprMode.Exact or FloatReprMode.Scientific or FloatReprMode.Round
                     or FloatReprMode.General =>
-                    $"Quiet NaN",
-                _ => throw new InvalidEnumArgumentException("Invalid FloatReprMode")
+                    "Quiet NaN",
+                _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
             };
         }
 
@@ -77,26 +77,26 @@ internal class FloatFormatter : IReprFormatter
             var payloadFormat = info.TypeName switch
             {
                 FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                    $"Signaling NaN, Payload: 0x{info.Mantissa.ToString($"X{(info.Spec.MantissaBitSize + 3) / 4}")}",
-                _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+                    $"Signaling NaN, Payload: 0x{info.Mantissa.ToString(format: $"X{(info.Spec.MantissaBitSize + 3) / 4}")}",
+                _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
             };
 
-            return reprConfig.FloatMode switch
+            return config.FloatMode switch
             {
                 FloatReprMode.Exact or FloatReprMode.Scientific or FloatReprMode.Round
                     or FloatReprMode.General => payloadFormat,
-                _ => throw new InvalidEnumArgumentException("Invalid FloatReprMode")
+                _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
             };
         }
 
-        return reprConfig.FloatMode switch
+        return config.FloatMode switch
         {
-            FloatReprMode.Round => obj.AsRounding(info, reprConfig),
-            FloatReprMode.Scientific => obj.AsScientific(info, reprConfig),
-            FloatReprMode.General => obj.AsGeneral(info, reprConfig),
-            FloatReprMode.Exact => obj.AsExact(info),
+            FloatReprMode.Round => obj.AsRounding(info: info, reprConfig: config),
+            FloatReprMode.Scientific => obj.AsScientific(info: info, reprConfig: config),
+            FloatReprMode.General => obj.AsGeneral(info: info, reprConfig: config),
+            FloatReprMode.Exact => obj.AsExact(info: info),
 
-            _ => throw new InvalidEnumArgumentException("Invalid FloatReprMode")
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
         };
     }
 }
@@ -113,13 +113,13 @@ internal static class FloatFormatterLogic
         {
 #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
-                $"{((Half)obj).ToString(roundingFormatString)}",
+                $"{((Half)obj).ToString(format: roundingFormatString)}",
 #endif
             FloatTypeKind.Float =>
-                $"{((float)obj).ToString(roundingFormatString)}",
+                $"{((float)obj).ToString(format: roundingFormatString)}",
             FloatTypeKind.Double =>
-                $"{((double)obj).ToString(roundingFormatString)}",
-            _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+                $"{((double)obj).ToString(format: roundingFormatString)}",
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
     public static string AsGeneral(this object obj, FloatInfo info,
@@ -135,7 +135,7 @@ internal static class FloatFormatterLogic
                 $"{(float)obj}",
             FloatTypeKind.Double =>
                 $"{(double)obj}",
-            _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
     public static string AsScientific(this object obj, FloatInfo info,
@@ -148,13 +148,13 @@ internal static class FloatFormatterLogic
         {
 #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
-                $"{((Half)obj).ToString(scientificFormatString)}",
+                $"{((Half)obj).ToString(format: scientificFormatString)}",
 #endif
             FloatTypeKind.Float =>
-                $"{((float)obj).ToString(scientificFormatString)}",
+                $"{((float)obj).ToString(format: scientificFormatString)}",
             FloatTypeKind.Double =>
-                $"{((double)obj).ToString(scientificFormatString)}",
-            _ => throw new InvalidEnumArgumentException("Invalid FloatTypeKind")
+                $"{((double)obj).ToString(format: scientificFormatString)}",
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
     public static string AsExact(this object obj, FloatInfo info)
@@ -176,7 +176,7 @@ internal static class FloatFormatterLogic
 
         if (realExponent >= 0)
         {
-            numerator = significand * BigInteger.Pow(2, realExponent);
+            numerator = significand * BigInteger.Pow(value: 2, exponent: realExponent);
             powerOf10Denominator = 0;
         }
         else
@@ -184,16 +184,16 @@ internal static class FloatFormatterLogic
             // We want enough decimal places to represent 1/2^(-binaryExponent) exactly
             // Since 2^n × 5^n = spec.MantissaBitSize^n, we need n = -binaryExponent decimal places
             powerOf10Denominator = -realExponent;
-            numerator = significand * BigInteger.Pow(5, powerOf10Denominator);
+            numerator = significand * BigInteger.Pow(value: 5, exponent: powerOf10Denominator);
         }
 
         // Now we have: numerator / halfSpec.MantissaBitSize^powerOf10Denominator
-        var numeratorStr = numerator.ToString(CultureInfo.InvariantCulture);
+        var numeratorStr = numerator.ToString(provider: CultureInfo.InvariantCulture);
         var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
-        var integerPart = numeratorStr.Substring(0, 1);
-        var fractionalPart = numeratorStr.Substring(1)
-            .TrimEnd('0')
-            .PadLeft(1, '0');
+        var integerPart = numeratorStr.Substring(startIndex: 0, length: 1);
+        var fractionalPart = numeratorStr.Substring(startIndex: 1)
+            .TrimEnd(trimChar: '0')
+            .PadLeft(totalWidth: 1, paddingChar: '0');
         return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
     }
 }

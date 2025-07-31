@@ -1,26 +1,31 @@
 ﻿namespace DebugUtils.Records;
 
 /// <summary>
-/// Specifies how floating-point numbers should be represented.
+///     Specifies how floating-point numbers should be represented.
 /// </summary>
 public enum FloatReprMode
 {
     /// <summary>Exact decimal representation without rounding</summary>
     Exact,
+
     /// <summary>Scientific notation (e.g., 1.23E+4)</summary>
     Scientific,
+
     /// <summary>Fixed-point notation with specified precision</summary>
     Round,
+
     /// <summary>Default .NET formatting</summary>
     General,
+
     /// <summary>Raw bytes as hexadecimal</summary>
     HexBytes,
+
     /// <summary>IEEE 754 bit field representation (sign|exponent|mantissa)</summary>
     BitField
 }
 
 /// <summary>
-/// Specifies how integers should be represented.
+///     Specifies how integers should be represented.
 /// </summary>
 public enum IntReprMode
 {
@@ -38,27 +43,29 @@ public enum IntReprMode
 }
 
 /// <summary>
-/// Specifies when types should be represented.
+///     Specifies when types should be represented.
 /// </summary>
 public enum TypeReprMode
 {
     /// <summary>
-    /// Always show type info besides null.
+    ///     Always show type info besides null.
     /// </summary>
     AlwaysShow,
+
     /// <summary>
-    /// Hide obvious type names.
-    /// Those include Tuples, List, Set, Dictionary, string, char.
+    ///     Hide obvious type names.
+    ///     Those include Tuples, List, Set, Dictionary, string, char.
     /// </summary>
     HideObvious,
+
     /// <summary>
-    /// Do not show type names.
+    ///     Do not show type names.
     /// </summary>
     AlwaysHide
 }
 
 /// <summary>
-/// Configuration options for controlling how objects are represented in string form.
+///     Configuration options for controlling how objects are represented in string form.
 /// </summary>
 /// <param name="FloatMode">Specifies how floating-point numbers should be formatted</param>
 /// <param name="FloatPrecision">Number of decimal places for floating-point formatting (when applicable)</param>
@@ -67,7 +74,7 @@ public enum TypeReprMode
 /// <param name="ForceIntModeInContainer">Whether to apply IntMode when formatting integers inside containers</param>
 /// <param name="TypeMode">When true, suppresses type prefixes even for types that normally show them</param>
 /// <example>
-/// <code>
+///     <code>
 /// // Exact floating-point representation
 /// var exactConfig = new ReprConfig(FloatMode: FloatReprMode.Exact);
 /// 

@@ -48,7 +48,7 @@ public static partial class ReprExtensions
     {
         var type = obj?.GetType() ?? typeof(T);
 
-        if (CSharpTypeNames.TryGetValue(type, out var typeName))
+        if (CSharpTypeNames.TryGetValue(key: type, value: out var typeName))
         {
             return typeName;
         }
@@ -59,9 +59,9 @@ public static partial class ReprExtensions
         }
 
         var result = type.Name;
-        if (result.Contains('`'))
+        if (result.Contains(value: '`'))
         {
-            result = result.Split('`')[0];
+            result = result.Split(separator: '`')[0];
         }
 
         return result;
@@ -71,7 +71,7 @@ public static partial class ReprExtensions
         // Handle nullable types
         if (type.IsNullableStructType())
         {
-            var underlyingType = Nullable.GetUnderlyingType(type)!;
+            var underlyingType = Nullable.GetUnderlyingType(nullableType: type)!;
 
             if (underlyingType.IsTupleType())
             {
@@ -79,12 +79,12 @@ public static partial class ReprExtensions
             }
         }
 
-        if (CSharpTypeNames.TryGetValue(type, out var typeName))
+        if (CSharpTypeNames.TryGetValue(key: type, value: out var typeName))
         {
             return typeName;
         }
 
-        if (FriendlyTypeNames.TryGetValue(type, out var friendlyTypeName))
+        if (FriendlyTypeNames.TryGetValue(key: type, value: out var friendlyTypeName))
         {
             return friendlyTypeName;
         }
@@ -95,9 +95,9 @@ public static partial class ReprExtensions
         }
 
         var result = type.Name;
-        if (result.Contains('`'))
+        if (result.Contains(value: '`'))
         {
-            result = result.Split('`')[0];
+            result = result.Split(separator: '`')[0];
         }
 
         return result;

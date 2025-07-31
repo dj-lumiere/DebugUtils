@@ -19,7 +19,7 @@ internal static class TypeInspector
         return type.IsSignedPrimitiveType() || type == typeof(byte) || type == typeof(uint) ||
                type == typeof(ulong) || type == typeof(ushort);
     }
-    #if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER
     public static bool IsSignedPrimitiveTypeAfter7(this Type type)
     {
         return type == typeof(Int128);
@@ -28,7 +28,7 @@ internal static class TypeInspector
     {
         return type == typeof(Int128) || type == typeof(UInt128);
     }
-    #endif
+#endif
     public static bool IsFloatType(this Type type)
     {
         return type == typeof(float) || type == typeof(double) || type == typeof(Half);
@@ -37,21 +37,21 @@ internal static class TypeInspector
     {
         return type?.IsGenericType == true &&
                type.GetInterfaces()
-                   .Any(i => i.IsGenericType &&
-                             i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+                   .Any(predicate: i => i.IsGenericType &&
+                                        i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
     }
     public static bool IsSetType(this Type type)
     {
         return type?.IsGenericType == true &&
                type.GetInterfaces()
-                   .Any(i => i.IsGenericType &&
-                             i.GetGenericTypeDefinition() == typeof(ISet<>));
+                   .Any(predicate: i => i.IsGenericType &&
+                                        i.GetGenericTypeDefinition() == typeof(ISet<>));
     }
     public static bool IsRecordType(this Type type)
     {
         // Check for EqualityContract property (records have this)
-        var equalityContract = type.GetProperty("EqualityContract",
-            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        var equalityContract = type.GetProperty(name: "EqualityContract",
+            bindingAttr: BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         return equalityContract != null;
     }
     public static bool IsTupleType(this Type type)
@@ -94,7 +94,7 @@ internal static class TypeInspector
     public static bool OverridesToStringType(this Type type)
     {
         // Check for explicit ToString() override
-        var toStringMethod = type.GetMethod("ToString", Type.EmptyTypes);
+        var toStringMethod = type.GetMethod(name: "ToString", types: Type.EmptyTypes);
         return toStringMethod?.DeclaringType == type;
     }
     public static bool NeedsTypePrefixType(this Type type)
@@ -116,13 +116,13 @@ internal static class TypeInspector
             return true;
         }
 
-        #if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER
         if (type == typeof(Int128) || type == typeof(UInt128))
         {
             return true;
         }
-        #endif
-        
+#endif
+
         if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
             type == typeof(BigInteger))
         {
@@ -136,14 +136,15 @@ internal static class TypeInspector
         }
 
         // nothing is attached
-        if (type.IsGenericTypeOf(typeof(List<>)) || type.IsGenericTypeOf(typeof(Dictionary<,>)) ||
-            type.IsGenericTypeOf(typeof(HashSet<>)))
+        if (type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) ||
+            type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>)) ||
+            type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)))
         {
             return false;
         }
 
 
-        if (type.IsAssignableTo(typeof(ITuple)) ||
+        if (type.IsAssignableTo(targetType: typeof(ITuple)) ||
             type.IsEnum)
         {
             return false;

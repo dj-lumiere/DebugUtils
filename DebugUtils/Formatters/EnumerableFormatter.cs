@@ -14,13 +14,14 @@ public class EnumerableFormatter : IReprFormatter
             ? config
             : ReprConfig.ContainerDefaults;
 
-        var items = list.Cast<object>().Select(item => item?.Repr(config, visited) ?? "null");
-        
+        var items = list.Cast<object>()
+            .Select(selector: item => item?.Repr(config: config, visited: visited) ?? "null");
+
         if (obj.IsSet())
         {
-            return "{" + string.Join(", ", items) + "}";
+            return "{" + String.Join(separator: ", ", values: items) + "}";
         }
 
-        return "[" + string.Join(", ", items) + "]";
+        return "[" + String.Join(separator: ", ", values: items) + "]";
     }
 }

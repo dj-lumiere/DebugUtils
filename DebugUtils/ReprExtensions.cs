@@ -1,41 +1,47 @@
 using System.Runtime.CompilerServices;
-using DebugUtils;
 using DebugUtils.Formatters;
 using DebugUtils.Records;
 
 namespace DebugUtils;
+
 public static partial class ReprExtensions
 {
-    public static string Repr<T>(this T obj, ReprConfig? reprConfig = null,
+    public static string Repr<T>(this T obj, ReprConfig? config = null,
         HashSet<int>? visited = null)
     {
-        reprConfig ??= ReprConfig.GlobalDefaults;
+        config ??= ReprConfig.GlobalDefaults;
         visited ??= new HashSet<int>();
 
         // 1. Handle Nullable<T> as a special case first.
         if (obj.IsNullableStruct())
         {
-            return FormatNullableValueType(obj, reprConfig);
+            return FormatNullableValueType(nullable: obj, config: config);
         }
 
-        if (obj is null) return "null";
+        if (obj is null)
+        {
+            return "null";
+        }
 
         // 2. Handle circular references for reference types.
         if (!obj.GetType()
                 .IsValueType)
         {
-            var id = RuntimeHelpers.GetHashCode(obj);
-            if (!visited.Add(id)) return $"<circular @{id:X8}>";
+            var id = RuntimeHelpers.GetHashCode(o: obj);
+            if (!visited.Add(item: id))
+            {
+                return $"<circular @{id:X8}>";
+            }
         }
 
         // 3. Get the correct formatter from the registry.
-        var formatter = ReprFormatterRegistry.GetFormatter(obj.GetType());
+        var formatter = ReprFormatterRegistry.GetFormatter(type: obj.GetType());
 
         string result;
         // 4. Call the formatter with the correct arguments.
         if (formatter is { } reprFormatter)
         {
-            result = reprFormatter.ToRepr(obj, reprConfig, visited);
+            result = reprFormatter.ToRepr(obj: obj, config: config, visited: visited);
         }
         else
         {
@@ -45,7 +51,7 @@ public static partial class ReprExtensions
         // 5. Cleanup and apply type prefix.
         try
         {
-            return reprConfig.TypeMode switch
+            return config.TypeMode switch
             {
                 TypeReprMode.AlwaysHide => result,
                 TypeReprMode.HideObvious => obj.NeedsTypePrefix()
@@ -57,15 +63,18 @@ public static partial class ReprExtensions
         finally
         {
             if (!obj.GetType()
-                    .IsValueType) visited.Remove(RuntimeHelpers.GetHashCode(obj));
+                    .IsValueType)
+            {
+                visited.Remove(item: RuntimeHelpers.GetHashCode(o: obj));
+            }
         }
     }
 
     // This method remains as it is, correctly handling the logic for Nullable<T>.
-    private static string FormatNullableValueType<T>(this T nullable, ReprConfig reprConfig)
+    private static string FormatNullableValueType<T>(this T nullable, ReprConfig config)
     {
         var type = typeof(T);
-        var underlyingType = System.Nullable.GetUnderlyingType(type)!;
+        var underlyingType = Nullable.GetUnderlyingType(nullableType: type)!;
         var reprName = underlyingType.GetReprTypeNameByTypeName();
 
         if (nullable == null)
@@ -73,8 +82,8 @@ public static partial class ReprExtensions
             return $"{reprName}?(null)";
         }
 
-        var value = type.GetProperty("Value")!.GetValue(nullable)!;
+        var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
         return
-            $"{reprName}?({value.Repr(reprConfig with { TypeMode = TypeReprMode.AlwaysHide })})";
+            $"{reprName}?({value.Repr(config: config with { TypeMode = TypeReprMode.AlwaysHide })})";
     }
 }

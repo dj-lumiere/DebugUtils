@@ -5,8 +5,8 @@ using DebugUtils.Interfaces;
 namespace DebugUtils.Formatters;
 
 /// <summary>
-/// A generic formatter for any record type.
-/// It uses reflection to represent the record's public properties.
+///     A generic formatter for any record type.
+///     It uses reflection to represent the record's public properties.
 /// </summary>
 public class RecordFormatter : IReprFormatter
 {
@@ -17,8 +17,9 @@ public class RecordFormatter : IReprFormatter
         visited ??= new HashSet<int>();
 
         // Get public properties with getters
-        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
+        var properties = type
+            .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+            .Where(predicate: p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
 
         foreach (var prop in properties)
         {
@@ -30,16 +31,17 @@ public class RecordFormatter : IReprFormatter
 
             try
             {
-                var value = prop.GetValue(obj);
+                var value = prop.GetValue(obj: obj);
                 // Recursively call the main Repr method for the value!
-                parts.Add($"{prop.Name}: {value.Repr(config, visited)}");
+                parts.Add(
+                    item: $"{prop.Name}: {value.Repr(config: config, visited: visited)}");
             }
             catch (Exception ex)
             {
-                parts.Add($"{prop.Name}: <Error: {ex.Message}>");
+                parts.Add(item: $"{prop.Name}: <Error: {ex.Message}>");
             }
         }
 
-        return $"{{ {string.Join(", ", parts)} }}";
+        return $"{{ {String.Join(separator: ", ", values: parts)} }}";
     }
 }

@@ -1,10 +1,9 @@
-
 using DebugUtils.Records;
 
 namespace DebugUtils.Interfaces;
 
 /// <summary>
-/// Defines a contract for a formatter.
+///     Defines a contract for a formatter.
 /// </summary>
 public interface IReprFormatter
 {

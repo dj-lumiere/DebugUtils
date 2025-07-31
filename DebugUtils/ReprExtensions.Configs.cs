@@ -1,40 +1,38 @@
 ﻿namespace DebugUtils;
 
-
-
 public static partial class ReprExtensions
 {
     public static readonly Dictionary<Type, string> CSharpTypeNames = new()
     {
-        [typeof(byte)] = "byte",
-        [typeof(sbyte)] = "sbyte",
-        [typeof(short)] = "short",
-        [typeof(ushort)] = "ushort",
-        [typeof(int)] = "int",
-        [typeof(uint)] = "uint",
-        [typeof(long)] = "long",
-        [typeof(ulong)] = "ulong",
-        [typeof(float)] = "float",
-        [typeof(double)] = "double",
-        [typeof(decimal)] = "decimal",
-        [typeof(object)] = "object",
+        [key: typeof(byte)] = "byte",
+        [key: typeof(sbyte)] = "sbyte",
+        [key: typeof(short)] = "short",
+        [key: typeof(ushort)] = "ushort",
+        [key: typeof(int)] = "int",
+        [key: typeof(uint)] = "uint",
+        [key: typeof(long)] = "long",
+        [key: typeof(ulong)] = "ulong",
+        [key: typeof(float)] = "float",
+        [key: typeof(double)] = "double",
+        [key: typeof(decimal)] = "decimal",
+        [key: typeof(object)] = "object"
     };
 
     public static readonly Dictionary<Type, string> FriendlyTypeNames = new()
     {
-        [typeof(List<>)] = "List",
-        [typeof(Dictionary<,>)] = "Dictionary",
-        [typeof(HashSet<>)] = "HashSet",
-        [typeof(LinkedList<>)] = "LinkedList",
-        [typeof(Queue<>)] = "Queue",
-        [typeof(Stack<>)] = "Stack",
-        [typeof(SortedDictionary<,>)] = "SortedDictionary",
-        [typeof(SortedSet<>)] = "SortedSet",
-        [typeof(LinkedListNode<>)] = "LinkedListNode",
-        [typeof(KeyValuePair<,>)] = "KeyValuePair",
-        [typeof(ValueTuple<,>)] = "ValueTuple",
-        [typeof(char)] = "char",
-        [typeof(string)] = "string",
-        [typeof(bool)] = "bool",
+        [key: typeof(List<>)] = "List",
+        [key: typeof(Dictionary<,>)] = "Dictionary",
+        [key: typeof(HashSet<>)] = "HashSet",
+        [key: typeof(LinkedList<>)] = "LinkedList",
+        [key: typeof(Queue<>)] = "Queue",
+        [key: typeof(Stack<>)] = "Stack",
+        [key: typeof(SortedDictionary<,>)] = "SortedDictionary",
+        [key: typeof(SortedSet<>)] = "SortedSet",
+        [key: typeof(LinkedListNode<>)] = "LinkedListNode",
+        [key: typeof(KeyValuePair<,>)] = "KeyValuePair",
+        [key: typeof(ValueTuple<,>)] = "ValueTuple",
+        [key: typeof(char)] = "char",
+        [key: typeof(string)] = "string",
+        [key: typeof(bool)] = "bool"
     };
 }

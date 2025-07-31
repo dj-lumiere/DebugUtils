@@ -8,20 +8,20 @@ namespace DebugUtils.Formatters;
 
 public class IntegerFormatter : IReprFormatter
 {
-    public string ToRepr(object obj, ReprConfig reprConfig, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
     {
         if (obj is null)
         {
-            throw new ArgumentNullException(nameof(obj));
+            throw new ArgumentNullException(paramName: nameof(obj));
         }
 
-        return reprConfig.IntMode switch
+        return config.IntMode switch
         {
             IntReprMode.Binary => obj.FormatAsBinary(),
             IntReprMode.Decimal => obj.ToString()!,
             IntReprMode.Hex => obj.FormatAsHex(),
             IntReprMode.HexBytes => obj.FormatAsHexBytes(),
-            _ => throw new InvalidEnumArgumentException("Invalid reprConfig")
+            _ => throw new InvalidEnumArgumentException(message: "Invalid Repr Config")
         };
     }
 }
@@ -87,7 +87,7 @@ internal static class IntegerFormatterLogic
             .IsIntegerPrimitiveType())
         {
             // cast byte, ushort, uint, ulong to ulong
-            var u = Convert.ToUInt64(obj);
+            var u = Convert.ToUInt64(value: obj);
             return $"0b{u.FormatUlongAsBinary()}";
         }
 
@@ -96,7 +96,7 @@ internal static class IntegerFormatterLogic
             return bi.FormatBigIntegerAsBinary();
         }
 
-        throw new ArgumentException("Invalid type");
+        throw new ArgumentException(message: "Invalid type");
     }
     public static string FormatAsHex(this object obj)
     {
@@ -116,7 +116,7 @@ internal static class IntegerFormatterLogic
             if (isNegative)
             {
                 ui128 = ~ui128 +
-                        1; // negating all the bits means subtracting ui128 from 0xFFFF_FFFF_FFFF_FFFF, hence the +1 offset afterward.
+                        1; 
             }
 
             return isNegative
@@ -157,7 +157,7 @@ internal static class IntegerFormatterLogic
             .IsIntegerPrimitiveType())
         {
             // cast byte, ushort, uint, ulong to ulong
-            var u = Convert.ToUInt64(obj);
+            var u = Convert.ToUInt64(value: obj);
             return $"0x{u.FormatUlongAsHex()}";
         }
 
@@ -166,7 +166,7 @@ internal static class IntegerFormatterLogic
             return bi.FormatBigIntegerAsHex();
         }
 
-        throw new ArgumentException("Invalid type");
+        throw new ArgumentException(message: "Invalid type");
     }
     public static string FormatAsHexBytes(this object obj)
     {
@@ -178,11 +178,11 @@ internal static class IntegerFormatterLogic
         var bytes = obj.GetBytes();
 
         // Reverse for big-endian display (the most significant byte first)
-        Array.Reverse(bytes);
-        return "0x" + Convert.ToHexString(bytes);
+        Array.Reverse(array: bytes);
+        return "0x" + Convert.ToHexString(inArray: bytes);
     }
 
-    private static Byte[] GetBytes(this object obj)
+    private static byte[] GetBytes(this object obj)
     {
         return obj switch
         {
@@ -193,17 +193,17 @@ internal static class IntegerFormatterLogic
                     : sb)
             },
             byte b => new[] { b }, // BitConverter.GetBytes(byte) doesn't exist
-            short s => BitConverter.GetBytes(s),
-            ushort us => BitConverter.GetBytes(us),
-            int i => BitConverter.GetBytes(i),
-            uint ui => BitConverter.GetBytes(ui),
-            long l => BitConverter.GetBytes(l),
-            ulong ul => BitConverter.GetBytes(ul),
+            short s => BitConverter.GetBytes(value: s),
+            ushort us => BitConverter.GetBytes(value: us),
+            int i => BitConverter.GetBytes(value: i),
+            uint ui => BitConverter.GetBytes(value: ui),
+            long l => BitConverter.GetBytes(value: l),
+            ulong ul => BitConverter.GetBytes(value: ul),
 #if NET7_0_OR_GREATER
             Int128 i128 => i128.GetBytesFromInt128(),
             UInt128 u128 => u128.GetBytesFromUInt128(),
 #endif
-            _ => throw new ArgumentException("Invalid type")
+            _ => throw new ArgumentException(message: "Invalid type")
         };
     }
     public static int GetByteSize<T>(this T obj)
@@ -217,22 +217,22 @@ internal static class IntegerFormatterLogic
 #if NET7_0_OR_GREATER
             Int128 or UInt128 => 16,
 #endif
-            _ => throw new ArgumentException("Invalid type")
+            _ => throw new ArgumentException(message: "Invalid type")
         };
     }
     public static ulong SignExtendConvertToUlong<T>(this T obj)
     {
         if (obj is null)
         {
-            throw new ArgumentNullException(nameof(obj));
+            throw new ArgumentNullException(paramName: nameof(obj));
         }
 
         if (!obj.IsIntegerPrimitive())
         {
-            throw new ArgumentException("Invalid type");
+            throw new ArgumentException(message: "Invalid type");
         }
 
-        var byteSize = GetByteSize(obj);
+        var byteSize = GetByteSize(obj: obj);
         var buffer = new byte[8];
         var bytes = obj.GetBytes();
 
@@ -250,40 +250,46 @@ internal static class IntegerFormatterLogic
             }
         }
 
-        var result = BitConverter.ToUInt64(buffer, 0);
+        var result = BitConverter.ToUInt64(value: buffer, startIndex: 0);
         return result;
     }
 
     public static string FormatUlongAsBinary(this ulong value)
     {
-        if (value == 0) return "0";
+        if (value == 0)
+        {
+            return "0";
+        }
 
         var highBytes = (uint)(value >> 32);
         var lowBytes = (uint)value;
 
         return ((highBytes != 0
-                    ? Convert.ToString(highBytes, 2)
+                    ? Convert.ToString(value: highBytes, toBase: 2)
                     : "") +
-                Convert.ToString(lowBytes, 2)
-                    .PadLeft(highBytes == 0
+                Convert.ToString(value: lowBytes, toBase: 2)
+                    .PadLeft(totalWidth: highBytes == 0
                         ? 0
-                        : 32, '0'))
+                        : 32, paddingChar: '0'))
             .ToUpper();
     }
     public static string FormatUlongAsHex(this ulong value)
     {
-        if (value == 0) return "0";
+        if (value == 0)
+        {
+            return "0";
+        }
 
         var highBytes = (uint)(value >> 32);
         var lowBytes = (uint)value;
 
         return ((highBytes != 0
-                    ? Convert.ToString(highBytes, 16)
+                    ? Convert.ToString(value: highBytes, toBase: 16)
                     : "") +
-                Convert.ToString(lowBytes, 16)
-                    .PadLeft(highBytes == 0
+                Convert.ToString(value: lowBytes, toBase: 16)
+                    .PadLeft(totalWidth: highBytes == 0
                         ? 0
-                        : 8, '0'))
+                        : 8, paddingChar: '0'))
             .ToUpper();
     }
 
@@ -303,11 +309,11 @@ internal static class IntegerFormatterLogic
         var result = new StringBuilder();
         while (value != 0)
         {
-            result.Append(value % 2);
+            result.Append(value: value % 2);
             value /= 2;
         }
 
-        var binaryString = string.Join("", result.ToString()
+        var binaryString = String.Join(separator: "", values: result.ToString()
             .Reverse());
         return signed
             ? $"-0b{binaryString}"
@@ -321,18 +327,21 @@ internal static class IntegerFormatterLogic
         }
 
         var signed = value < 0;
-        var absValue = BigInteger.Abs(value);
-        var hexString = absValue.ToString("X"); // Built-in hex formatting
+        var absValue = BigInteger.Abs(value: value);
+        var hexString = absValue.ToString(format: "X"); // Built-in hex formatting
 
         return signed
             ? $"-0x{hexString}"
             : $"0x{hexString}";
     }
-    
+
 #if NET7_0_OR_GREATER
     public static string FormatUInt128AsBinary(this UInt128 value)
     {
-        if (value == 0) return "0";
+        if (value == 0)
+        {
+            return "0";
+        }
 
         var highBytes = (ulong)(value >> 64);
         var lowBytes = (ulong)value;
@@ -341,14 +350,17 @@ internal static class IntegerFormatterLogic
                     ? highBytes.FormatUlongAsBinary()
                     : "") +
                 lowBytes.FormatUlongAsBinary()
-                    .PadLeft(highBytes == 0
+                    .PadLeft(totalWidth: highBytes == 0
                         ? 0
-                        : 64, '0'))
+                        : 64, paddingChar: '0'))
             .ToUpper();
     }
     public static string FormatUInt128AsHex(this UInt128 value)
     {
-        if (value == 0) return "0";
+        if (value == 0)
+        {
+            return "0";
+        }
 
         var highBytes = (ulong)(value >> 64);
         var lowBytes = (ulong)value;
@@ -357,13 +369,13 @@ internal static class IntegerFormatterLogic
                     ? highBytes.FormatUlongAsHex()
                     : "") +
                 lowBytes.FormatUlongAsHex()
-                    .PadLeft(highBytes == 0
+                    .PadLeft(totalWidth: highBytes == 0
                         ? 0
-                        : 16, '0'))
+                        : 16, paddingChar: '0'))
             .ToUpper();
     }
 
-    public static Byte[] GetBytesFromInt128(this Int128 value)
+    public static byte[] GetBytesFromInt128(this Int128 value)
     {
         var ui128 = (UInt128)value;
         var isNegative = value < 0;
@@ -375,14 +387,16 @@ internal static class IntegerFormatterLogic
 
         return ui128.GetBytesFromUInt128();
     }
-    public static Byte[] GetBytesFromUInt128(this UInt128 value)
+    public static byte[] GetBytesFromUInt128(this UInt128 value)
     {
         var highBytes = (ulong)(value >> 64);
         var lowBytes = (ulong)value;
-        var bytes = new Byte[16];
+        var bytes = new byte[16];
         var index = 0;
-        Array.Copy(BitConverter.GetBytes(lowBytes), 0, bytes, 0, 8);
-        Array.Copy(BitConverter.GetBytes(highBytes), 0, bytes, 8, 8);
+        Array.Copy(sourceArray: BitConverter.GetBytes(value: lowBytes), sourceIndex: 0,
+            destinationArray: bytes, destinationIndex: 0, length: 8);
+        Array.Copy(sourceArray: BitConverter.GetBytes(value: highBytes), sourceIndex: 0,
+            destinationArray: bytes, destinationIndex: 8, length: 8);
         return bytes;
     }
 

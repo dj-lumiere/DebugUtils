@@ -16,17 +16,20 @@ public class TupleFormatter : IReprFormatter
             ? config
             : ReprConfig.ContainerDefaults;
 
-        StringBuilder sb = new StringBuilder();
-        sb.Append("(");
-        for (int i = 0; i < tuple.Length; i++)
+        var sb = new StringBuilder();
+        sb.Append(value: "(");
+        for (var i = 0; i < tuple.Length; i++)
         {
             if (i > 0)
             {
-                sb.Append(", ");
+                sb.Append(value: ", ");
             }
-            sb.Append(tuple[i].Repr(config, visited));
+
+            sb.Append(value: tuple[index: i]
+                .Repr(config: config, visited: visited));
         }
-        sb.Append(")");
+
+        sb.Append(value: ")");
         return sb.ToString();
     }
 }

@@ -14,16 +14,20 @@ public class DictionaryFormatter : IReprFormatter
             ? config
             : ReprConfig.ContainerDefaults;
 
-        if (dict.Count == 0) return "{}";
-        var items = new List<string>();
-        
-        foreach (DictionaryEntry entry in dict)
+        if (dict.Count == 0)
         {
-            var key = entry.Key?.Repr(config, visited) ?? "null";
-            var value = entry.Value?.Repr(config, visited) ?? "null";
-            items.Add($"{key}: {value}");
+            return "{}";
         }
 
-        return "{" + string.Join(", ", items) + "}";
+        var items = new List<string>();
+
+        foreach (DictionaryEntry entry in dict)
+        {
+            var key = entry.Key?.Repr(config: config, visited: visited) ?? "null";
+            var value = entry.Value?.Repr(config: config, visited: visited) ?? "null";
+            items.Add(item: $"{key}: {value}");
+        }
+
+        return "{" + String.Join(separator: ", ", values: items) + "}";
     }
 }

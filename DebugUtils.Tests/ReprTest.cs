@@ -119,7 +119,7 @@ public class ReprTest
     public void TestByteRepr(IntReprMode mode, string expected)
     {
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, ((byte)42).Repr(reprConfig: config));
+        Assert.Equal(expected, ((byte)42).Repr(config: config));
     }
 
     [Theory]
@@ -130,7 +130,7 @@ public class ReprTest
     public void TestIntRepr(IntReprMode mode, string expected)
     {
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, (-42).Repr(reprConfig: config));
+        Assert.Equal(expected, (-42).Repr(config: config));
     }
 
 #if NET7_0_OR_GREATER
@@ -144,7 +144,7 @@ public class ReprTest
     {
         var i128 = Int128.MinValue;
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, i128.Repr(reprConfig: config));
+        Assert.Equal(expected, i128.Repr(config: config));
     }
 
     [Theory]
@@ -157,7 +157,7 @@ public class ReprTest
     {
         var i128 = Int128.MaxValue;
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, i128.Repr(reprConfig: config));
+        Assert.Equal(expected, i128.Repr(config: config));
     }
 #endif
 
@@ -165,7 +165,7 @@ public class ReprTest
     public void TestBigIntRepr()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal("BigInteger(-42)", new BigInteger(-42).Repr(reprConfig: config));
+        Assert.Equal("BigInteger(-42)", new BigInteger(-42).Repr(config: config));
     }
 
     // Floating Point Types
