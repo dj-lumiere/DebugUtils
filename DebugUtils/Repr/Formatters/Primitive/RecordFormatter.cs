@@ -1,10 +1,6 @@
-#region
-
 using System.Reflection;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
-
-#endregion
 
 namespace DebugUtils.Repr.Formatters.Primitive;
 
@@ -23,8 +19,8 @@ public class RecordFormatter : IReprFormatter
 
         // Get public properties with getters
         var properties = type
-            .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
-            .Where(predicate: p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
+                        .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                        .Where(predicate: p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
 
         foreach (var prop in properties)
         {

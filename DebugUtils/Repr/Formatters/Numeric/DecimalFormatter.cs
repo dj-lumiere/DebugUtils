@@ -22,13 +22,13 @@ public class DecimalFormatter : IReprFormatter
         var scale = (byte)(flags >> 16); // How many digits after decimal
         var isNegative = (flags & 0x80000000) != 0;
         var scaleBits = Convert.ToString(value: scale, toBase: 2)
-            .PadLeft(totalWidth: 8, paddingChar: '0');
+                               .PadLeft(totalWidth: 8, paddingChar: '0');
         var hiBits = Convert.ToString(value: hi, toBase: 2)
-            .PadLeft(totalWidth: 32, paddingChar: '0');
+                            .PadLeft(totalWidth: 32, paddingChar: '0');
         var midBits = Convert.ToString(value: mid, toBase: 2)
-            .PadLeft(totalWidth: 32, paddingChar: '0');
+                             .PadLeft(totalWidth: 32, paddingChar: '0');
         var loBits = Convert.ToString(value: lo, toBase: 2)
-            .PadLeft(totalWidth: 32, paddingChar: '0');
+                            .PadLeft(totalWidth: 32, paddingChar: '0');
 
         return config.FloatMode switch
         {
@@ -80,8 +80,8 @@ internal static class DecimalFormatterLogic
         var realPowerOf10 = valueStr.Length - (scale + 1);
         var integerPart = valueStr.Substring(startIndex: 0, length: 1);
         var fractionalPart = valueStr.Substring(startIndex: 1)
-            .TrimEnd(trimChar: '0')
-            .PadLeft(totalWidth: 1, paddingChar: '0');
+                                     .TrimEnd(trimChar: '0')
+                                     .PadLeft(totalWidth: 1, paddingChar: '0');
         return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
     }
 }

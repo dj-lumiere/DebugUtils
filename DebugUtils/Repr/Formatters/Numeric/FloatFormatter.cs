@@ -9,9 +9,9 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 [ReprFormatter(
     typeof(float),
     typeof(double),
-#if NET5_0_OR_GREATER
+    #if NET5_0_OR_GREATER
     typeof(Half)
-#endif
+    #endif
 )]
 internal class FloatFormatter : IReprFormatter
 {
@@ -19,9 +19,9 @@ internal class FloatFormatter : IReprFormatter
     {
         var info = obj switch
         {
-#if NET5_0_OR_GREATER
+            #if NET5_0_OR_GREATER
             Half h => h.AnalyzeHalf(),
-#endif
+            #endif
             float f => f.AnalyzeFloat(),
             double d => d.AnalyzeDouble(),
             _ => throw new ArgumentException(message: "Invalid type")
@@ -118,10 +118,10 @@ internal static class FloatFormatterLogic
             : 0);
         return info.TypeName switch
         {
-#if NET5_0_OR_GREATER
+            #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{((Half)obj).ToString(format: roundingFormatString)}",
-#endif
+            #endif
             FloatTypeKind.Float =>
                 $"{((float)obj).ToString(format: roundingFormatString)}",
             FloatTypeKind.Double =>
@@ -134,10 +134,10 @@ internal static class FloatFormatterLogic
     {
         return info.TypeName switch
         {
-#if NET5_0_OR_GREATER
+            #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{(Half)obj}",
-#endif
+            #endif
             FloatTypeKind.Float =>
                 $"{(float)obj}",
             FloatTypeKind.Double =>
@@ -153,10 +153,10 @@ internal static class FloatFormatterLogic
             : 0);
         return info.TypeName switch
         {
-#if NET5_0_OR_GREATER
+            #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{((Half)obj).ToString(format: scientificFormatString)}",
-#endif
+            #endif
             FloatTypeKind.Float =>
                 $"{((float)obj).ToString(format: scientificFormatString)}",
             FloatTypeKind.Double =>
@@ -199,8 +199,8 @@ internal static class FloatFormatterLogic
         var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
         var integerPart = numeratorStr.Substring(startIndex: 0, length: 1);
         var fractionalPart = numeratorStr.Substring(startIndex: 1)
-            .TrimEnd(trimChar: '0')
-            .PadLeft(totalWidth: 1, paddingChar: '0');
+                                         .TrimEnd(trimChar: '0')
+                                         .PadLeft(totalWidth: 1, paddingChar: '0');
         return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
     }
 }

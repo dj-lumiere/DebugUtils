@@ -13,8 +13,9 @@ public class SetFormatter : IReprFormatter
         config = config.GetContainerConfig();
 
         var items = list.Cast<object>()
-            .Select(selector: item => item?.Repr(config: config, visited: visited) ?? "null");
-        
+                        .Select(selector: item =>
+                             item?.Repr(config: config, visited: visited) ?? "null");
+
         return "{" + String.Join(separator: ", ", values: items) + "}";
     }
 }

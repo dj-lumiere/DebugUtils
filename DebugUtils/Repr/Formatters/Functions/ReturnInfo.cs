@@ -14,7 +14,7 @@ public class ReturnInfo
         var returnType = method.ReturnType;
         TypeName = returnType.GetReprTypeNameByTypeName();
         IsRef = returnType.IsByRef;
-        IsAsync = method.IsDefined(typeof(AsyncStateMachineAttribute));
+        IsAsync = method.IsDefined(attributeType: typeof(AsyncStateMachineAttribute));
     }
 
     public override string ToString()
@@ -33,6 +33,6 @@ internal static class ReturnInfoExtensions
 {
     public static ReturnInfo ToReturnInfo(this MethodInfo methodInfo)
     {
-        return new ReturnInfo(methodInfo);
+        return new ReturnInfo(method: methodInfo);
     }
 }

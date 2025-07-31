@@ -4,10 +4,10 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 
 internal static class FloatAnalyzers
 {
-#if NET5_0_OR_GREATER
+    #if NET5_0_OR_GREATER
     private static readonly FloatSpec halfSpec = new(ExpBitSize: 5, MantissaBitSize: 10,
         TotalSize: 16, MantissaMask: 0x3FF, MantissaMsbMask: 0x3FF, ExpMask: 0x1F, ExpOffset: 15);
-#endif
+    #endif
     private static readonly FloatSpec floatSpec = new(ExpBitSize: 8, MantissaBitSize: 23,
         TotalSize: 32, MantissaMask: 0x7FFFFF, MantissaMsbMask: 0x7FFFFF, ExpMask: 0xFF,
         ExpOffset: 127);
@@ -16,7 +16,7 @@ internal static class FloatAnalyzers
         new(ExpBitSize: 11, MantissaBitSize: 52, TotalSize: 64, MantissaMask: 0xFFFFFFFFFFFFFL,
             MantissaMsbMask: 0x8000000000000L, ExpMask: 0x7FFL, ExpOffset: 1023);
 
-#if NET5_0_OR_GREATER
+    #if NET5_0_OR_GREATER
     public static FloatInfo AnalyzeHalf(this Half value)
     {
         var bits = BitConverter.HalfToInt16Bits(value: value);
@@ -37,13 +37,13 @@ internal static class FloatAnalyzers
                 ? mantissa
                 : (1 << halfSpec.MantissaBitSize) + mantissa),
             ExpBits: Convert.ToString(value: rawExponent, toBase: 2)
-                .PadLeft(totalWidth: halfSpec.ExpBitSize, paddingChar: '0'),
+                            .PadLeft(totalWidth: halfSpec.ExpBitSize, paddingChar: '0'),
             MantissaBits: Convert.ToString(value: mantissa, toBase: 2)
-                .PadLeft(totalWidth: halfSpec.MantissaBitSize, paddingChar: '0'),
+                                 .PadLeft(totalWidth: halfSpec.MantissaBitSize, paddingChar: '0'),
             TypeName: FloatTypeKind.Half
         );
     }
-#endif
+    #endif
     public static FloatInfo AnalyzeFloat(this float value)
     {
         var bits = BitConverter.SingleToInt32Bits(value: value);
@@ -64,9 +64,9 @@ internal static class FloatAnalyzers
                 ? mantissa
                 : (1 << floatSpec.MantissaBitSize) + mantissa),
             ExpBits: Convert.ToString(value: rawExponent, toBase: 2)
-                .PadLeft(totalWidth: floatSpec.ExpBitSize, paddingChar: '0'),
+                            .PadLeft(totalWidth: floatSpec.ExpBitSize, paddingChar: '0'),
             MantissaBits: Convert.ToString(value: mantissa, toBase: 2)
-                .PadLeft(totalWidth: floatSpec.MantissaBitSize, paddingChar: '0'),
+                                 .PadLeft(totalWidth: floatSpec.MantissaBitSize, paddingChar: '0'),
             TypeName: FloatTypeKind.Float
         );
     }
@@ -90,9 +90,10 @@ internal static class FloatAnalyzers
                 ? mantissa
                 : (1L << doubleSpec.MantissaBitSize) + mantissa),
             ExpBits: Convert.ToString(value: rawExponent, toBase: 2)
-                .PadLeft(totalWidth: doubleSpec.ExpBitSize, paddingChar: '0'),
+                            .PadLeft(totalWidth: doubleSpec.ExpBitSize, paddingChar: '0'),
             MantissaBits: Convert.ToString(value: mantissa, toBase: 2)
-                .PadLeft(totalWidth: doubleSpec.MantissaBitSize, paddingChar: '0'),
+                                 .PadLeft(totalWidth: doubleSpec.MantissaBitSize,
+                                      paddingChar: '0'),
             TypeName: FloatTypeKind.Double
         );
     }

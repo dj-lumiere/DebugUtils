@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
-using static DebugUtils.CallStack;
 
 namespace DebugUtils.Repr.Formatters.Primitive;
 
@@ -56,7 +55,7 @@ internal static class JsonExtensions
 
         if (!type.IsValueType)
         {
-            if (!visited.Add(objHash))
+            if (!visited.Add(item: objHash))
             {
                 // json["type"] = $"CircularRef[{json["type"]}]";
                 return json;
@@ -70,7 +69,7 @@ internal static class JsonExtensions
             {
                 // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} is array");
                 var rank = array.Rank;
-                json.Add("elements",
+                json.Add(propertyName: "elements",
                     value: array.GetJsonFromArrayRecursive(config: config, visited: visited,
                         indices: new int[rank], dimension: 0, depth: depth + 1));
                 return json;
@@ -82,7 +81,7 @@ internal static class JsonExtensions
                 for (var i = 0; i < tuple.Length; i++)
                 {
                     entries.Add(value: tuple[index: i]
-                      ?.GetJson(config: config, visited: visited, depth + 1) ?? null);
+                      ?.GetJson(config: config, visited: visited, depth: depth + 1) ?? null);
                 }
 
                 json.Add(propertyName: "count", value: tuple.Length);
@@ -97,10 +96,12 @@ internal static class JsonExtensions
                 {
                     var entryJson = new JsonObject
                     {
-                        ["key"] = entry.Key?.GetJson(config, visited, depth + 1),
-                        ["value"] = entry.Value?.GetJson(config, visited, depth + 1)
+                        [propertyName: "key"] = entry.Key?.GetJson(config: config,
+                            visited: visited, depth: depth + 1),
+                        [propertyName: "value"] = entry.Value?.GetJson(config: config,
+                            visited: visited, depth: depth + 1)
                     };
-                    entries.Add(entryJson);
+                    entries.Add(value: entryJson);
                 }
 
                 json.Add(propertyName: "count", value: dict.Count);
@@ -115,7 +116,8 @@ internal static class JsonExtensions
                 foreach (var item in list)
                 {
                     count += 1;
-                    jsonlist.Add(value: item.GetJson(config: config, visited: visited, depth + 1));
+                    jsonlist.Add(value: item.GetJson(config: config, visited: visited,
+                        depth: depth + 1));
                 }
 
                 json.Add(propertyName: "count", value: count);
@@ -146,8 +148,8 @@ internal static class JsonExtensions
                 continue;
             }
 
-            if (prop.Name.Contains("Assembly") ||
-                (prop.Name.StartsWith("Is") && Char.IsUpper(prop.Name[2])))
+            if (prop.Name.Contains(value: "Assembly") ||
+                prop.Name.StartsWith(value: "Is") && Char.IsUpper(c: prop.Name[index: 2]))
             {
                 continue;
             }

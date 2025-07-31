@@ -14,8 +14,7 @@ public static partial class ReprExtensions
 
         if (array.GetType()
                 .GetElementType()
-                ?
-                .IsArray ?? false)
+                ?.IsArray ?? false)
         {
             return "JaggedArray";
         }
@@ -36,7 +35,7 @@ public static partial class ReprExtensions
         }
 
         if (type.GetElementType()
-                ?.IsArray ?? false)
+               ?.IsArray ?? false)
         {
             return "JaggedArray";
         }

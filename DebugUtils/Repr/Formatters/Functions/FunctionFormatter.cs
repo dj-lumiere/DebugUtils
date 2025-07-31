@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;

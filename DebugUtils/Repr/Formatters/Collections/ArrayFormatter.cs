@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Nodes;
-using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;

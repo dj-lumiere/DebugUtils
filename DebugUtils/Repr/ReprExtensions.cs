@@ -1,8 +1,12 @@
+#region
+
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
 using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
+
+#endregion
 
 namespace DebugUtils.Repr;
 

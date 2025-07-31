@@ -11,27 +11,36 @@ internal static class TypeInspector
 
     public static bool IsSignedPrimitiveType(this Type type)
     {
-        return type == typeof(sbyte) || type == typeof(short) || type == typeof(int) ||
-               type == typeof(long);
+
+        return type == typeof(sbyte)
+               || type == typeof(short)
+               || type == typeof(int)
+               || type == typeof(long)
+               #if NET7_0_OR_GREATER
+               || type == typeof(Int128)
+            #endif
+            ;
     }
     public static bool IsIntegerPrimitiveType(this Type type)
     {
-        return type.IsSignedPrimitiveType() || type == typeof(byte) || type == typeof(uint) ||
-               type == typeof(ulong) || type == typeof(ushort);
+        return type.IsSignedPrimitiveType()
+               || type == typeof(byte)
+               || type == typeof(ushort)
+               || type == typeof(uint)
+               || type == typeof(ulong)
+               #if NET7_0_OR_GREATER
+               || type == typeof(Int128)
+            #endif
+            ;
     }
-    #if NET7_0_OR_GREATER
-    public static bool IsSignedPrimitiveTypeAfter7(this Type type)
-    {
-        return type == typeof(Int128);
-    }
-    public static bool IsIntegerPrimitiveTypeAfter7(this Type type)
-    {
-        return type == typeof(Int128) || type == typeof(UInt128);
-    }
-    #endif
     public static bool IsFloatType(this Type type)
     {
-        return type == typeof(float) || type == typeof(double) || type == typeof(Half);
+        return type == typeof(float)
+               || type == typeof(double)
+               #if NET5_0_OR_GREATER
+               || type == typeof(Half)
+            #endif
+            ;
     }
     public static bool IsDictionaryType(this Type type)
     {
@@ -99,78 +108,28 @@ internal static class TypeInspector
     }
     public static bool NeedsTypePrefixType(this Type type)
     {
-        // nothing is attached
-        if (type.IsNullableStructType())
-        {
-            return false;
-        }
-
-        if (type.IsAssignableTo(typeof(Delegate)))
-        {
-            return false;
-        }
-
-        if (type == typeof(string) || type == typeof(char) || type == typeof(bool))
-        {
-            return false;
-        }
-
-        if (type == typeof(Rune) || type == typeof(TimeSpan) || type == typeof(DateTime) ||
-            type == typeof(DateTimeOffset))
-        {
-            return true;
-        }
-
-        #if NET7_0_OR_GREATER
-        if (type == typeof(Int128) || type == typeof(UInt128))
-        {
-            return true;
-        }
-        #endif
-
-        if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
-            type == typeof(BigInteger))
-        {
-            return true;
-        }
-
-        // will use a special type prefix
-        if (type.IsArray)
-        {
-            return true;
-        }
-
-        // nothing is attached
-        if (type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) ||
+        // Types that never need a prefix
+        if (type.IsNullableStructType() || type.IsAssignableTo(targetType: typeof(Delegate)) ||
+            type == typeof(string) || type == typeof(char) || type == typeof(bool) ||
+            type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) ||
             type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>)) ||
-            type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)))
+            type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)) ||
+            type.IsAssignableTo(targetType: typeof(ITuple)) || type.IsEnum)
         {
             return false;
         }
 
-
-        if (type.IsAssignableTo(targetType: typeof(ITuple)) ||
-            type.IsEnum)
-        {
-            return false;
-        }
-
-        if (type.IsRecordType())
+        // Types that always need a prefix
+        if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
+            type == typeof(BigInteger) || type == typeof(Rune) || type == typeof(TimeSpan) ||
+            type == typeof(DateTime) || type == typeof(DateTimeOffset) || type.IsArray ||
+            type.IsRecordType())
         {
             return true;
         }
 
-        if (type.IsValueType && type.OverridesToStringType())
-        {
-            return false;
-        }
-
-        if (type.OverridesToStringType())
-        {
-            return false;
-        }
-
-        return true;
+        // Other types
+        return !type.OverridesToStringType();
     }
     public static bool IsGenericTypeOf(this Type type, Type genericTypeDefinition)
     {

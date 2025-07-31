@@ -39,15 +39,23 @@ internal static class ParameterDetailsExtensions
         if (param.ParameterType.IsByRef)
         {
             if (param.IsOut)
+            {
                 return "out";
+            }
+
             if (param.IsIn)
+            {
                 return "in";
+            }
+
             return "ref"; // Default for ByRef that's not in/out
         }
 
         // Check for params array
-        if (param.IsDefined(typeof(ParamArrayAttribute)))
+        if (param.IsDefined(attributeType: typeof(ParamArrayAttribute)))
+        {
             return "params";
+        }
 
         return ""; // No modifier
     }

@@ -27,7 +27,7 @@ internal static class FunctionDetailsExtensions
 {
     public static FunctionDetails ToFunctionDetails(this MethodInfo methodInfo)
     {
-        return new FunctionDetails(methodInfo);
+        return new FunctionDetails(methodInfo: methodInfo);
     }
 
     public static string GetSanitizedName(this MethodInfo methodInfo)
@@ -38,10 +38,10 @@ internal static class FunctionDetailsExtensions
         {
             // Since we are finding "g__" and "|", which consist of ascii character,
             // it doesn't suffer from localization/cultural issues that matter how letters are counted.
-            var start = unsanitizedName.IndexOf("g__") + 3;
-            var end = unsanitizedName.IndexOf('|', start);
+            var start = unsanitizedName.IndexOf(value: "g__") + 3;
+            var end = unsanitizedName.IndexOf(value: '|', startIndex: start);
             return end > start
-                ? unsanitizedName.Substring(start, end - start)
+                ? unsanitizedName.Substring(startIndex: start, length: end - start)
                 : "local func";
         }
 

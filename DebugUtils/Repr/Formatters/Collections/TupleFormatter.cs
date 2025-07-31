@@ -24,7 +24,7 @@ public class TupleFormatter : IReprFormatter
             }
 
             sb.Append(value: tuple[index: i]
-                .Repr(config: config, visited: visited));
+               .Repr(config: config, visited: visited));
         }
 
         sb.Append(value: ")");

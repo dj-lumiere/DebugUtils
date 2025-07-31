@@ -1,5 +1,6 @@
 ﻿using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
+// ReSharper disable BuiltInTypeReferenceStyle
 
 namespace DebugUtils.Repr.Formatters.Primitive;
 

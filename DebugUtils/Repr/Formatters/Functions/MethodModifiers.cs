@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
@@ -44,12 +45,36 @@ public class MethodModifiers
 
     private static string GetAccessLevelName(MethodInfo method)
     {
-        if (method.IsPublic) return "public";
-        if (method.IsPrivate) return "private";
-        if (method.IsFamily) return "protected";
-        if (method.IsAssembly) return "internal";
-        if (method.IsFamilyOrAssembly) return "protected internal";
-        if (method.IsFamilyAndAssembly) return "private protected";
+        if (method.IsPublic)
+        {
+            return "public";
+        }
+
+        if (method.IsPrivate)
+        {
+            return "private";
+        }
+
+        if (method.IsFamily)
+        {
+            return "protected";
+        }
+
+        if (method.IsAssembly)
+        {
+            return "internal";
+        }
+
+        if (method.IsFamilyOrAssembly)
+        {
+            return "protected internal";
+        }
+
+        if (method.IsFamilyAndAssembly)
+        {
+            return "private protected";
+        }
+
         return "unknown";
     }
 
@@ -64,31 +89,31 @@ public class MethodModifiers
     {
         // Check if method is marked with AsyncStateMachine attribute
         return method.IsDefined(
-            typeof(System.Runtime.CompilerServices.AsyncStateMachineAttribute));
+            attributeType: typeof(AsyncStateMachineAttribute));
     }
 
     private static bool IsExtensionMethod(MethodInfo method)
     {
         // Extension methods are static and have ExtensionAttribute
         return method.IsStatic &&
-               method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute));
+               method.IsDefined(attributeType: typeof(ExtensionAttribute));
     }
 
     private static bool IsOperatorMethod(MethodInfo method)
     {
         return method.IsSpecialName &&
-               (method.Name.StartsWith("op_") || method.Name == "Implicit" ||
+               (method.Name.StartsWith(value: "op_") || method.Name == "Implicit" ||
                 method.Name == "Explicit");
     }
 
     private static bool IsPropertyMethod(MethodInfo method)
     {
         return method.IsSpecialName &&
-               (method.Name.StartsWith("get_") || method.Name.StartsWith("set_"));
+               (method.Name.StartsWith(value: "get_") || method.Name.StartsWith(value: "set_"));
     }
     private static bool IsExternMethod(MethodInfo method)
     {
-        return method.Attributes.HasFlag(MethodAttributes.PinvokeImpl);
+        return method.Attributes.HasFlag(flag: MethodAttributes.PinvokeImpl);
     }
     private static bool IsUnsafeMethod(MethodInfo method)
     {
@@ -99,7 +124,7 @@ public class MethodModifiers
         }
 
         if (method.GetParameters()
-                  .Any(p => p.ParameterType.IsPointer))
+                  .Any(predicate: p => p.ParameterType.IsPointer))
         {
             return true;
         }
@@ -112,28 +137,62 @@ public class MethodModifiers
         var modifiers = new List<string>();
 
         // 1. Add Access Modifier
-        if (!string.IsNullOrEmpty(AccessLevelName))
+        if (!String.IsNullOrEmpty(value: AccessLevelName))
         {
-            modifiers.Add(AccessLevelName);
+            modifiers.Add(item: AccessLevelName);
         }
 
         // 2. Add Scope/Inheritance Modifiers
         // Note: C# syntax doesn't allow 'virtual' and 'abstract' with 'sealed'
         // so the order here handles the common combinations correctly.
-        if (IsStatic) modifiers.Add("static");
-        if (IsAbstract) modifiers.Add("abstract");
-        if (IsVirtual) modifiers.Add("virtual");
-        if (IsOverride) modifiers.Add("override");
-        if (IsSealed) modifiers.Add("sealed");
+        if (IsStatic)
+        {
+            modifiers.Add(item: "static");
+        }
+
+        if (IsAbstract)
+        {
+            modifiers.Add(item: "abstract");
+        }
+
+        if (IsVirtual)
+        {
+            modifiers.Add(item: "virtual");
+        }
+
+        if (IsOverride)
+        {
+            modifiers.Add(item: "override");
+        }
+
+        if (IsSealed)
+        {
+            modifiers.Add(item: "sealed");
+        }
 
         // 3. Add Other Modifiers
-        if (IsAsync) modifiers.Add("async");
-        if (IsExtern) modifiers.Add("extern");
-        if (IsUnsafe) modifiers.Add("unsafe");
-        if (IsGeneric) modifiers.Add("generic");
+        if (IsAsync)
+        {
+            modifiers.Add(item: "async");
+        }
+
+        if (IsExtern)
+        {
+            modifiers.Add(item: "extern");
+        }
+
+        if (IsUnsafe)
+        {
+            modifiers.Add(item: "unsafe");
+        }
+
+        if (IsGeneric)
+        {
+            modifiers.Add(item: "generic");
+        }
 
         // Join the list into a single string
-        return string.Join(" ", modifiers);
+        return String.Join(separator: " ", values: modifiers);
     }
 }
 
@@ -141,6 +200,6 @@ internal static class MethodModifiersExtensions
 {
     public static MethodModifiers ToMethodModifiers(this MethodInfo methodInfo)
     {
-        return new MethodModifiers(methodInfo);
+        return new MethodModifiers(method: methodInfo);
     }
 }

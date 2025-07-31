@@ -9,9 +9,9 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 
 [ReprFormatter(typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int),
     typeof(uint), typeof(long), typeof(ulong), typeof(BigInteger)
-#if NET7_0_OR_GREATER
+    #if NET7_0_OR_GREATER
     , typeof(Int128), typeof(UInt128)
-#endif
+    #endif
 )]
 public class IntegerFormatter : IReprFormatter
 {
@@ -37,7 +37,7 @@ internal static class IntegerFormatterLogic
 {
     public static string FormatAsBinary(this object obj)
     {
-#if NET7_0_OR_GREATER
+        #if NET7_0_OR_GREATER
         if (obj is Int128 i128)
         {
             var ui128 = (UInt128)i128;
@@ -65,9 +65,9 @@ internal static class IntegerFormatterLogic
         {
             return $"0b{u128.FormatUInt128AsBinary()}";
         }
-#endif
+        #endif
         if (obj.GetType()
-            .IsSignedPrimitiveType())
+               .IsSignedPrimitiveType())
         {
             // cast sbyte, short, int, long to ulong
             // Negative values get sign-extended, filling upper bits with 1s.
@@ -91,7 +91,7 @@ internal static class IntegerFormatterLogic
         }
 
         if (obj.GetType()
-            .IsIntegerPrimitiveType())
+               .IsIntegerPrimitiveType())
         {
             // cast byte, ushort, uint, ulong to ulong
             var u = Convert.ToUInt64(value: obj);
@@ -107,7 +107,7 @@ internal static class IntegerFormatterLogic
     }
     public static string FormatAsHex(this object obj)
     {
-#if NET7_0_OR_GREATER
+        #if NET7_0_OR_GREATER
         if (obj is Int128 i128)
         {
             var ui128 = (UInt128)i128;
@@ -135,9 +135,9 @@ internal static class IntegerFormatterLogic
         {
             return $"0x{u128.FormatUInt128AsHex()}";
         }
-#endif
+        #endif
         if (obj.GetType()
-            .IsSignedPrimitiveType())
+               .IsSignedPrimitiveType())
         {
             // cast sbyte, short, int, long to ulong
             // Negative values get sign-extended, filling upper bits with ones.
@@ -161,7 +161,7 @@ internal static class IntegerFormatterLogic
         }
 
         if (obj.GetType()
-            .IsIntegerPrimitiveType())
+               .IsIntegerPrimitiveType())
         {
             // cast byte, ushort, uint, ulong to ulong
             var u = Convert.ToUInt64(value: obj);
@@ -206,10 +206,10 @@ internal static class IntegerFormatterLogic
             uint ui => BitConverter.GetBytes(value: ui),
             long l => BitConverter.GetBytes(value: l),
             ulong ul => BitConverter.GetBytes(value: ul),
-#if NET7_0_OR_GREATER
+            #if NET7_0_OR_GREATER
             Int128 i128 => i128.GetBytesFromInt128(),
             UInt128 u128 => u128.GetBytesFromUInt128(),
-#endif
+            #endif
             _ => throw new ArgumentException(message: "Invalid type")
         };
     }
@@ -221,9 +221,9 @@ internal static class IntegerFormatterLogic
             short or ushort => 2,
             int or uint => 4,
             long or ulong => 8,
-#if NET7_0_OR_GREATER
+            #if NET7_0_OR_GREATER
             Int128 or UInt128 => 16,
-#endif
+            #endif
             _ => throw new ArgumentException(message: "Invalid type")
         };
     }
@@ -275,10 +275,10 @@ internal static class IntegerFormatterLogic
                     ? Convert.ToString(value: highBytes, toBase: 2)
                     : "") +
                 Convert.ToString(value: lowBytes, toBase: 2)
-                    .PadLeft(totalWidth: highBytes == 0
-                        ? 0
-                        : 32, paddingChar: '0'))
-            .ToUpper();
+                       .PadLeft(totalWidth: highBytes == 0
+                            ? 0
+                            : 32, paddingChar: '0'))
+           .ToUpper();
     }
     public static string FormatUlongAsHex(this ulong value)
     {
@@ -294,10 +294,10 @@ internal static class IntegerFormatterLogic
                     ? Convert.ToString(value: highBytes, toBase: 16)
                     : "") +
                 Convert.ToString(value: lowBytes, toBase: 16)
-                    .PadLeft(totalWidth: highBytes == 0
-                        ? 0
-                        : 8, paddingChar: '0'))
-            .ToUpper();
+                       .PadLeft(totalWidth: highBytes == 0
+                            ? 0
+                            : 8, paddingChar: '0'))
+           .ToUpper();
     }
 
     public static string FormatBigIntegerAsBinary(this BigInteger value)
@@ -321,7 +321,7 @@ internal static class IntegerFormatterLogic
         }
 
         var binaryString = String.Join(separator: "", values: result.ToString()
-            .Reverse());
+           .Reverse());
         return signed
             ? $"-0b{binaryString}"
             : $"0b{binaryString}";
@@ -342,7 +342,7 @@ internal static class IntegerFormatterLogic
             : $"0x{hexString}";
     }
 
-#if NET7_0_OR_GREATER
+    #if NET7_0_OR_GREATER
     public static string FormatUInt128AsBinary(this UInt128 value)
     {
         if (value == 0)
@@ -357,10 +357,10 @@ internal static class IntegerFormatterLogic
                     ? highBytes.FormatUlongAsBinary()
                     : "") +
                 lowBytes.FormatUlongAsBinary()
-                    .PadLeft(totalWidth: highBytes == 0
-                        ? 0
-                        : 64, paddingChar: '0'))
-            .ToUpper();
+                        .PadLeft(totalWidth: highBytes == 0
+                             ? 0
+                             : 64, paddingChar: '0'))
+           .ToUpper();
     }
     public static string FormatUInt128AsHex(this UInt128 value)
     {
@@ -376,10 +376,10 @@ internal static class IntegerFormatterLogic
                     ? highBytes.FormatUlongAsHex()
                     : "") +
                 lowBytes.FormatUlongAsHex()
-                    .PadLeft(totalWidth: highBytes == 0
-                        ? 0
-                        : 16, paddingChar: '0'))
-            .ToUpper();
+                        .PadLeft(totalWidth: highBytes == 0
+                             ? 0
+                             : 16, paddingChar: '0'))
+           .ToUpper();
     }
 
     public static byte[] GetBytesFromInt128(this Int128 value)
@@ -406,5 +406,5 @@ internal static class IntegerFormatterLogic
         return bytes;
     }
 
-#endif
+    #endif
 }
