@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using System.Numerics;
 using System.Text;
-using DebugUtils.Records;
-using DebugUtils.Interfaces;
+using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeLibraries;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.Formatters.Numeric;
 
 public class IntegerFormatter : IReprFormatter
 {

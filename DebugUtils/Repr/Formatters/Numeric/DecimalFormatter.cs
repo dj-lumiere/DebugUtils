@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Numerics;
-using DebugUtils.Records;
-using DebugUtils.Interfaces;
+using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.Formatters.Numeric;
 
 public class DecimalFormatter : IReprFormatter
 {

@@ -1,6 +1,6 @@
-using DebugUtils.Records;
+using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Interfaces;
+namespace DebugUtils.Repr.Interfaces;
 
 /// <summary>
 ///     Defines a contract for a formatter.

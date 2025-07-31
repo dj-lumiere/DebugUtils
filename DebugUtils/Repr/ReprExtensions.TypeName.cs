@@ -1,6 +1,6 @@
-﻿using DebugUtils.Formatters;
+﻿using DebugUtils.Repr.TypeLibraries;
 
-namespace DebugUtils;
+namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {

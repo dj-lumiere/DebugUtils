@@ -1,6 +1,6 @@
-﻿using DebugUtils.Records;
+﻿using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.Formatters.Numeric;
 
 internal static class FloatAnalyzers
 {

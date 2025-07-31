@@ -1,10 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
-using Xunit;
-using DebugUtils;
-using System.Collections.Generic;
-using System.Linq;
-using DebugUtils.Records;
+using DebugUtils.Repr;
+using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Tests;
 

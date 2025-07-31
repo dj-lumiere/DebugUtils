@@ -1,8 +1,12 @@
-using System.Reflection;
-using DebugUtils.Records;
-using DebugUtils.Interfaces;
+#region
 
-namespace DebugUtils.Formatters;
+using System.Reflection;
+using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
+
+#endregion
+
+namespace DebugUtils.Repr.Formatters.Primitive;
 
 /// <summary>
 ///     A generic formatter for any record type.

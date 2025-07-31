@@ -1,8 +1,8 @@
 using System.Collections;
-using DebugUtils.Records;
-using DebugUtils.Interfaces;
+using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.Formatters.Collections;
 
 public class EnumerableFormatter : IReprFormatter
 {
@@ -16,11 +16,6 @@ public class EnumerableFormatter : IReprFormatter
 
         var items = list.Cast<object>()
             .Select(selector: item => item?.Repr(config: config, visited: visited) ?? "null");
-
-        if (obj.IsSet())
-        {
-            return "{" + String.Join(separator: ", ", values: items) + "}";
-        }
 
         return "[" + String.Join(separator: ", ", values: items) + "]";
     }

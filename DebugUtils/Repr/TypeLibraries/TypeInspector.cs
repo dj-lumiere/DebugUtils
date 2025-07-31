@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.TypeLibraries;
 
 internal static class TypeInspector
 {

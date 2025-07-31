@@ -1,4 +1,4 @@
-﻿namespace DebugUtils;
+﻿namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {

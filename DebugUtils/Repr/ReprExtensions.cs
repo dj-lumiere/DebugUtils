@@ -1,8 +1,9 @@
 using System.Runtime.CompilerServices;
-using DebugUtils.Formatters;
-using DebugUtils.Records;
+using DebugUtils.Repr.Formatters;
+using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeLibraries;
 
-namespace DebugUtils;
+namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {

@@ -1,7 +1,7 @@
-﻿using DebugUtils.Records;
-using DebugUtils.Interfaces;
+﻿using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Formatters;
+namespace DebugUtils.Repr.Formatters.Collections;
 
 public class ArrayFormatter : IReprFormatter
 {
