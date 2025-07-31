@@ -15,20 +15,20 @@ public static class ReprFormatterRegistry
 {
     private static readonly Dictionary<Type, IReprFormatter> Formatters = new();
 
-    private static readonly Lazy<EnumFormatter> enumFormatter =
+    private static readonly Lazy<EnumFormatter> EnumFormatter =
         new(valueFactory: () => new EnumFormatter());
 
-    private static readonly Lazy<RecordFormatter> recordFormatter =
+    private static readonly Lazy<RecordFormatter> RecordFormatter =
         new(valueFactory: () => new RecordFormatter());
 
-    private static readonly Lazy<ReflectionFormatter> reflectionFormatter =
-        new(valueFactory: () => new ReflectionFormatter());
+    private static readonly Lazy<ObjectFormatter> ObjectFormatter =
+        new(valueFactory: () => new ObjectFormatter());
 
-    private static readonly Lazy<ReflectionJsonFormatter> reflectionJsonFormatter =
-        new(valueFactory: () => new ReflectionJsonFormatter());
+    private static readonly Lazy<ObjectJsonFormatter> ObjectJsonFormatter =
+        new(valueFactory: () => new ObjectJsonFormatter());
 
-    private static readonly IReprFormatter toStringFormatter = new ToStringFormatter();
-    private static readonly IReprFormatter setFormatter = new SetFormatter();
+    private static readonly IReprFormatter ToStringFormatter = new ToStringFormatter();
+    private static readonly IReprFormatter SetFormatter = new SetFormatter();
 
     static ReprFormatterRegistry()
     {
@@ -68,19 +68,19 @@ public static class ReprFormatterRegistry
         Formatters[key: typeof(IDictionary)] = new DictionaryFormatter();
         Formatters[key: typeof(IEnumerable)] = new EnumerableFormatter();
         Formatters[key: typeof(ITuple)] = new TupleFormatter();
-        Formatters[key: typeof(Enum)] = enumFormatter.Value;
+        Formatters[key: typeof(Enum)] = EnumFormatter.Value;
         Formatters[key: typeof(Delegate)] = new FunctionFormatter();
     }
     public static IReprFormatter GetFormatter(Type type, ReprConfig config)
     {
         if (config.FormattingMode == FormattingMode.ReflectionJson)
         {
-            return reflectionJsonFormatter.Value;
+            return ObjectJsonFormatter.Value;
         }
 
         if (config.FormattingMode == FormattingMode.Reflection)
         {
-            return reflectionFormatter.Value;
+            return ObjectFormatter.Value;
         }
 
         if (Formatters.TryGetValue(key: type, value: out var formatter))
@@ -95,7 +95,7 @@ public static class ReprFormatterRegistry
 
         if (type.IsRecordType())
         {
-            return recordFormatter.Value;
+            return RecordFormatter.Value;
         }
 
         if (type.IsDictionaryType())
@@ -115,7 +115,7 @@ public static class ReprFormatterRegistry
 
         if (type.IsSetType())
         {
-            return setFormatter;
+            return SetFormatter;
         }
 
         if (type.IsAssignableTo(targetType: typeof(Delegate)))
@@ -130,9 +130,9 @@ public static class ReprFormatterRegistry
 
         if (type.OverridesToStringType())
         {
-            return toStringFormatter;
+            return ToStringFormatter;
         }
 
-        return reflectionFormatter.Value;
+        return ObjectFormatter.Value;
     }
 }

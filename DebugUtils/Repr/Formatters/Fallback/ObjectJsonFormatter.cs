@@ -11,7 +11,7 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 ///     The default object pointer that handles any type not specifically registered.
 ///     It uses reflection to represent the record's public properties.
 /// </summary>
-public class ReflectionJsonFormatter : IReprFormatter
+public class ObjectJsonFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -22,7 +22,7 @@ public class ReflectionJsonFormatter : IReprFormatter
     }
 }
 
-internal static class JsonExtensions
+internal static class ObjectJsonFormatterLogic
 {
     public static JsonObject GetJson(this object obj, ReprConfig config, HashSet<int>? visited,
         int depth)
