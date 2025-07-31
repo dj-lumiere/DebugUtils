@@ -1,4 +1,5 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using System.Text.Json.Nodes;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;
@@ -13,7 +14,7 @@ public class ArrayFormatter : IReprFormatter
 
         var rank = array.Rank;
         var content = array.ArrayToReprRecursive(indices: new int[rank], dimension: 0,
-            reprConfig: config, visited: visited);
+            config: config, visited: visited);
         return content;
     }
 }
@@ -21,7 +22,7 @@ public class ArrayFormatter : IReprFormatter
 internal static class ArrayFormatterLogic
 {
     public static string ArrayToReprRecursive(this Array array, int[] indices, int dimension,
-        ReprConfig reprConfig, HashSet<int>? visited)
+        ReprConfig config, HashSet<int>? visited)
     {
         if (dimension == array.Rank - 1)
         {
@@ -35,15 +36,15 @@ internal static class ArrayFormatterLogic
                 {
                     // If the element is a jagged array, recurse directly to format its content
                     // without adding another "Array(...)" wrapper.
-                    items.Add(item: ArrayToReprRecursive(array: innerArray,
+                    items.Add(item: innerArray.ArrayToReprRecursive(
                         indices: new int[innerArray.Rank], dimension: 0,
-                        reprConfig: reprConfig, visited: visited));
+                        config: config, visited: visited));
                 }
                 else
                 {
                     // Otherwise, format the element normally.
                     items.Add(
-                        item: value?.Repr(config: reprConfig, visited: visited) ?? "null");
+                        item: value?.Repr(config: config, visited: visited) ?? "null");
                 }
             }
 
@@ -55,7 +56,7 @@ internal static class ArrayFormatterLogic
         {
             indices[dimension] = i;
             subArrays.Add(item: ArrayToReprRecursive(array: array, indices: indices,
-                dimension: dimension + 1, reprConfig: reprConfig,
+                dimension: dimension + 1, config: config,
                 visited: visited));
         }
 
