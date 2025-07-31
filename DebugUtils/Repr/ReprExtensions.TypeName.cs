@@ -99,6 +99,11 @@ public static partial class ReprExtensions
             result = result.Split(separator: '`')[0];
         }
 
+        if (result.EndsWith("&"))
+        {
+            result = string.Concat("ref ", result.AsSpan(start: 0, length: result.Length - 1));
+        }
+
         return result;
     }
 }

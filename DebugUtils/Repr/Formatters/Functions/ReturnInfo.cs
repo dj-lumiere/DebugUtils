@@ -23,7 +23,7 @@ public class ReturnInfo
             ? "ref "
             : "";
         result += IsAsync
-            ? $"async {TypeName}"
+            ? $"async Task<{TypeName}>"
             : TypeName;
         return result;
     }

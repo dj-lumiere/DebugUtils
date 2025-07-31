@@ -19,7 +19,10 @@ public class FunctionDetails
 
     public override string ToString()
     {
-        return $"{Modifiers} {Return} {Name}({Parameters})";
+        var parameterStr = String.Join(separator: ", ",
+            values: Parameters.Select(selector: p => p.ToString()));
+        return
+            $"{Modifiers} {Return} {Name}({parameterStr})";
     }
 }
 

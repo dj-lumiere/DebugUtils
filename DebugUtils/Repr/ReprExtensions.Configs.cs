@@ -6,6 +6,7 @@ public static partial class ReprExtensions
 {
     public static readonly Dictionary<Type, string> CSharpTypeNames = new()
     {
+        [key: typeof(void)] = "void",
         [key: typeof(byte)] = "byte",
         [key: typeof(sbyte)] = "sbyte",
         [key: typeof(short)] = "short",
