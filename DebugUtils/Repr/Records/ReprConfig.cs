@@ -64,12 +64,52 @@ public enum TypeReprMode
     AlwaysHide
 }
 
-public enum ContainerBehavior
+public enum ContainerReprMode
 {
-    UseDefaultConfig, // Use default config
-    UseParentConfig, // Use the same config as parent
-    UseSimpleFormats, // Force simple formats (General float, Decimal int)
-    UseCustomConfig // Use explicit container config
+    /// <summary>
+    ///     Use default config
+    /// </summary>
+    UseDefaultConfig,
+
+    /// <summary>
+    ///     Use the same config as parent
+    /// </summary>
+    UseParentConfig,
+
+    /// <summary>
+    ///     Force simple formats (General float, Decimal int)
+    /// </summary>
+    UseSimpleFormats,
+
+    /// <summary>
+    ///     Use explicit container config
+    /// </summary>
+    UseCustomConfig
+}
+
+public enum FormattingMode
+{
+    /// <summary>
+    ///     Uses custom formatter with ToString fallback when ToString provides more useful information.
+    /// </summary>
+    Smart,
+
+    /// <summary>
+    ///     Uses custom formatter with ToString fallback, with JSON-friendly output formatting.
+    ///     Output: JSON objects like {"type":"1DArray", "value":[{"type":"char", "value":"a"}, ...]}
+    /// </summary>
+    SmartJson,
+
+    /// <summary>
+    ///     Always uses reflection-based custom formatting, never falls back to ToString.
+    /// </summary>
+    Reflection,
+
+    /// <summary>
+    ///     Always uses reflection-based custom formatting with JSON-friendly output.
+    ///     Output: JSON objects with type and value information for all objects.
+    /// </summary>
+    ReflectionJson
 }
 
 /// <summary>
@@ -77,10 +117,14 @@ public enum ContainerBehavior
 /// </summary>
 /// <param name="FloatMode">Specifies how floating-point numbers should be formatted</param>
 /// <param name="FloatPrecision">Number of decimal places for floating-point formatting (when applicable)</param>
-/// <param name="ForceFloatModeInContainer">Whether to apply FloatMode when formatting floats inside containers</param>
 /// <param name="IntMode">Specifies how integers should be formatted (decimal, hex, binary, etc.)</param>
-/// <param name="ForceIntModeInContainer">Whether to apply IntMode when formatting integers inside containers</param>
-/// <param name="TypeMode">When true, suppresses type prefixes even for types that normally show them</param>
+/// <param name="ContainerReprMode">
+///     Specifies how elements/fields/properties in container/struct/class/.record should be
+///     formatted
+/// </param>
+/// <param name="TypeMode">Specifies when to hide type prefixes</param>
+/// <param name="FormattingMode">Specifies how to do formatting (adaptive mode, always reflection)</param>
+/// <param name="CustomContainerConfig">The config to use when ContainerReprMode is in custom mode</param>
 /// <example>
 ///     <code>
 /// // Exact floating-point representation
@@ -101,22 +145,23 @@ public record ReprConfig(
     FloatReprMode FloatMode = FloatReprMode.General,
     int FloatPrecision = 2,
     IntReprMode IntMode = IntReprMode.Decimal,
-    ContainerBehavior containerBehavior = ContainerBehavior.UseSimpleFormats,
-    ReprConfig? CustomContainerConfig = null,
-    TypeReprMode TypeMode = TypeReprMode.HideObvious
+    ContainerReprMode ContainerReprMode = ContainerReprMode.UseSimpleFormats,
+    TypeReprMode TypeMode = TypeReprMode.HideObvious,
+    FormattingMode FormattingMode = FormattingMode.Smart,
+    ReprConfig? CustomContainerConfig = null
 )
 {
     public static ReprConfig ContainerDefaults => new(
         FloatMode: FloatReprMode.General,
         FloatPrecision: 2,
-        containerBehavior: ContainerBehavior.UseSimpleFormats,
+        ContainerReprMode: ContainerReprMode.UseSimpleFormats,
         IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious);
 
     public static ReprConfig GlobalDefaults => new(
         FloatMode: FloatReprMode.Exact,
         FloatPrecision: -1,
-        containerBehavior: ContainerBehavior.UseDefaultConfig,
+        ContainerReprMode: ContainerReprMode.UseDefaultConfig,
         IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious);
 }

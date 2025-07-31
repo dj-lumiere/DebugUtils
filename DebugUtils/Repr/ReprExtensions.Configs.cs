@@ -40,11 +40,11 @@ public static partial class ReprExtensions
 
     public static ReprConfig GetContainerConfig(this ReprConfig config)
     {
-        return config.containerBehavior switch
+        return config.ContainerReprMode switch
         {
-            ContainerBehavior.UseParentConfig => config,
-            ContainerBehavior.UseSimpleFormats => ReprConfig.ContainerDefaults,
-            ContainerBehavior.UseCustomConfig => config.CustomContainerConfig ??
+            ContainerReprMode.UseParentConfig => config,
+            ContainerReprMode.UseSimpleFormats => ReprConfig.ContainerDefaults,
+            ContainerReprMode.UseCustomConfig => config.CustomContainerConfig ??
                                                  ReprConfig.ContainerDefaults,
             _ => ReprConfig.GlobalDefaults
         };

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Formatters.Collections;
 using DebugUtils.Repr.Formatters.Primitive;
 using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
 
 namespace DebugUtils.Repr.Formatters;
@@ -21,6 +22,9 @@ public static class ReprFormatterRegistry
     private static readonly Lazy<ReflectionFormatter> reflectionFormatter =
         new(valueFactory: () => new ReflectionFormatter());
 
+    private static readonly Lazy<ReflectionJsonFormatter> reflectionJsonFormatter =
+        new(valueFactory: () => new ReflectionJsonFormatter());
+
     private static readonly IReprFormatter toStringFormatter = new ToStringFormatter();
     private static readonly IReprFormatter setFormatter = new SetFormatter();
 
@@ -34,8 +38,11 @@ public static class ReprFormatterRegistry
     {
         // Only register exact type matches from attributes
         var formatterTypes = typeof(ReprFormatterRegistry).Assembly
-            .GetTypes()
-            .Where(predicate: t => t.GetCustomAttribute<ReprFormatterAttribute>() != null);
+                                                          .GetTypes()
+                                                          .Where(predicate: t =>
+                                                               t.GetCustomAttribute<
+                                                                   ReprFormatterAttribute>() !=
+                                                               null);
 
         foreach (var type in formatterTypes)
         {
@@ -61,8 +68,18 @@ public static class ReprFormatterRegistry
         Formatters[key: typeof(ITuple)] = new TupleFormatter();
         Formatters[key: typeof(Enum)] = enumFormatter.Value;
     }
-    public static IReprFormatter GetFormatter(Type type)
+    public static IReprFormatter GetFormatter(Type type, ReprConfig config)
     {
+        if (config.FormattingMode == FormattingMode.ReflectionJson)
+        {
+            return reflectionJsonFormatter.Value;
+        }
+
+        if (config.FormattingMode == FormattingMode.Reflection)
+        {
+            return reflectionFormatter.Value;
+        }
+
         if (Formatters.TryGetValue(key: type, value: out var formatter))
         {
             return formatter;
