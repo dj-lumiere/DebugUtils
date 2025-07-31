@@ -5,7 +5,7 @@ using DebugUtils;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DebugUtils;
+namespace DebugUtils.Tests;
 
 // Test data structures from DebugUtilsTest.cs
 public struct Point
