@@ -2,6 +2,7 @@ using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Formatters.Collections;
+using DebugUtils.Repr.Formatters.Functions;
 using DebugUtils.Repr.Formatters.Primitive;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
@@ -67,6 +68,7 @@ public static class ReprFormatterRegistry
         Formatters[key: typeof(IEnumerable)] = new EnumerableFormatter();
         Formatters[key: typeof(ITuple)] = new TupleFormatter();
         Formatters[key: typeof(Enum)] = enumFormatter.Value;
+        Formatters[key: typeof(Delegate)] = new FunctionFormatter();
     }
     public static IReprFormatter GetFormatter(Type type, ReprConfig config)
     {
