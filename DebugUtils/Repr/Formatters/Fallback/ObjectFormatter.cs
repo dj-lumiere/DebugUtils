@@ -9,7 +9,7 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 ///     The default object pointer that handles any type not specifically registered.
 ///     It uses reflection to represent the record's public properties.
 /// </summary>
-[ReprOptions(needsPrefix:true)]
+[ReprOptions(needsPrefix: true)]
 public class ObjectFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -38,9 +38,9 @@ public class ObjectFormatter : IReprFormatter
                 parts.Add(
                     item: $"{prop.Name}: {value.Repr(config: config, visited: visited)}");
             }
-            catch
+            catch (Exception ex)
             {
-                parts.Add(item: $"{prop.Name}: <error>");
+                parts.Add(item: $"{prop.Name}: <error {ex.Message}>");
             }
         }
 
