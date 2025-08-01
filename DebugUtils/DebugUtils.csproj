@@ -4,6 +4,16 @@
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>DebugUtils.CSharp</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Lumi</Authors>
+    <Description>Debugging suite for C#.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dj-lumiere/DebugUtils-CSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dj-lumiere/DebugUtils-CSharp.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>debug;logging;utilities;repr;inspector</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>
