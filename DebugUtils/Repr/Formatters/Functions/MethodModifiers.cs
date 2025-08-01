@@ -5,8 +5,10 @@ namespace DebugUtils.Repr.Formatters.Functions;
 
 public class MethodModifiers
 {
-    // Access modifiers
-    public string AccessLevelName { get; }
+    public bool IsPublic { get; set; }
+    public bool IsPrivate { get; set; }
+    public bool IsProtected { get; set; }
+    public bool IsInternal { get; set; }
 
     // Other modifiers
     public bool IsStatic { get; }
@@ -21,7 +23,10 @@ public class MethodModifiers
 
     public MethodModifiers(MethodInfo method)
     {
-        AccessLevelName = method.GetAccessLevelName();
+        IsPublic = method.IsPublic;
+        IsPrivate = method.IsPrivate || method.IsFamilyAndAssembly;
+        IsProtected = method.IsFamily || method.IsFamilyOrAssembly;
+        IsInternal = method.IsAssembly;
         IsStatic = method.IsStatic;
         IsVirtual = method is { IsVirtual: true, IsFinal: false }; // Virtual but not sealed
         IsOverride = method.IsOverrideMethod();
@@ -38,9 +43,24 @@ public class MethodModifiers
         var modifiers = new List<string>();
 
         // 1. Add Access Modifier
-        if (!String.IsNullOrEmpty(value: AccessLevelName))
+        if (IsPublic)
         {
-            modifiers.Add(item: AccessLevelName);
+            modifiers.Add(item: "public");
+        }
+
+        if (IsPrivate)
+        {
+            modifiers.Add(item: "private");
+        }
+
+        if (IsProtected)
+        {
+            modifiers.Add(item: "protected");
+        }
+
+        if (IsInternal)
+        {
+            modifiers.Add(item: "internal");
         }
 
         // 2. Add Scope/Inheritance Modifiers
