@@ -116,9 +116,6 @@ internal static class TypeInspector
             || type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)) 
             || type.IsAssignableTo(targetType: typeof(ITuple)) 
             || type.IsEnum
-            || type == typeof(Guid)
-            || type == typeof(Uri)
-            || type == typeof(Version)
             )
         {
             return false;
