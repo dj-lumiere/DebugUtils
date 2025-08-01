@@ -15,7 +15,9 @@ internal static class ObjectJsonExtensions
         visited ??= new HashSet<int>();
         var objHash = RuntimeHelpers.GetHashCode(o: obj);
         var json = new JsonObject();
-        
+
+        json.Add(propertyName: "type", value: type.GetReprTypeNameByTypeName());
+
         if (depth > 10)
         {
             json.Add(propertyName: "value", value: "Truncated for brevity.");
@@ -41,7 +43,7 @@ internal static class ObjectJsonExtensions
         {
             if (!visited.Add(item: objHash))
             {
-                // json["type"] = $"CircularRef[{json["type"]}]";
+                json["type"] = $"Circular Reference to {json["type"]} @ {objHash:X8}";
                 return json;
             }
         }
