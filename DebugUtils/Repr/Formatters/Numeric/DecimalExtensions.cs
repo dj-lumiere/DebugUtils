@@ -4,7 +4,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 
 internal static class DecimalExtensions
 {
-    public static string AsExact(this decimal value)
+    public static string FormatAsExact(this decimal value)
     {
         // Get the internal bits
         var bits = Decimal.GetBits(d: value);

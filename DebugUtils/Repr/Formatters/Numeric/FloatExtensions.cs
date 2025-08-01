@@ -101,7 +101,7 @@ internal static class FloatExtensions
         );
     }
 
-    public static string AsRounding(this object obj, FloatInfo info,
+    public static string FormatAsRounding(this object obj, FloatInfo info,
         ReprConfig reprConfig)
     {
         var roundingFormatString = "F" + (reprConfig.FloatPrecision > 0
@@ -120,7 +120,7 @@ internal static class FloatExtensions
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
-    public static string AsGeneral(this object obj, FloatInfo info,
+    public static string FormatAsGeneral(this object obj, FloatInfo info,
         ReprConfig reprConfig)
     {
         return info.TypeName switch
@@ -136,7 +136,7 @@ internal static class FloatExtensions
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
-    public static string AsScientific(this object obj, FloatInfo info,
+    public static string FormatAsScientific(this object obj, FloatInfo info,
         ReprConfig reprConfig)
     {
         var scientificFormatString = "E" + (reprConfig.FloatPrecision > 0
@@ -155,7 +155,7 @@ internal static class FloatExtensions
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
-    public static string AsExact(this object obj, FloatInfo info)
+    public static string FormatAsExact(this object obj, FloatInfo info)
     {
         var realExponent = info.RealExponent - info.Spec.MantissaBitSize;
         var significand = info.Significand;
