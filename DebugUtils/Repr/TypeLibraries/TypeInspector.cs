@@ -138,6 +138,19 @@ internal static class TypeInspector
                type.GetGenericTypeDefinition() == genericTypeDefinition;
     }
 
+    public static bool IsAnonymousType(this Type type)
+    {
+        // An anonymous class is always generic and not public.
+        // Also, its type name starts with "<>" or "VB$", and contains AnonymousType.
+        // C# compiler marks anonymous types with the System.Runtime.CompilerServices.CompilerGeneratedAttribute
+        return Attribute.IsDefined(element: type,
+                   attributeType: typeof(CompilerGeneratedAttribute))
+               && type.IsGenericType
+               && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic
+               && type.Name.Contains(value: "AnonymousType")
+               && (type.Name.StartsWith(value: "<>") || type.Name.StartsWith(value: "VB$"));
+    }
+
     #endregion
 
     #region Type Check By Object

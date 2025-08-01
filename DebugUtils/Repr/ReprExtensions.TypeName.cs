@@ -78,6 +78,11 @@ public static partial class ReprExtensions
             return type.ProcessTaskType();
         }
 
+        if (type.IsAnonymousType())
+        {
+            return "Anonymous";
+        }
+
         var result = type.Name;
         if (result.Contains(value: '`'))
         {
