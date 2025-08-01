@@ -3,6 +3,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
 
@@ -17,6 +18,7 @@ public static partial class ReprExtensions
     {
         config ??= ReprConfig.GlobalDefaults;
         visited ??= new HashSet<int>();
+        var id = RuntimeHelpers.GetHashCode(o: obj);
 
         if (config.FormattingMode == FormattingMode.Json)
         {
@@ -37,7 +39,6 @@ public static partial class ReprExtensions
         if (!obj.GetType()
                 .IsValueType)
         {
-            var id = RuntimeHelpers.GetHashCode(o: obj);
             if (!visited.Add(item: id))
             {
                 return $"<Circular Reference to {obj.GetReprTypeName()} @{id:X8}>";
@@ -49,8 +50,15 @@ public static partial class ReprExtensions
 
         string result;
         // 4. Call the formatter with the correct arguments.
+
         if (formatter is { } reprFormatter)
         {
+            if (config.FormattingMode == FormattingMode.Json)
+            {
+                result = obj.AsJson(config: config, visited: visited, formatter: reprFormatter,
+                    id: id);
+            }
+
             result = reprFormatter.ToRepr(obj: obj, config: config, visited: visited);
         }
         else
@@ -78,6 +86,21 @@ public static partial class ReprExtensions
                 visited.Remove(item: RuntimeHelpers.GetHashCode(o: obj));
             }
         }
+    }
+
+    private static string AsJson<T>(this T obj, ReprConfig config, HashSet<int> visited,
+        IReprFormatter formatter, int id)
+    {
+        // prevent immediate circular reference crashing
+        if (!obj?.GetType()
+                 .IsValueType ?? false)
+        {
+            visited.Remove(item: id);
+        }
+
+        var result = formatter.ToRepr(obj: obj, config: config, visited: visited);
+        visited.Add(item: id);
+        return result;
     }
 
     // This method remains as it is, correctly handling the logic for Nullable<T>.
