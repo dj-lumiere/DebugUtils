@@ -4,34 +4,7 @@ namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {
-    private static string GetArrayTypeNameByTypeName(this Type type)
-    {
-        if (!type.IsArray)
-        {
-            return "";
-        }
-
-        var rank = type.GetArrayRank();
-        if (rank != 1)
-        {
-            return $"{rank}DArray";
-        }
-
-        if (type.GetElementType()
-               ?.IsArray ?? false)
-        {
-            return "JaggedArray";
-        }
-
-        return "1DArray";
-    }
-
-    public static string GetReprTypeName<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.GetReprTypeNameByTypeName();
-    }
-    public static string GetReprTypeNameByTypeName(this Type type)
+    public static string GetReprTypeName(this Type type)
     {
         // Handle nullable types
         if (type.IsNullableStructType())
@@ -63,7 +36,7 @@ public static partial class ReprExtensions
 
         if (isRefType)
         {
-            return type.ProcessRefType();
+            return type.GetRefTypeReprName();
         }
 
         var isTaskType = type == typeof(Task);
@@ -75,7 +48,7 @@ public static partial class ReprExtensions
 
         if (isTaskType || isGenericTaskType || isValueTask || isGenericValueTask)
         {
-            return type.ProcessTaskType();
+            return type.GetTaskTypeReprName();
         }
 
         if (type.IsAnonymousType())
@@ -91,14 +64,39 @@ public static partial class ReprExtensions
 
         return result;
     }
-
-    public static string ProcessRefType(this Type type)
+    public static string GetReprTypeName<T>(this T obj)
     {
-        var innerType = type?.GetElementType() ?? null;
-        return $"ref {innerType?.GetReprTypeNameByTypeName() ?? "null"}";
+        var type = obj?.GetType() ?? typeof(T);
+        return type.GetReprTypeName();
     }
 
-    public static string ProcessTaskType(this Type type)
+    private static string GetArrayTypeNameByTypeName(this Type type)
+    {
+        if (!type.IsArray)
+        {
+            return "";
+        }
+
+        var rank = type.GetArrayRank();
+        if (rank != 1)
+        {
+            return $"{rank}DArray";
+        }
+
+        if (type.GetElementType()
+               ?.IsArray ?? false)
+        {
+            return "JaggedArray";
+        }
+
+        return "1DArray";
+    }
+    private static string GetRefTypeReprName(this Type type)
+    {
+        var innerType = type?.GetElementType() ?? null;
+        return $"ref {innerType?.GetReprTypeName() ?? "null"}";
+    }
+    private static string GetTaskTypeReprName(this Type type)
     {
         // For Task (non-generic)
         if (type == typeof(Task) || type == typeof(ValueTask))
@@ -113,7 +111,7 @@ public static partial class ReprExtensions
             if (genericDef == typeof(Task<>) || genericDef == typeof(ValueTask<>))
             {
                 var innerType = type.GetGenericArguments()[0]; // ✅ Use this instead!
-                var innerTypeReprName = innerType.GetReprTypeNameByTypeName();
+                var innerTypeReprName = innerType.GetReprTypeName();
                 return $"{genericDef.Name.Split(separator: '`')[0]}<{innerTypeReprName}>";
             }
         }
