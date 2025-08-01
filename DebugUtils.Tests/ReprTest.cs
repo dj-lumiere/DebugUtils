@@ -589,18 +589,22 @@ public class ReprTest
     {
         var data = new { Name = "Alice", Age = 30 };
         var config = new ReprConfig(FormattingMode: FormattingMode.Json);
-        var actualJson = data.Repr(config: config);
-        var expectedJsonObject = new JsonObject();
-        expectedJsonObject.Add(propertyName: "type", value: "Anonymous");
-        var nameObject = new JsonObject();
-        nameObject.Add(propertyName: "type", value: "string");
-        nameObject.Add(propertyName: "value", value: "Alice");
-        expectedJsonObject.Add(propertyName: "Name", value: nameObject);
-        var ageObject = new JsonObject();
-        ageObject.Add(propertyName: "type", value: "int");
-        ageObject.Add(propertyName: "value", value: "30");
-        expectedJsonObject.Add(propertyName: "Age", value: ageObject);
-        var expectedJson = expectedJsonObject.ToString();
-        Assert.Equal(expected: expectedJson, actual: actualJson);
+        var actualJsonString = data.Repr(config: config);
+        var actualJsonNode = JsonNode.Parse(actualJsonString);
+        var expectedJsonNode = new JsonObject
+        {
+            ["type"] = "Anonymous",
+            ["Name"] = new JsonObject
+            {
+                ["type"] = "string",
+                ["value"] = "Alice"
+            },
+            ["Age"] = new JsonObject
+            {
+                ["type"] = "int",
+                ["value"] = "30"
+            }
+        };
+        Assert.True(JsonNode.DeepEquals(actualJsonNode, expectedJsonNode));
     }
 }
