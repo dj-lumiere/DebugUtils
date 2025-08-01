@@ -147,18 +147,20 @@ public class ReprTest
         var child = new Children { Name = "Child", Parent = parent };
         parent.Parent = child;
         Assert.StartsWith(
+            expectedStartString:
             "Children(Name: \"Parent\", Parent: Children(Name: \"Child\", Parent: <Circular Reference to Children @",
-            parent.Repr());
-        Assert.EndsWith(">))", parent.Repr());
+            actualString: parent.Repr());
+        Assert.EndsWith(expectedEndString: ">))", actualString: parent.Repr());
 
         var jsonConfig = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
         var obj = new { Name = "John", Age = 30 };
         Assert.Equal(
+            expected:
             "{\"type\":\"Anonymous\",\"Name\":{\"type\":\"string\",\"value\":\"John\"},\"Age\":{\"type\":\"int\",\"value\":\"30\"}}",
-            obj.Repr(config: jsonConfig)
-               .Replace("\r", "")
-               .Replace("\n", "")
-               .Replace(" ", ""));
+            actual: obj.Repr(config: jsonConfig)
+                       .Replace(oldValue: "\r", newValue: "")
+                       .Replace(oldValue: "\n", newValue: "")
+                       .Replace(oldValue: " ", newValue: ""));
     }
 
     [Fact]
@@ -171,7 +173,7 @@ public class ReprTest
         Assert.Equal(expected: "List", actual: listType.GetReprTypeName());
 
         var intNullableType = typeof(int?);
-        Assert.Equal(typeof(int?), typeof(Nullable<int>));
+        Assert.Equal(expected: typeof(int?), actual: typeof(Nullable<int>));
         Assert.Equal(expected: "int?", actual: intNullableType.GetReprTypeName());
 
         var taskType = typeof(Task<bool>);
