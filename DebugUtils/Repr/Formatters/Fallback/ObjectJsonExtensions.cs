@@ -134,17 +134,6 @@ internal static class ObjectJsonExtensions
                         .Where(predicate: p => p is { CanRead: true, GetMethod.IsPublic: true });
         foreach (var prop in properties)
         {
-            if (prop.Name is "Assembly" or "Module" or "StructLayoutAttribute")
-            {
-                continue;
-            }
-
-            if (prop.Name.Contains(value: "Assembly") ||
-                prop.Name.StartsWith(value: "Is") && Char.IsUpper(c: prop.Name[index: 2]))
-            {
-                continue;
-            }
-
             try
             {
                 var value = prop.GetValue(obj: obj);
