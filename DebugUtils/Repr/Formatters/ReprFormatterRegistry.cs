@@ -73,66 +73,25 @@ public static class ReprFormatterRegistry
     }
     public static IReprFormatter GetFormatter(Type type, ReprConfig config)
     {
-        if (config.FormattingMode == FormattingMode.ReflectionJson)
+        var formatter = (config.FormattingMode, type) switch
         {
-            return ObjectJsonFormatter.Value;
-        }
+            (FormattingMode.ReflectionJson, _) => ObjectJsonFormatter.Value,
+            (FormattingMode.Reflection, _) => ObjectFormatter.Value,
+            (_, { } t) when Formatters.TryGetValue(key: t, value: out var result) => result,
+            (_, { } t) when t.IsEnum => Formatters[key: typeof(Enum)],
+            (_, { } t) when t.IsRecordType() => RecordFormatter.Value,
+            (_, { } t) when t.IsDictionaryType() => Formatters[key: typeof(IDictionary)],
+            (_, { } t) when t.IsTupleType() => Formatters[key: typeof(ITuple)],
+            (_, { } t) when t.IsArray => Formatters[key: typeof(Array)],
+            (_, { } t) when t.IsSetType() => SetFormatter,
+            (_, { } t) when t.IsAssignableTo(targetType: typeof(Delegate)) => Formatters[
+                key: typeof(Delegate)],
+            (_, { } t) when t.IsAssignableTo(targetType: typeof(IEnumerable)) => Formatters[
+                key: typeof(IEnumerable)],
+            (_, { } t) when t.OverridesToStringType() => ToStringFormatter,
+            (_, _) => ObjectFormatter.Value
+        };
 
-        if (config.FormattingMode == FormattingMode.Reflection)
-        {
-            return ObjectFormatter.Value;
-        }
-
-        if (Formatters.TryGetValue(key: type, value: out var formatter))
-        {
-            return formatter;
-        }
-
-        if (type.IsEnum)
-        {
-            return Formatters[key: typeof(Enum)];
-        }
-
-        if (type.IsRecordType())
-        {
-            return RecordFormatter.Value;
-        }
-
-        if (type.IsDictionaryType())
-        {
-            return Formatters[key: typeof(IDictionary)];
-        }
-
-        if (type.IsTupleType())
-        {
-            return Formatters[key: typeof(ITuple)];
-        }
-
-        if (type.IsArray)
-        {
-            return Formatters[key: typeof(Array)];
-        }
-
-        if (type.IsSetType())
-        {
-            return SetFormatter;
-        }
-
-        if (type.IsAssignableTo(targetType: typeof(Delegate)))
-        {
-            return Formatters[key: typeof(Delegate)];
-        }
-
-        if (type.IsAssignableTo(targetType: typeof(IEnumerable)))
-        {
-            return Formatters[key: typeof(IEnumerable)];
-        }
-
-        if (type.OverridesToStringType())
-        {
-            return ToStringFormatter;
-        }
-
-        return ObjectFormatter.Value;
+        return formatter;
     }
 }
