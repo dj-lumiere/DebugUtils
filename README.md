@@ -86,7 +86,7 @@ using DebugUtils;
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
 Console.WriteLine(data.Repr());
-// Output: { Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]) }
+// Output: Anonymous(Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))
 
 // 📍 Caller tracking for debugging
 public class Program
