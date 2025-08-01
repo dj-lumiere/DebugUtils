@@ -6,7 +6,7 @@ error logs.**
 ## Core Features
 
 🔍 **`.Repr()`** - See actual content instead of type names  
-📍 **`GetCallerMethod()`** - Know exactly where errors/logs originated  
+📍 **`GetCallerName()`** - Know exactly where errors/logs originated  
 ⚡ **Performance-focused** - Built for competitive programming and production debugging  
 🎯 **Zero dependencies** - Just add to your project and go
 
@@ -55,7 +55,7 @@ public class MainClass
 {
     public void ProcessData()
     {
-        var caller = DebugUtils.GetCallerMethod();
+        var caller = CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Processing started...");
         
         try 
@@ -93,10 +93,10 @@ public class Program
 {
     public void MyAlgorithm()
     {
-        Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Starting algorithm...");
+        Console.WriteLine($"[{CallStack.GetCallerName()}] Starting algorithm...");
         
         var result = ComputeResult();
-        Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Result: {result.Repr()}");
+        Console.WriteLine($"[{CallStack.GetCallerName()}] Result: {result.Repr()}");
     }
 }
 
@@ -145,7 +145,7 @@ new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
 // double(0.30000000000000004)
 ```
 
-### 📍 Caller Method Tracking (`GetCallerMethod()`)
+### 📍 Caller Method Tracking (`GetCallerName()`)
 
 Perfect for logging, error tracking, and debugging call flows:
 
@@ -154,7 +154,7 @@ public class DataProcessor
 {
     public void ProcessFile(string filename)
     {
-        var caller = DebugUtils.GetCallerMethod();
+        var caller = CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Processing file: {filename}");
         
         if (!File.Exists(filename))
@@ -238,15 +238,15 @@ Debug algorithms instantly without writing custom debug code:
 // Debug your DP table
 int[,] dp = new int[n, m];
 // ... fill DP table ...
-Console.WriteLine($"[{CallStack.GetCallerMethod()}] DP: {dp.Repr()}");
+Console.WriteLine($"[{CallStack.GetCallerName()}] DP: {dp.Repr()}");
 
 // Track algorithm execution
 public int Solve(int[] arr)
 {
-    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Input: {arr.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerName()}] Input: {arr.Repr()}");
     
     var result = ProcessArray(arr);
-    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Result: {result}");
+    Console.WriteLine($"[{CallStack.GetCallerName()}] Result: {result}");
     return result;
 }
 ```
@@ -256,7 +256,7 @@ public int Solve(int[] arr)
 ```csharp
 public async Task<ApiResponse> ProcessRequest(RequestData request)
 {
-    var caller = CallStack.GetCallerMethod();
+    var caller = CallStack.GetCallerName();
     logger.Info($"[{caller}] Request: {request.Repr()}");
     
     try 
@@ -286,9 +286,9 @@ public void TestComplexAlgorithm()
     var actual = MyAlgorithm(input);
     
     // Amazing error messages when tests fail
-    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Input: {input.Repr()}");
-    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Expected: {expected.Repr()}");
-    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Actual: {actual.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerName()}] Input: {input.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerName()}] Expected: {expected.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerName()}] Actual: {actual.Repr()}");
     
     Assert.Equal(expected, actual);
 }
@@ -306,7 +306,7 @@ public void TestComplexAlgorithm()
 **Current Features:**
 
 - ✅ `.Repr()` - Comprehensive object representation
-- ✅ `GetCallerMethod()` - Call stack tracking
+- ✅ `GetCallerName()` - Call stack tracking
 - ✅ Multi-framework support (.NET 6-9)
 - ✅ Zero dependencies
 
