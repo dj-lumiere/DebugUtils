@@ -7,8 +7,85 @@ using DebugUtils.Repr.TypeLibraries;
 
 namespace DebugUtils.Repr;
 
+/// <summary>
+/// Provides the main extension methods for generating detailed string representations of objects.
+/// This is the primary entry point for the Repr functionality, offering Python-like repr() 
+/// capabilities for .NET objects with extensive customization options.
+/// </summary>
 public static partial class ReprExtensions
 {
+    /// <summary>
+    /// Generates a detailed string representation of any object with configurable formatting options.
+    /// Similar to Python's repr() function, this method provides unambiguous object representations 
+    /// for debugging, logging, and diagnostic purposes.
+    /// </summary>
+    /// <typeparam name="T">The type of object to represent.</typeparam>
+    /// <param name="obj">The object to represent. Can be null.</param>
+    /// <param name="config">
+    /// Optional configuration controlling formatting behavior. If null, uses GlobalDefaults.
+    /// Controls aspects like numeric formatting, type display, and output mode.
+    /// </param>
+    /// <param name="visited">
+    /// Optional set containing hash codes of objects currently being processed.
+    /// Used internally for circular reference detection. Should typically be null for external calls.
+    /// </param>
+    /// <returns>
+    /// A detailed string representation of the object. The format depends on the object type
+    /// and configuration settings. Circular references are detected and displayed as 
+    /// "&lt;Circular Reference to TypeName @HashCode&gt;".
+    /// </returns>
+    /// <remarks>
+    /// <para>Key features:</para>
+    /// <list type="bullet">
+    /// <item><description>Automatic circular reference detection and prevention</description></item>
+    /// <item><description>Configurable formatting for numbers, floats, and containers</description></item>
+    /// <item><description>Support for hierarchical JSON output mode</description></item>
+    /// <item><description>Extensible formatter registry system</description></item>
+    /// <item><description>Special handling for nullable types</description></item>
+    /// <item><description>Thread-safe operation with per-call state isolation</description></item>
+    /// </list>
+    /// <para>Performance considerations:</para>
+    /// <list type="bullet">
+    /// <item><description>Uses RuntimeHelpers.GetHashCode for object identity</description></item>
+    /// <item><description>Maintains visited set only for reference types</description></item>
+    /// <item><description>Automatic cleanup prevents memory leaks</description></item>
+    /// </list>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Basic usage
+    /// var list = new List&lt;int&gt; { 1, 2, 3 };
+    /// Console.WriteLine(list.Repr()); 
+    /// // Output: [1, 2, 3]
+    /// 
+    /// // With custom configuration
+    /// var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
+    /// Console.WriteLine(3.14f.Repr(config)); 
+    /// // Output: float(3.1400001049041748046875E0)
+    /// 
+    /// // Nullable types
+    /// int? nullable = 123;
+    /// Console.WriteLine(nullable.Repr()); 
+    /// // Output: int?(123)
+    /// 
+    /// // Circular reference detection
+    /// var parent = new Person { Name = "Parent" };
+    /// var child = new Person { Name = "Child", Parent = parent };
+    /// parent.Children = new[] { child };
+    /// Console.WriteLine(parent.Repr());
+    /// // Output: Person(Name: "Parent", Children: [Person(Name: "Child", Parent: &lt;Circular Reference to Person @A1B2C3D4&gt;)])
+    /// 
+    /// // Hierarchical JSON mode
+    /// var jsonConfig = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
+    /// var obj = new { Name = "John", Age = 30 };
+    /// Console.WriteLine(obj.Repr(jsonConfig));
+    /// // Output: {"type":"Anonymous","value":{"Name":"John","Age":30}}
+    /// </code>
+    /// </example>
+    /// <exception cref="StackOverflowException">
+    /// Should not occur due to circular reference detection, but could theoretically happen
+    /// with extremely deep object hierarchies exceeding system stack limits.
+    /// </exception>
     public static string Repr<T>(this T obj, ReprConfig? config = null,
         HashSet<int>? visited = null)
     {
@@ -110,7 +187,7 @@ public static partial class ReprExtensions
         // Handle JSON modes
         if (config.FormattingMode == FormattingMode.Hierarchical)
         {
-            return nullable.FormatNullableAsJson(reprName: reprName,
+            return nullable.FormatNullableAsHierarchical(reprName: reprName,
                 config: config with { TypeMode = TypeReprMode.AlwaysHide });
         }
 
@@ -124,7 +201,7 @@ public static partial class ReprExtensions
             $"{reprName}?({value.Repr(config: config with { TypeMode = TypeReprMode.AlwaysHide })})";
     }
 
-    private static string FormatNullableAsJson<T>(this T nullable, string reprName,
+    private static string FormatNullableAsHierarchical<T>(this T nullable, string reprName,
         ReprConfig config)
     {
         if (nullable == null)

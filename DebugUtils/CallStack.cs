@@ -2,20 +2,36 @@
 
 namespace DebugUtils;
 
+/// <summary>
+/// Provides utilities for inspecting the call stack and retrieving caller information.
+/// Useful for debugging, logging, and diagnostic purposes.
+/// </summary>
 public static class CallStack
 {
     /// <summary>
-    ///     Retrieves information about the calling method using stack trace inspection.
-    ///     Useful for debugging and logging to identify which method initiated a call.
+    /// Retrieves information about the calling method using stack trace inspection.
+    /// This method looks one level up in the call stack to identify the immediate caller.
     /// </summary>
     /// <returns>
-    ///     A string in the format "{ClassName}.{MethodName}" representing the immediate caller
-    ///     of the method where this is used. Returns "[unknown]" if caller information cannot be determined.
+    /// A string in the format "{ClassName}.{MethodName}" representing the immediate caller
+    /// of the method where this is used. Returns descriptive error messages if caller 
+    /// information cannot be determined.
     /// </returns>
     /// <remarks>
-    ///     This method looks one level up in the call stack, so it will return information
-    ///     about the method that directly called GetCallerName().
+    /// <para>This method performs stack frame inspection to determine the calling method.</para>
+    /// <para>Performance note: Stack trace inspection has overhead and should be used judiciously.</para>
     /// </remarks>
+    /// <example>
+    /// <code>
+    /// public class Main
+    /// {
+    ///     public void MyMethod()
+    ///     {
+    ///         Console.WriteLine(CallStack.GetCallerName()); // Output: "Main.MyMethod"
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public static string GetCallerName()
     {
         try
