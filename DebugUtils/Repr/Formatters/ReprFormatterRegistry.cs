@@ -88,6 +88,7 @@ public static class ReprFormatterRegistry
                 key: typeof(Delegate)],
             (_, { } t) when t.IsAssignableTo(targetType: typeof(IEnumerable)) => Formatters[
                 key: typeof(IEnumerable)],
+            (_, { } t) when t.IsAnonymousType() => RecordFormatter.Value,
             (_, { } t) when t.OverridesToStringType() => ToStringFormatter,
             (_, _) => ObjectFormatter.Value
         };
