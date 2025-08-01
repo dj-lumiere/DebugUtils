@@ -111,26 +111,27 @@ internal static class TypeInspector
         // Types that never need a prefix
         if (type.IsNullableStructType()
             || type.IsAssignableTo(targetType: typeof(Delegate))
-            || type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) 
-            || type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>)) 
-            || type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)) 
-            || type.IsAssignableTo(targetType: typeof(ITuple)) 
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>))
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>))
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>))
+            || type.IsAssignableTo(targetType: typeof(ITuple))
             || type.IsEnum
-            )
+           )
         {
             return false;
         }
-        
+
         // Check if the formatter for this type has a ReprOptions attribute
         var formatter = ReprFormatterRegistry.GetFormatter(type, ReprConfig.GlobalDefaults);
-        var formatterAttr = formatter.GetType().GetCustomAttribute<ReprOptionsAttribute>();
+        var formatterAttr = formatter.GetType()
+                                     .GetCustomAttribute<ReprOptionsAttribute>();
         if (formatterAttr != null)
         {
             return formatterAttr.NeedsPrefix;
         }
-        
+
         // Record types and types that doesn't override ToString need type prefix.
-        return type.IsRecordType() &&!type.OverridesToStringType();
+        return type.IsRecordType() && !type.OverridesToStringType();
     }
     public static bool IsGenericTypeOf(this Type type, Type genericTypeDefinition)
     {
