@@ -114,7 +114,7 @@ internal static class ObjectJsonExtensions
                 json[propertyName: "type"] = "Function";
                 json.Add(propertyName: "properties",
                     value: functionDetails.GetJson(config: config, visited: visited,
-                        depth: depth));
+                        depth: depth + 1));
                 return json;
             }
         }
