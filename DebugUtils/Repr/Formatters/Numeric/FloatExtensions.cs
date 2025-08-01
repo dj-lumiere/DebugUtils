@@ -100,8 +100,8 @@ internal static class FloatExtensions
             TypeName: FloatTypeKind.Double
         );
     }
-    
-        public static string AsRounding(this object obj, FloatInfo info,
+
+    public static string AsRounding(this object obj, FloatInfo info,
         ReprConfig reprConfig)
     {
         var roundingFormatString = "F" + (reprConfig.FloatPrecision > 0

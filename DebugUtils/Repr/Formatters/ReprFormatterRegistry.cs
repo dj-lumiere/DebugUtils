@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Formatters.Collections;
 using DebugUtils.Repr.Formatters.Fallback;
 using DebugUtils.Repr.Formatters.Functions;
@@ -11,7 +12,7 @@ using DebugUtils.Repr.TypeLibraries;
 
 namespace DebugUtils.Repr.Formatters;
 
-public static class ReprFormatterRegistry
+internal static class ReprFormatterRegistry
 {
     private static readonly Dictionary<Type, IReprFormatter> Formatters = new();
 
@@ -24,8 +25,8 @@ public static class ReprFormatterRegistry
     private static readonly Lazy<ObjectFormatter> ObjectFormatter =
         new(valueFactory: () => new ObjectFormatter());
 
-    private static readonly Lazy<ObjectJsonFormatter> ObjectJsonFormatter =
-        new(valueFactory: () => new ObjectJsonFormatter());
+    private static readonly Lazy<HierarchicalObjectFormatter> ObjectJsonFormatter =
+        new(valueFactory: () => new HierarchicalObjectFormatter());
 
     private static readonly IReprFormatter ToStringFormatter = new ToStringFormatter();
     private static readonly IReprFormatter SetFormatter = new SetFormatter();
@@ -53,6 +54,7 @@ public static class ReprFormatterRegistry
             {
                 continue;
             }
+
             var targetTypes = attr?.TargetTypes ?? Array.Empty<Type>();
             foreach (var targetType in targetTypes)
             {
@@ -78,7 +80,7 @@ public static class ReprFormatterRegistry
     {
         var formatter = (config.FormattingMode, type) switch
         {
-            (FormattingMode.Json, _) => ObjectJsonFormatter.Value,
+            (FormattingMode.Hierarchical, _) => ObjectJsonFormatter.Value,
             (FormattingMode.Reflection, _) => ObjectFormatter.Value,
             (_, { } t) when Formatters.TryGetValue(key: t, value: out var result) => result,
             (_, { } t) when t.IsEnum => Formatters[key: typeof(Enum)],

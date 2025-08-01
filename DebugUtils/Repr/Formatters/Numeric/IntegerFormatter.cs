@@ -12,7 +12,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
     , typeof(Int128), typeof(UInt128)
     #endif
 )]
-[ReprOptions(needsPrefix:true)]
+[ReprOptions(needsPrefix: true)]
 public class IntegerFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)

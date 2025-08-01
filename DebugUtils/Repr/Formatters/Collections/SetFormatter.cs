@@ -5,7 +5,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;
 
-[ReprOptions(true)]
+[ReprOptions(needsPrefix: true)]
 public class SetFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

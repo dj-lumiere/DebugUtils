@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Formatters;
+﻿namespace DebugUtils.Repr.Formatters.Attributes;
 
 [AttributeUsage(validOn: AttributeTargets.Class)]
 public class ReprFormatterAttribute : Attribute

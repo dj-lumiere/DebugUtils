@@ -13,7 +13,7 @@ public class ParameterDetails
     public ParameterDetails(ParameterInfo parameterInfo)
     {
         Name = parameterInfo.Name ?? "unnamed";
-        TypeReprName = parameterInfo.ParameterType.GetReprTypeNameByTypeName();
+        TypeReprName = parameterInfo.ParameterType.GetReprTypeName();
         Modifier = parameterInfo.GetParameterModifier();
         HasDefaultValue = parameterInfo.HasDefaultValue;
         DefaultValue = parameterInfo.HasDefaultValue
@@ -24,22 +24,22 @@ public class ParameterDetails
     public override string ToString()
     {
         List<string> parts = new();
-        if (!string.IsNullOrEmpty(Modifier))
+        if (!String.IsNullOrEmpty(value: Modifier))
         {
-            parts.Add(Modifier);
+            parts.Add(item: Modifier);
         }
 
-        if (!string.IsNullOrEmpty(TypeReprName))
+        if (!String.IsNullOrEmpty(value: TypeReprName))
         {
-            parts.Add(TypeReprName);
+            parts.Add(item: TypeReprName);
         }
 
-        if (!string.IsNullOrEmpty(Name))
+        if (!String.IsNullOrEmpty(value: Name))
         {
-            parts.Add(Name);
+            parts.Add(item: Name);
         }
 
-        return string.Join(" ", parts);
+        return String.Join(separator: " ", values: parts);
     }
 }
 
@@ -47,7 +47,7 @@ internal static class ParameterDetailsExtensions
 {
     public static ParameterDetails ToParameterDetails(this ParameterInfo parameterInfo)
     {
-        return new ParameterDetails(parameterInfo);
+        return new ParameterDetails(parameterInfo: parameterInfo);
     }
     public static string GetParameterModifier(this ParameterInfo param)
     {

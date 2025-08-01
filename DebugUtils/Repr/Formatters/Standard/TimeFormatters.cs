@@ -30,7 +30,7 @@ public class DateTimeOffsetFormatter : IReprFormatter
         var dto = (DateTimeOffset)obj;
         if (dto.Offset == TimeSpan.Zero)
         {
-            return dto.ToString("yyyy-MM-dd HH:mm:ss") + "Z";
+            return dto.ToString(format: "yyyy-MM-dd HH:mm:ss") + "Z";
         }
 
         var offset = dto.Offset.ToString(format: "c");
@@ -39,7 +39,7 @@ public class DateTimeOffsetFormatter : IReprFormatter
             offset = "+" + offset;
         }
 
-        return dto.ToString("yyyy-MM-dd HH:mm:ss") + offset;
+        return dto.ToString(format: "yyyy-MM-dd HH:mm:ss") + offset;
     }
 }
 
