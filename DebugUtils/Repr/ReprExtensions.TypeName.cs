@@ -49,8 +49,9 @@ public static partial class ReprExtensions
 
             if (underlyingType.IsTupleType())
             {
-                return "Tuple"; // Simple approach
+                return "Tuple?"; // Simple approach
             }
+            return $"{underlyingType.GetReprTypeName()}?";
         }
 
         if (CSharpTypeNames.TryGetValue(key: type, value: out var typeName))

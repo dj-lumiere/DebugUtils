@@ -181,8 +181,7 @@ public static partial class ReprExtensions
     private static string FormatNullableValueType<T>(this T nullable, ReprConfig config)
     {
         var type = typeof(T);
-        var underlyingType = Nullable.GetUnderlyingType(nullableType: type)!;
-        var reprName = underlyingType.GetReprTypeName();
+        var reprName = type.GetReprTypeName();
 
         // Handle JSON modes
         if (config.FormattingMode == FormattingMode.Hierarchical)
@@ -193,12 +192,12 @@ public static partial class ReprExtensions
 
         if (nullable == null)
         {
-            return $"{reprName}?(null)";
+            return $"{reprName}(null)";
         }
 
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
         return
-            $"{reprName}?({value.Repr(config: config with { TypeMode = TypeReprMode.AlwaysHide })})";
+            $"{reprName}({value.Repr(config: config with { TypeMode = TypeReprMode.AlwaysHide })})";
     }
 
     private static string FormatNullableAsHierarchical<T>(this T nullable, string reprName,
