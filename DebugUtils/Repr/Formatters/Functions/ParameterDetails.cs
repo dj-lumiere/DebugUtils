@@ -20,10 +20,26 @@ public class ParameterDetails
             ? parameterInfo.DefaultValue
             : null;
     }
-    
+
     public override string ToString()
     {
-        return $"{Modifier} {TypeReprName} {Name}";
+        List<string> parts = new();
+        if (!string.IsNullOrEmpty(Modifier))
+        {
+            parts.Add(Modifier);
+        }
+
+        if (!string.IsNullOrEmpty(TypeReprName))
+        {
+            parts.Add(TypeReprName);
+        }
+
+        if (!string.IsNullOrEmpty(Name))
+        {
+            parts.Add(Name);
+        }
+
+        return string.Join(" ", parts);
     }
 }
 

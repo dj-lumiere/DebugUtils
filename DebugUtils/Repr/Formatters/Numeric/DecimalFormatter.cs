@@ -5,6 +5,7 @@ using DebugUtils.Repr.Records;
 namespace DebugUtils.Repr.Formatters.Numeric;
 
 [ReprFormatter(typeof(decimal))]
+[ReprOptions(needsPrefix:true)]
 public class DecimalFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)

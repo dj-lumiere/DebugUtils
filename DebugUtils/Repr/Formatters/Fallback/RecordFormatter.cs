@@ -8,6 +8,7 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 ///     A generic formatter for any record type.
 ///     It uses reflection to represent the record's public properties.
 /// </summary>
+[ReprOptions(needsPrefix:true)]
 public class RecordFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

@@ -13,6 +13,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
     typeof(Half)
     #endif
 )]
+[ReprOptions(needsPrefix:true)]
 internal class FloatFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)

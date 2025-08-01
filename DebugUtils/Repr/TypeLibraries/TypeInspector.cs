@@ -1,7 +1,7 @@
-﻿using System.Numerics;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Formatters;
+using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.TypeLibraries;
 
@@ -108,33 +108,32 @@ internal static class TypeInspector
     }
     public static bool NeedsTypePrefixType(this Type type)
     {
-        // Check for the attribute first
-        var attr = type.GetCustomAttribute<ReprOptionsAttribute>();
-        if (attr != null)
-        {
-            return attr.NeedsPrefix;
-        }
-
         // Types that never need a prefix
-        if (type.IsNullableStructType() || type.IsAssignableTo(targetType: typeof(Delegate)) ||
-            type == typeof(string) || type == typeof(char) || type == typeof(bool) ||
-            type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) ||
-            type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>)) ||
-            type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)) ||
-            type.IsAssignableTo(targetType: typeof(ITuple)) || type.IsEnum)
+        if (type.IsNullableStructType()
+            || type.IsAssignableTo(targetType: typeof(Delegate))
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(List<>)) 
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(Dictionary<,>)) 
+            || type.IsGenericTypeOf(genericTypeDefinition: typeof(HashSet<>)) 
+            || type.IsAssignableTo(targetType: typeof(ITuple)) 
+            || type.IsEnum
+            || type == typeof(Guid)
+            || type == typeof(Uri)
+            || type == typeof(Version)
+            )
         {
             return false;
         }
-
-        // Types that always need a prefix
-        if (type.IsIntegerPrimitiveType() || type.IsFloatType() || type == typeof(decimal) ||
-            type == typeof(BigInteger) || type.IsArray || type.IsRecordType())
+        
+        // Check if the formatter for this type has a ReprOptions attribute
+        var formatter = ReprFormatterRegistry.GetFormatter(type, ReprConfig.GlobalDefaults);
+        var formatterAttr = formatter.GetType().GetCustomAttribute<ReprOptionsAttribute>();
+        if (formatterAttr != null)
         {
-            return true;
+            return formatterAttr.NeedsPrefix;
         }
-
-        // Other types
-        return !type.OverridesToStringType();
+        
+        // Record types and types that doesn't override ToString need type prefix.
+        return type.IsRecordType() &&!type.OverridesToStringType();
     }
     public static bool IsGenericTypeOf(this Type type, Type genericTypeDefinition)
     {

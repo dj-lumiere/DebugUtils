@@ -3,6 +3,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
+[ReprOptions(needsPrefix:false)]
 public class FunctionFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
