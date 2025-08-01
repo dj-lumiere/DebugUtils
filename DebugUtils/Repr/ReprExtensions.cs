@@ -98,7 +98,8 @@ public static partial class ReprExtensions
             visited.Remove(item: id);
         }
 
-        var result = formatter.ToRepr(obj: obj, config: config, visited: visited);
+        // Since I handled null checking at the first stage of repr.
+        var result = formatter.ToRepr(obj: obj!, config: config, visited: visited);
         visited.Add(item: id);
         return result;
     }

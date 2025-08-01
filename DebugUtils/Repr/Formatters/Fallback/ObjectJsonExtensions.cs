@@ -81,10 +81,10 @@ internal static class ObjectJsonExtensions
                 {
                     var entryJson = new JsonObject
                     {
-                        [propertyName: "key"] = entry.Key?.GetJson(config: config,
+                        [propertyName: "key"] = entry.Key.GetJson(config: config,
                             visited: visited, depth: depth + 1),
                         [propertyName: "value"] = entry.Value?.GetJson(config: config,
-                            visited: visited, depth: depth + 1)
+                            visited: visited, depth: depth + 1) ?? null
                     };
                     entries.Add(value: entryJson);
                 }
@@ -100,8 +100,8 @@ internal static class ObjectJsonExtensions
                 foreach (var item in list)
                 {
                     count += 1;
-                    jsonlist.Add(value: item.GetJson(config: config, visited: visited,
-                        depth: depth + 1));
+                    jsonlist.Add(value: item?.GetJson(config: config, visited: visited,
+                        depth: depth + 1) ?? null);
                 }
 
                 json.Add(propertyName: "count", value: count);
@@ -124,7 +124,8 @@ internal static class ObjectJsonExtensions
         foreach (var field in fields)
         {
             var value = field.GetValue(obj: obj);
-            var addingValue = value.GetJson(config: config, visited: visited, depth: depth + 1);
+            var addingValue = value?.GetJson(config: config, visited: visited, depth: depth + 1)
+                              ?? null;
             json.Add(propertyName: field.Name, value: addingValue);
         }
 
@@ -138,7 +139,7 @@ internal static class ObjectJsonExtensions
             {
                 var value = prop.GetValue(obj: obj);
                 var addingValue =
-                    value.GetJson(config: config, visited: visited, depth: depth + 1);
+                    value?.GetJson(config: config, visited: visited, depth: depth + 1) ?? null;
                 json.Add(propertyName: prop.Name, value: addingValue);
             }
             catch (Exception ex)
