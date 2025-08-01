@@ -8,10 +8,51 @@ using DebugUtils.Repr.TypeLibraries;
 namespace DebugUtils.Repr;
 
 /// <summary>
-/// Provides the main extension methods for generating detailed string representations of objects.
-/// This is the primary entry point for the Repr functionality, offering Python-like repr() 
-/// capabilities for .NET objects with extensive customization options.
+/// Provides extension methods for generating detailed string representations of .NET objects.
+/// This class contains the core functionality for the Repr system, offering Python-like repr() 
+/// capabilities with extensive customization options for debugging, logging, and diagnostic purposes.
 /// </summary>
+/// <remarks>
+/// <para>The ReprExtensions class serves as the main entry point for object representation functionality.
+/// It combines several key areas of functionality:</para>
+/// <list type="bullet">
+/// <item><description><strong>Object Representation:</strong> The primary Repr() extension method that converts any object to a detailed string representation</description></item>
+/// <item><description><strong>Type Name Resolution:</strong> Methods for obtaining human-readable type names, handling generics, nullable types, and special .NET types</description></item>
+/// <item><description><strong>Configuration Management:</strong> Type mappings and configuration utilities for controlling formatting behavior</description></item>
+/// </list>
+/// 
+/// <para><b>Key Features:</b></para>
+/// <list type="bullet">
+/// <item><description>Automatic circular reference detection and prevention</description></item>
+/// <item><description>Configurable formatting for numeric types, floats, and containers</description></item>
+/// <item><description>Support for hierarchical JSON output mode</description></item>
+/// <item><description>Extensible formatter registry system</description></item>
+/// <item><description>Thread-safe operation with per-call state isolation</description></item>
+/// <item><description>Comprehensive type system integration</description></item>
+/// </list>
+/// 
+/// <para><strong>Performance Characteristics:</strong></para>
+/// <list type="bullet">
+/// <item><description>Optimized type name lookups using static dictionaries</description></item>
+/// <item><description>Efficient circular reference detection using RuntimeHelpers.GetHashCode</description></item>
+/// <item><description>Minimal allocations for simple object representations</description></item>
+/// <item><description>Automatic cleanup prevents memory leaks</description></item>
+/// </list>
+/// 
+/// <para><strong>Extensibility:</strong></para>
+/// <list type="bullet">
+/// <item><description>Custom formatters can be registered via IReprFormatter interface</description></item>
+/// <item><description>Attribute-based configuration using ReprOptionsAttribute</description></item>
+/// <item><description>Configurable container handling strategies</description></item>
+/// <item><description>Support for custom type name mappings</description></item>
+/// </list>
+/// </remarks>
+/// <seealso cref="Repr{T}(T, ReprConfig?, HashSet{int}?)"/>
+/// <seealso cref="GetReprTypeName{T}(T)"/>
+/// <seealso cref="GetReprTypeName(Type)"/>
+/// <seealso cref="GetContainerConfig(ReprConfig)"/>
+/// <seealso cref="ReprConfig"/>
+/// <seealso cref="IReprFormatter"/>
 public static partial class ReprExtensions
 {
     /// <summary>
@@ -47,7 +88,7 @@ public static partial class ReprExtensions
     /// <para>Performance considerations:</para>
     /// <list type="bullet">
     /// <item><description>Uses RuntimeHelpers.GetHashCode for object identity</description></item>
-    /// <item><description>Maintains visited set only for reference types</description></item>
+    /// <item><description>Maintains a visited set only for reference types</description></item>
     /// <item><description>Automatic cleanup prevents memory leaks</description></item>
     /// </list>
     /// </remarks>
@@ -56,7 +97,7 @@ public static partial class ReprExtensions
     /// // Basic usage
     /// var list = new List&lt;int&gt; { 1, 2, 3 };
     /// Console.WriteLine(list.Repr()); 
-    /// // Output: [1, 2, 3]
+    /// // Output: [int(1), int(2), int(3)]
     /// 
     /// // With custom configuration
     /// var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
@@ -69,17 +110,19 @@ public static partial class ReprExtensions
     /// // Output: int?(123)
     /// 
     /// // Circular reference detection
-    /// var parent = new Person { Name = "Parent" };
-    /// var child = new Person { Name = "Child", Parent = parent };
-    /// parent.Children = new[] { child };
+    /// var parent = new Children { Name = "Parent" };
+    /// var child = new Children { Name = "Child", Parent = parent };
+    /// parent.Parent = child;
     /// Console.WriteLine(parent.Repr());
     /// // Output: Person(Name: "Parent", Children: [Person(Name: "Child", Parent: &lt;Circular Reference to Person @A1B2C3D4&gt;)])
+    /// // "A1B2C3D4" part can be different
     /// 
     /// // Hierarchical JSON mode
     /// var jsonConfig = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
     /// var obj = new { Name = "John", Age = 30 };
     /// Console.WriteLine(obj.Repr(jsonConfig));
-    /// // Output: {"type":"Anonymous","value":{"Name":"John","Age":30}}
+    /// // Output: "{"type":"Anonymous","Name":{"type":"string","value":"John"},"Age":{"type":"int","value":"30"}}"
+    /// // (removed any whitespaces for brevity)
     /// </code>
     /// </example>
     /// <exception cref="StackOverflowException">

@@ -30,7 +30,8 @@ public class ReprOptionsAttribute : Attribute
     /// Initializes a new instance of the ReprOptionsAttribute with the specified prefix requirement.
     /// </summary>
     /// <param name="needsPrefix">
-    /// true if the type should always display a type prefix (e.g., "TypeName(content)");
+    /// true if the type should always display a type prefix unless explicitly said to hidden
+    /// (e.g., "TypeName(content)");
     /// false if the type should display content without a type wrapper.
     /// </param>
     public ReprOptionsAttribute(bool needsPrefix)

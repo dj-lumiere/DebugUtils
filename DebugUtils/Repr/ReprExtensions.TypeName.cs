@@ -3,10 +3,6 @@ using static DebugUtils.Repr.TypeLibraries.TypeNameMappings;
 
 namespace DebugUtils.Repr;
 
-/// <summary>
-/// Provides extension methods for obtaining human-readable type names for representation purposes.
-/// Handles complex scenarios including nullable types, generic types, arrays, and special .NET types.
-/// </summary>
 public static partial class ReprExtensions
 {
     /// <summary>
@@ -15,11 +11,7 @@ public static partial class ReprExtensions
     /// </summary>
     /// <param name="type">The type to get the representation name for.</param>
     /// <returns>
-    /// A string representing the type in a human-readable format. Examples:
-    /// - "int" instead of "Int32"
-    /// - "List" instead of "List`1" 
-    /// - "Task&lt;string&gt;" instead of "Task`1"
-    /// - "int?" instead of "Nullable`1"
+    /// A string representing the type in a human-readable format.
     /// </returns>
     /// <remarks>
     /// <para>This method handles several special cases:</para>

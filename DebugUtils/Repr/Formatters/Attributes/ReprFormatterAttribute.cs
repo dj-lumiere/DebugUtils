@@ -15,6 +15,7 @@
 /// <example>
 /// <code>
 /// [ReprFormatter(typeof(Person), typeof(Employee))]
+/// [ReprOptions(needsPrefix: false)]
 /// public class PersonFormatter : IReprFormatter
 /// {
 ///     public string ToRepr(object obj, ReprConfig config, HashSet&lt;int&gt;? visited = null)

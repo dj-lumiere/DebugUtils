@@ -15,6 +15,7 @@ namespace DebugUtils.Repr.Interfaces;
 /// <example>
 /// <code>
 /// [ReprFormatter(typeof(MyCustomType))]
+/// [ReprOptions(needsPrefix: false)]
 /// public class MyCustomFormatter : IReprFormatter
 /// {
 ///     public string ToRepr(object obj, ReprConfig config, HashSet&lt;int&gt;? visited = null)
