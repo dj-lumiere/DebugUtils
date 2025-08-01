@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text;
+using System.Text.Json.Nodes;
 using DebugUtils.Repr;
 using DebugUtils.Repr.Records;
 
@@ -87,7 +88,7 @@ public class ReprTest
             actual: new[,] { { 1, 2 }, { 3, 4 } }.Repr());
         Assert.Equal(expected: "JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])",
             actual: new int[][] { new[] { 1, 2 }, new[] { 3, 4, 5 } }.Repr());
-        
+
         Assert.Equal(expected: "[int(1), int(2), int(3)]",
             actual: new List<int> { 1, 2, 3 }.Repr());
         Assert.Equal(expected: "{\"a\", \"b\"}",
@@ -581,5 +582,25 @@ public class ReprTest
         Assert.StartsWith(expectedStartString: "[<Circular Reference to List @",
             actualString: repr);
         Assert.EndsWith(expectedEndString: ">]", actualString: repr);
+    }
+
+    [Fact]
+    public void TestJsonRepr()
+    {
+        var data = new { Name = "Alice", Age = 30 };
+        var config = new ReprConfig(FormattingMode: FormattingMode.Json);
+        var actualJson = data.Repr(config: config);
+        var expectedJsonObject = new JsonObject();
+        expectedJsonObject.Add(propertyName: "type", value: "Anonymous");
+        var nameObject = new JsonObject();
+        nameObject.Add(propertyName: "type", value: "string");
+        nameObject.Add(propertyName: "value", value: "Alice");
+        expectedJsonObject.Add(propertyName: "Name", value: nameObject);
+        var ageObject = new JsonObject();
+        ageObject.Add(propertyName: "type", value: "int");
+        ageObject.Add(propertyName: "value", value: "30");
+        expectedJsonObject.Add(propertyName: "Age", value: ageObject);
+        var expectedJson = expectedJsonObject.ToString();
+        Assert.Equal(expected: expectedJson, actual: actualJson);
     }
 }
