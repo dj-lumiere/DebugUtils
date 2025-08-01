@@ -65,7 +65,7 @@ public enum Colors
 
 public class Children
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public Children? Parent { get; set; }
 }
 
