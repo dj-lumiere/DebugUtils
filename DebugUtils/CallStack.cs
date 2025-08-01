@@ -14,9 +14,9 @@ public static class CallStack
     /// </returns>
     /// <remarks>
     ///     This method looks one level up in the call stack, so it will return information
-    ///     about the method that directly called GetCallerMethod().
+    ///     about the method that directly called GetCallerName().
     /// </remarks>
-    public static string GetCallerMethod()
+    public static string GetCallerName()
     {
         try
         {
