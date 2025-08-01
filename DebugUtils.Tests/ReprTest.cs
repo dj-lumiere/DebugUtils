@@ -63,6 +63,12 @@ public enum Colors
     BLUE
 }
 
+public class Children
+{
+    public string Name { get; set; }
+    public Children? Parent { get; set; }
+}
+
 public class ReprTest
 {
     [Fact]
@@ -121,6 +127,55 @@ public class ReprTest
         var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
         Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
             actual: new[] { 1, 2, 3 }.Repr(config: showTypes));
+    }
+
+    [Fact]
+    public void ExampleTestRepr()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        Assert.Equal(expected: "[int(1), int(2), int(3)]", actual: list.Repr());
+
+        var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
+        var f = 3.14f;
+        Assert.Equal(expected: "float(3.1400001049041748046875E0)",
+            actual: f.Repr(config: config));
+
+        int? nullable = 123;
+        Assert.Equal(expected: "int?(123)", actual: nullable.Repr());
+
+        var parent = new Children { Name = "Parent" };
+        var child = new Children { Name = "Child", Parent = parent };
+        parent.Parent = child;
+        Assert.StartsWith(
+            "Children(Name: \"Parent\", Parent: Children(Name: \"Child\", Parent: <Circular Reference to Children @",
+            parent.Repr());
+        Assert.EndsWith(">))", parent.Repr());
+
+        var jsonConfig = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
+        var obj = new { Name = "John", Age = 30 };
+        Assert.Equal(
+            "{\"type\":\"Anonymous\",\"Name\":{\"type\":\"string\",\"value\":\"John\"},\"Age\":{\"type\":\"int\",\"value\":\"30\"}}",
+            obj.Repr(config: jsonConfig)
+               .Replace("\r", "")
+               .Replace("\n", "")
+               .Replace(" ", ""));
+    }
+
+    [Fact]
+    public void GetReprTypeNameTest()
+    {
+        var intType = typeof(int);
+        Assert.Equal(expected: "int", actual: intType.GetReprTypeName());
+
+        var listType = typeof(List<string>);
+        Assert.Equal(expected: "List", actual: listType.GetReprTypeName());
+
+        var intNullableType = typeof(int?);
+        Assert.Equal(typeof(int?), typeof(Nullable<int>));
+        Assert.Equal(expected: "int?", actual: intNullableType.GetReprTypeName());
+
+        var taskType = typeof(Task<bool>);
+        Assert.Equal(expected: "Task<bool>", actual: taskType.GetReprTypeName());
     }
 
     // Basic Types

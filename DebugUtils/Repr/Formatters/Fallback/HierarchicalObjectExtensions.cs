@@ -9,7 +9,8 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 
 internal static class HierarchicalObjectExtensions
 {
-    public static JsonObject ToJsonObject(this object obj, ReprConfig config, HashSet<int>? visited,
+    public static JsonObject ToJsonObject(this object obj, ReprConfig config,
+        HashSet<int>? visited,
         int depth)
     {
         var type = obj.GetType();
@@ -124,8 +125,9 @@ internal static class HierarchicalObjectExtensions
         foreach (var field in fields)
         {
             var value = field.GetValue(obj: obj);
-            var addingValue = value?.ToJsonObject(config: config, visited: visited, depth: depth + 1)
-                              ?? null;
+            var addingValue =
+                value?.ToJsonObject(config: config, visited: visited, depth: depth + 1)
+                ?? null;
             json.Add(propertyName: field.Name, value: addingValue);
         }
 
@@ -139,7 +141,8 @@ internal static class HierarchicalObjectExtensions
             {
                 var value = prop.GetValue(obj: obj);
                 var addingValue =
-                    value?.ToJsonObject(config: config, visited: visited, depth: depth + 1) ?? null;
+                    value?.ToJsonObject(config: config, visited: visited, depth: depth + 1) ??
+                    null;
                 json.Add(propertyName: prop.Name, value: addingValue);
             }
             catch (Exception ex)
@@ -181,7 +184,8 @@ internal static class HierarchicalObjectExtensions
                 {
                     // Otherwise, format the element normally.
                     items.Add(
-                        item: value?.ToJsonObject(config: config, visited: visited, depth: depth + 1));
+                        item: value?.ToJsonObject(config: config, visited: visited,
+                            depth: depth + 1));
                 }
             }
 

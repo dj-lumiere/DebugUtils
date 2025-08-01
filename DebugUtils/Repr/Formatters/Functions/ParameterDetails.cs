@@ -56,13 +56,20 @@ internal static class ParameterDetailsExtensions
         HashSet<int> visited, int depth)
     {
         var result = new JsonObject();
-        result.Add("name", details.Name.ToJsonObject(config, visited, depth + 1));
-        result.Add("typeReprName", details.TypeReprName.ToJsonObject(config, visited, depth + 1));
-        result.Add("Modifier", details.Modifier.ToJsonObject(config, visited, depth + 1));
-        result.Add("HasDefaultValue",
-            details.HasDefaultValue.ToJsonObject(config, visited, depth + 1));
-        result.Add("DefaultValue",
-            details.DefaultValue?.ToJsonObject(config, visited, depth + 1) ?? null);
+        result.Add(propertyName: "name",
+            value: details.Name.ToJsonObject(config: config, visited: visited, depth: depth + 1));
+        result.Add(propertyName: "typeReprName",
+            value: details.TypeReprName.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "Modifier",
+            value: details.Modifier.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "HasDefaultValue",
+            value: details.HasDefaultValue.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "DefaultValue",
+            value: details.DefaultValue?.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1) ?? null);
         return result;
     }
     public static string GetParameterModifier(this ParameterInfo param)

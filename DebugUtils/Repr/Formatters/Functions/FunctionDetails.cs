@@ -28,13 +28,13 @@ internal class FunctionDetails
         if (!String.IsNullOrEmpty(value: Modifiers.ToString()))
         {
             parts.Add(item: Modifiers.ToString());
-            parts.Add(" ");
+            parts.Add(item: " ");
         }
 
         if (!String.IsNullOrEmpty(value: ReturnTypeReprName))
         {
             parts.Add(item: ReturnTypeReprName);
-            parts.Add(" ");
+            parts.Add(item: " ");
         }
 
         if (!String.IsNullOrEmpty(value: Name))
@@ -57,11 +57,17 @@ internal static class FunctionDetailsExtensions
         HashSet<int> visited, int depth)
     {
         var result = new JsonObject();
-        result.Add("name", details.Name.ToJsonObject(config, visited, depth + 1));
-        result.Add("returnTypeReprName",
-            details.ReturnTypeReprName.ToJsonObject(config, visited, depth + 1));
-        result.Add("Modifiers", details.Modifiers.ToJsonObject(config, visited, depth + 1));
-        result.Add("Parameters", details.Parameters.ToJsonObject(config, visited, depth + 1));
+        result.Add(propertyName: "name",
+            value: details.Name.ToJsonObject(config: config, visited: visited, depth: depth + 1));
+        result.Add(propertyName: "returnTypeReprName",
+            value: details.ReturnTypeReprName.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "Modifiers",
+            value: details.Modifiers.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "Parameters",
+            value: details.Parameters.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
         return result;
     }
 

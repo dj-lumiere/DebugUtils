@@ -171,7 +171,8 @@ public static partial class ReprExtensions
         {
             if (config.FormattingMode == FormattingMode.Hierarchical)
             {
-                result = obj.InvokeHierarchicalFormatter(config: config, visited: visited, formatter: reprFormatter,
+                result = obj.InvokeHierarchicalFormatter(config: config, visited: visited,
+                    formatter: reprFormatter,
                     id: id);
             }
 
@@ -204,7 +205,8 @@ public static partial class ReprExtensions
         }
     }
 
-    private static string InvokeHierarchicalFormatter<T>(this T obj, ReprConfig config, HashSet<int> visited,
+    private static string InvokeHierarchicalFormatter<T>(this T obj, ReprConfig config,
+        HashSet<int> visited,
         IReprFormatter formatter, int id)
     {
         // prevent immediate circular reference crashing

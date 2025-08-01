@@ -2,15 +2,8 @@
 
 namespace DebugUtils.Repr;
 
-// ReprExtensions.Configs.cs  
-/// <summary>
-/// Provides configuration-related extension methods and static data for the Repr system.
-/// Contains mappings for C# type names and friendly display names.
-/// </summary>
 public static partial class ReprExtensions
 {
-
-
     /// <summary>
     /// Determines the appropriate configuration to use for formatting container contents
     /// based on the current configuration's container handling mode.

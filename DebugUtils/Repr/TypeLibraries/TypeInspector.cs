@@ -17,7 +17,7 @@ internal static class TypeInspector
                || type == typeof(short)
                || type == typeof(int)
                || type == typeof(long)
-            #if NET7_0_OR_GREATER
+               #if NET7_0_OR_GREATER
                || type == typeof(Int128)
             #endif
             ;
@@ -29,7 +29,7 @@ internal static class TypeInspector
                || type == typeof(ushort)
                || type == typeof(uint)
                || type == typeof(ulong)
-            #if NET7_0_OR_GREATER
+               #if NET7_0_OR_GREATER
                || type == typeof(Int128)
             #endif
             ;

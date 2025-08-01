@@ -131,26 +131,45 @@ internal static class MethodModifiersExtensions
         HashSet<int> visited, int depth)
     {
         var result = new JsonObject();
-        result.Add("isPublic", methodModifiers.IsPublic.ToJsonObject(config, visited, depth + 1));
-        result.Add("isPrivate",
-            methodModifiers.IsPrivate.ToJsonObject(config, visited, depth + 1));
-        result.Add("isProtected",
-            methodModifiers.IsProtected.ToJsonObject(config, visited, depth + 1));
-        result.Add("isInternal",
-            methodModifiers.IsInternal.ToJsonObject(config, visited, depth + 1));
-        result.Add("isStatic", methodModifiers.IsStatic.ToJsonObject(config, visited, depth + 1));
-        result.Add("isVirtual",
-            methodModifiers.IsVirtual.ToJsonObject(config, visited, depth + 1));
-        result.Add("isOverride",
-            methodModifiers.IsOverride.ToJsonObject(config, visited, depth + 1));
-        result.Add("isAbstract",
-            methodModifiers.IsAbstract.ToJsonObject(config, visited, depth + 1));
-        result.Add("isSealed", methodModifiers.IsSealed.ToJsonObject(config, visited, depth + 1));
-        result.Add("isAsync", methodModifiers.IsAsync.ToJsonObject(config, visited, depth + 1));
-        result.Add("isGeneric",
-            methodModifiers.IsGeneric.ToJsonObject(config, visited, depth + 1));
-        result.Add("isExtern", methodModifiers.IsExtern.ToJsonObject(config, visited, depth + 1));
-        result.Add("isUnsafe", methodModifiers.IsUnsafe.ToJsonObject(config, visited, depth + 1));
+        result.Add(propertyName: "isPublic",
+            value: methodModifiers.IsPublic.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isPrivate",
+            value: methodModifiers.IsPrivate.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isProtected",
+            value: methodModifiers.IsProtected.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isInternal",
+            value: methodModifiers.IsInternal.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isStatic",
+            value: methodModifiers.IsStatic.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isVirtual",
+            value: methodModifiers.IsVirtual.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isOverride",
+            value: methodModifiers.IsOverride.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isAbstract",
+            value: methodModifiers.IsAbstract.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isSealed",
+            value: methodModifiers.IsSealed.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isAsync",
+            value: methodModifiers.IsAsync.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isGeneric",
+            value: methodModifiers.IsGeneric.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isExtern",
+            value: methodModifiers.IsExtern.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
+        result.Add(propertyName: "isUnsafe",
+            value: methodModifiers.IsUnsafe.ToJsonObject(config: config, visited: visited,
+                depth: depth + 1));
         return result;
     }
 
