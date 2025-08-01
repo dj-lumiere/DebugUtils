@@ -607,4 +607,16 @@ public class ReprTest
         };
         Assert.True(JsonNode.DeepEquals(actualJsonNode, expectedJsonNode));
     }
+
+    [Fact]
+    public void TestJsonCircularRepr()
+    {
+        List<object> a = new();
+        a.Add(item: a);
+        var config = new ReprConfig(FormattingMode: FormattingMode.Json);
+        var actualJsonString = a.Repr(config: config);
+        Assert.Contains(expectedSubstring: "Circular Reference to List @",
+            actualString: actualJsonString);
+        Assert.Contains(expectedSubstring: "]", actualString: actualJsonString);
+    }
 }
