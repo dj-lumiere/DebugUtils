@@ -5,7 +5,7 @@ using DebugUtils.Repr.Records;
 namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(string))]
-[ReprOptions(needsPrefix:false)]
+[ReprOptions(needsPrefix: false)]
 public class StringFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -14,8 +14,18 @@ public class StringFormatter : IReprFormatter
     }
 }
 
+[ReprFormatter(typeof(StringBuilder))]
+[ReprOptions(needsPrefix: true)]
+public class StringBuilderFormatter : IReprFormatter
+{
+    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    {
+        return $"{((StringBuilder)obj).ToString()}";
+    }
+}
+
 [ReprFormatter(typeof(char))]
-[ReprOptions(needsPrefix:false)]
+[ReprOptions(needsPrefix: false)]
 public class CharFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -48,7 +58,7 @@ public class CharFormatter : IReprFormatter
 }
 
 [ReprFormatter(typeof(Rune))]
-[ReprOptions(needsPrefix:true)]
+[ReprOptions(needsPrefix: true)]
 public class RuneFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
