@@ -79,7 +79,7 @@ public class ReprTest
         var data = new { Name = "Alice", Age = 30, Scores = new[] { 95, 87, 92 } };
         Assert.Equal(
             expected:
-            "Anonymous({ Name: \"Alice\", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]) })",
+            "Anonymous(Name: \"Alice\", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))",
             actual: data.Repr());
 
         Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
