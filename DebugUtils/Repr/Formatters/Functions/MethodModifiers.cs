@@ -1,5 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
+using DebugUtils.Repr.Formatters.Fallback;
+using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
@@ -124,12 +127,32 @@ internal static class MethodModifiersExtensions
     {
         return new MethodModifiers(method: methodInfo);
     }
-    public static string GetAccessLevelName(this MethodInfo method)
+    public static JsonObject ToJsonObject(this MethodModifiers methodModifiers, ReprConfig config,
+        HashSet<int> visited, int depth)
     {
-        if (method.IsPublic)
-        {
-            return "public";
-        }
+        var result = new JsonObject();
+        result.Add("isPublic", methodModifiers.IsPublic.ToJsonObject(config, visited, depth + 1));
+        result.Add("isPrivate",
+            methodModifiers.IsPrivate.ToJsonObject(config, visited, depth + 1));
+        result.Add("isProtected",
+            methodModifiers.IsProtected.ToJsonObject(config, visited, depth + 1));
+        result.Add("isInternal",
+            methodModifiers.IsInternal.ToJsonObject(config, visited, depth + 1));
+        result.Add("isStatic", methodModifiers.IsStatic.ToJsonObject(config, visited, depth + 1));
+        result.Add("isVirtual",
+            methodModifiers.IsVirtual.ToJsonObject(config, visited, depth + 1));
+        result.Add("isOverride",
+            methodModifiers.IsOverride.ToJsonObject(config, visited, depth + 1));
+        result.Add("isAbstract",
+            methodModifiers.IsAbstract.ToJsonObject(config, visited, depth + 1));
+        result.Add("isSealed", methodModifiers.IsSealed.ToJsonObject(config, visited, depth + 1));
+        result.Add("isAsync", methodModifiers.IsAsync.ToJsonObject(config, visited, depth + 1));
+        result.Add("isGeneric",
+            methodModifiers.IsGeneric.ToJsonObject(config, visited, depth + 1));
+        result.Add("isExtern", methodModifiers.IsExtern.ToJsonObject(config, visited, depth + 1));
+        result.Add("isUnsafe", methodModifiers.IsUnsafe.ToJsonObject(config, visited, depth + 1));
+        return result;
+    }
 
         if (method.IsPrivate)
         {
