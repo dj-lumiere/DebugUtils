@@ -72,7 +72,7 @@ public class Children
 public class ReprTest
 {
     [Fact]
-    public void ExampleTestRepr()
+    public void ReadmeTestRepr()
     {
         var arr = new int[] { 1, 2, 3, 4 };
         Assert.Equal(expected: "System.Int32[]", actual: arr.ToString());
@@ -641,12 +641,18 @@ public class ReprTest
         var d = Add4;
         var e = Lambda;
         var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-        Assert.Contains("\"type\": \"Function\"", a.Repr(config));
-        Assert.Contains("\"type\": \"Function\"", Add5.Repr(config));
-        Assert.Contains("\"type\": \"Function\"", b.Repr(config));
-        Assert.Contains("\"type\": \"Function\"", c.Repr(config));
-        Assert.Contains("\"type\": \"Function\"", d.Repr(config));
-        Assert.Contains("\"type\": \"Function\"", e.Repr(config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: a.Repr(config: config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: Add5.Repr(config: config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: b.Repr(config: config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: c.Repr(config: config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: d.Repr(config: config));
+        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+            actualString: e.Repr(config: config));
     }
 
     [Fact]
