@@ -7,7 +7,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Fallback;
 
-internal static class ObjectJsonExtensions
+internal static class HierarchicalObjectExtensions
 {
     public static JsonObject GetJson(this object obj, ReprConfig config, HashSet<int>? visited,
         int depth)
@@ -17,7 +17,7 @@ internal static class ObjectJsonExtensions
         var objHash = RuntimeHelpers.GetHashCode(o: obj);
         var json = new JsonObject();
 
-        json.Add(propertyName: "type", value: type.GetReprTypeNameByTypeName());
+        json.Add(propertyName: "type", value: type.GetReprTypeName());
 
         if (depth > 10)
         {

@@ -100,10 +100,11 @@ public enum FormattingMode
     Reflection,
 
     /// <summary>
-    ///     Always uses reflection-based custom formatting with JSON-friendly output.
+    ///     Always uses reflection-based custom formatting with hierarchical format,
+    ///     which is in json-like dialect.
     ///     Output: JSON objects with type and value information for all objects.
     /// </summary>
-    Json
+    Hierarchical
 }
 
 /// <summary>

@@ -1,13 +1,9 @@
-#region
-
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
-
-#endregion
 
 namespace DebugUtils.Repr;
 
@@ -20,7 +16,7 @@ public static partial class ReprExtensions
         visited ??= new HashSet<int>();
         var id = RuntimeHelpers.GetHashCode(o: obj);
 
-        if (config.FormattingMode == FormattingMode.Json)
+        if (config.FormattingMode == FormattingMode.Hierarchical)
         {
             config = config with { TypeMode = TypeReprMode.AlwaysHide };
         }
@@ -53,7 +49,7 @@ public static partial class ReprExtensions
 
         if (formatter is { } reprFormatter)
         {
-            if (config.FormattingMode == FormattingMode.Json)
+            if (config.FormattingMode == FormattingMode.Hierarchical)
             {
                 result = obj.AsJson(config: config, visited: visited, formatter: reprFormatter,
                     id: id);
@@ -109,10 +105,10 @@ public static partial class ReprExtensions
     {
         var type = typeof(T);
         var underlyingType = Nullable.GetUnderlyingType(nullableType: type)!;
-        var reprName = underlyingType.GetReprTypeNameByTypeName();
+        var reprName = underlyingType.GetReprTypeName();
 
         // Handle JSON modes
-        if (config.FormattingMode == FormattingMode.Json)
+        if (config.FormattingMode == FormattingMode.Hierarchical)
         {
             return nullable.FormatNullableAsJson(reprName: reprName,
                 config: config with { TypeMode = TypeReprMode.AlwaysHide });
@@ -147,7 +143,7 @@ public static partial class ReprExtensions
         var valueRepr = value.Repr(config: config with
         {
             TypeMode = TypeReprMode.AlwaysHide,
-            FormattingMode = FormattingMode.Json
+            FormattingMode = FormattingMode.Hierarchical
         });
         Console.WriteLine(value: valueRepr);
         // Parse the JSON and extract the value part

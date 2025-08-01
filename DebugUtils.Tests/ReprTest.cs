@@ -592,7 +592,7 @@ public class ReprTest
     public void TestJsonRepr()
     {
         var data = new { Name = "Alice", Age = 30 };
-        var config = new ReprConfig(FormattingMode: FormattingMode.Json);
+        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
         var actualJsonString = data.Repr(config: config);
         var actualJsonNode = JsonNode.Parse(json: actualJsonString);
         var expectedJsonNode = new JsonObject
@@ -618,7 +618,7 @@ public class ReprTest
     {
         List<object> a = new();
         a.Add(item: a);
-        var config = new ReprConfig(FormattingMode: FormattingMode.Json);
+        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
         var actualJsonString = a.Repr(config: config);
         Assert.Contains(expectedSubstring: "Circular Reference to List @",
             actualString: actualJsonString);
