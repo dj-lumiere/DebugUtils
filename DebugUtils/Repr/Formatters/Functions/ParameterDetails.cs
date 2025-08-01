@@ -5,7 +5,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
-public class ParameterDetails
+internal class ParameterDetails
 {
     public string Name { get; init; }
     public string TypeReprName { get; init; }

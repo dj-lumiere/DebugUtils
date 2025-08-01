@@ -10,7 +10,7 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 ///     It uses reflection to represent the record's public properties.
 /// </summary>
 [ReprOptions(needsPrefix: true)]
-public class RecordFormatter : IReprFormatter
+internal class RecordFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

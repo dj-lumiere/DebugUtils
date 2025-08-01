@@ -6,7 +6,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
-public class MethodModifiers
+internal class MethodModifiers
 {
     public bool IsPublic { get; set; }
     public bool IsPrivate { get; set; }

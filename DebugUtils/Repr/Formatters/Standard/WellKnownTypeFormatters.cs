@@ -16,7 +16,7 @@ public class GuidFormatter : IReprFormatter
 
 [ReprFormatter(typeof(Uri))]
 [ReprOptions(needsPrefix: true)]
-public class UriFormatter : IReprFormatter
+internal class UriFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -26,7 +26,7 @@ public class UriFormatter : IReprFormatter
 
 [ReprFormatter(typeof(Version))]
 [ReprOptions(needsPrefix: true)]
-public class VersionFormatter : IReprFormatter
+internal class VersionFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

@@ -6,7 +6,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(DateTime))]
 [ReprOptions(needsPrefix: true)]
-public class DateTimeFormatter : IReprFormatter
+internal class DateTimeFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -23,7 +23,7 @@ public class DateTimeFormatter : IReprFormatter
 
 [ReprFormatter(typeof(DateTimeOffset))]
 [ReprOptions(needsPrefix: true)]
-public class DateTimeOffsetFormatter : IReprFormatter
+internal class DateTimeOffsetFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -45,7 +45,7 @@ public class DateTimeOffsetFormatter : IReprFormatter
 
 [ReprFormatter(typeof(TimeSpan))]
 [ReprOptions(needsPrefix: true)]
-public class TimeSpanFormatter : IReprFormatter
+internal class TimeSpanFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -56,7 +56,7 @@ public class TimeSpanFormatter : IReprFormatter
 #if NET6_0_OR_GREATER
 [ReprFormatter(typeof(DateOnly))]
 [ReprOptions(needsPrefix: true)]
-public class DateOnlyFormatter : IReprFormatter
+internal class DateOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -66,7 +66,7 @@ public class DateOnlyFormatter : IReprFormatter
 
 [ReprFormatter(typeof(TimeOnly))]
 [ReprOptions(needsPrefix: true)]
-public class TimeOnlyFormatter : IReprFormatter
+internal class TimeOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

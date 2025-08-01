@@ -1,13 +1,13 @@
 ﻿namespace DebugUtils.Repr.Records;
 
-public enum FloatTypeKind
+internal enum FloatTypeKind
 {
     Half,
     Float,
     Double
 }
 
-public record FloatInfo(
+internal record FloatInfo(
     FloatSpec Spec,
     long Bits,
     bool IsNegative,

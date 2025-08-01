@@ -7,7 +7,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 
 [ReprFormatter(typeof(decimal))]
 [ReprOptions(needsPrefix: true)]
-public class DecimalFormatter : IReprFormatter
+internal class DecimalFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
     {
@@ -41,7 +41,7 @@ public class DecimalFormatter : IReprFormatter
                 $"{dec.ToString(format: "F" + (config.FloatPrecision > 0 ? config.FloatPrecision : 0))}",
             FloatReprMode.Scientific =>
                 $"{dec.ToString(format: "E" + (config.FloatPrecision > 0 ? config.FloatPrecision - 1 : 0))}",
-            FloatReprMode.Exact => $"{dec.AsExact()}",
+            FloatReprMode.Exact => $"{dec.FormatAsExact()}",
             FloatReprMode.General => $"{dec}",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
         };

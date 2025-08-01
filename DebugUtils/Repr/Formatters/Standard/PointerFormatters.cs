@@ -8,7 +8,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(IntPtr))]
 [ReprOptions(needsPrefix: true)]
-public class IntPtrFormatter : IReprFormatter
+internal class IntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -20,7 +20,7 @@ public class IntPtrFormatter : IReprFormatter
 
 [ReprFormatter(typeof(UIntPtr))]
 [ReprOptions(needsPrefix: true)]
-public class UIntPtrFormatter : IReprFormatter
+internal class UIntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

@@ -7,7 +7,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(string))]
 [ReprOptions(needsPrefix: false)]
-public class StringFormatter : IReprFormatter
+internal class StringFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -17,7 +17,7 @@ public class StringFormatter : IReprFormatter
 
 [ReprFormatter(typeof(StringBuilder))]
 [ReprOptions(needsPrefix: true)]
-public class StringBuilderFormatter : IReprFormatter
+internal class StringBuilderFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -27,7 +27,7 @@ public class StringBuilderFormatter : IReprFormatter
 
 [ReprFormatter(typeof(char))]
 [ReprOptions(needsPrefix: false)]
-public class CharFormatter : IReprFormatter
+internal class CharFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -60,7 +60,7 @@ public class CharFormatter : IReprFormatter
 
 [ReprFormatter(typeof(Rune))]
 [ReprOptions(needsPrefix: true)]
-public class RuneFormatter : IReprFormatter
+internal class RuneFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

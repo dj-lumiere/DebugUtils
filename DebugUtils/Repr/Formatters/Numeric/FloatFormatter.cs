@@ -100,10 +100,10 @@ internal class FloatFormatter : IReprFormatter
 
         return config.FloatMode switch
         {
-            FloatReprMode.Round => obj.AsRounding(info: info, reprConfig: config),
-            FloatReprMode.Scientific => obj.AsScientific(info: info, reprConfig: config),
-            FloatReprMode.General => obj.AsGeneral(info: info, reprConfig: config),
-            FloatReprMode.Exact => obj.AsExact(info: info),
+            FloatReprMode.Round => obj.FormatAsRounding(info: info, reprConfig: config),
+            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, reprConfig: config),
+            FloatReprMode.General => obj.FormatAsGeneral(info: info, reprConfig: config),
+            FloatReprMode.Exact => obj.FormatAsExact(info: info),
 
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
         };

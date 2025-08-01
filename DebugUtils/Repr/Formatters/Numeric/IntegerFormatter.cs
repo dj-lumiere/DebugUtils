@@ -13,7 +13,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
     #endif
 )]
 [ReprOptions(needsPrefix: true)]
-public class IntegerFormatter : IReprFormatter
+internal class IntegerFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
     {
