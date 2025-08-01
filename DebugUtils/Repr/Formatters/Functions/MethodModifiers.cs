@@ -154,33 +154,6 @@ internal static class MethodModifiersExtensions
         return result;
     }
 
-        if (method.IsPrivate)
-        {
-            return "private";
-        }
-
-        if (method.IsFamily)
-        {
-            return "protected";
-        }
-
-        if (method.IsAssembly)
-        {
-            return "internal";
-        }
-
-        if (method.IsFamilyOrAssembly)
-        {
-            return "protected internal";
-        }
-
-        if (method.IsFamilyAndAssembly)
-        {
-            return "private protected";
-        }
-
-        return "unknown";
-    }
     public static bool IsOverrideMethod(this MethodInfo method)
     {
         // A method is override if it's virtual and has a base definition
