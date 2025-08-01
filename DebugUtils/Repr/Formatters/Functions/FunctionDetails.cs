@@ -6,14 +6,14 @@ public class FunctionDetails
 {
     public string Name { get; }
     public ParameterDetails[] Parameters { get; }
-    public ReturnInfo Return { get; }
+    public string ReturnTypeReprName { get; }
     public MethodModifiers Modifiers { get; }
 
     public FunctionDetails(MethodInfo methodInfo)
     {
         Name = methodInfo.GetSanitizedName();
         Parameters = methodInfo.GetParameterDetails();
-        Return = methodInfo.ToReturnInfo();
+        ReturnTypeReprName = methodInfo.ReturnType.GetReprTypeName();
         Modifiers = methodInfo.ToMethodModifiers();
     }
 
@@ -21,8 +21,24 @@ public class FunctionDetails
     {
         var parameterStr = String.Join(separator: ", ",
             values: Parameters.Select(selector: p => p.ToString()));
-        return
-            $"{Modifiers} {Return} {Name}({parameterStr})";
+        var parts = new List<string>();
+        if (String.IsNullOrEmpty(value: Modifiers.ToString()))
+        {
+            parts.Add(item: Modifiers.ToString());
+        }
+
+        if (String.IsNullOrEmpty(value: ReturnTypeReprName))
+        {
+            parts.Add(item: ReturnTypeReprName);
+        }
+
+        if (String.IsNullOrEmpty(value: Name))
+        {
+            parts.Add(item: Name);
+        }
+
+        parts.Add(item: "(" + parameterStr + ")");
+        return String.Join(separator: " ", values: parts);
     }
 }
 
