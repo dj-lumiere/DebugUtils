@@ -51,24 +51,27 @@ Console.WriteLine(dict.Repr()); // 😍 "{"a": int(1), "b": int(2)}"
 ```csharp
 using DebugUtils;
 
-public void ProcessData()
+public class MainClass
 {
-    var caller = DebugUtils.GetCallerMethod();
-    Console.WriteLine($"[{caller}] Processing started...");
-    
-    try 
+    public void ProcessData()
     {
-        // Your code here
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"[{caller}] Error: {ex.Message}");
-        throw;
+        var caller = DebugUtils.GetCallerMethod();
+        Console.WriteLine($"[{caller}] Processing started...");
+        
+        try 
+        {
+            // Your code here
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[{caller}] Error: {ex.Message}");
+            throw;
+        }
     }
 }
 
-// Output: [MainClass.RunAlgorithm] Processing started...
-// Output: [MainClass.RunAlgorithm] Error: Invalid input format
+// Output: [MainClass.ProcessData] Processing started...
+// Output: [MainClass.ProcessData] Error: Invalid input format
 ```
 
 ## Installation
