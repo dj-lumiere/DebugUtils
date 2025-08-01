@@ -1,27 +1,50 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Formatters.Attributes;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(DateTime))]
+[ReprOptions(needsPrefix: true)]
 public class DateTimeFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
-        return ((DateTime)obj).ToString(format: "yyyy-MM-dd HH:mm:ss");
+        var datetime = (DateTime)obj;
+        var kindSuffix = datetime.Kind switch
+        {
+            DateTimeKind.Utc => " UTC",
+            DateTimeKind.Local => " Local",
+            _ => " Unspecified"
+        };
+        return datetime.ToString(format: "yyyy-MM-dd HH:mm:ss") + kindSuffix;
     }
 }
 
 [ReprFormatter(typeof(DateTimeOffset))]
+[ReprOptions(needsPrefix: true)]
 public class DateTimeOffsetFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
-        return ((DateTimeOffset)obj).ToString(format: "yyyy-MM-dd HH:mm:ss");
+        var dto = (DateTimeOffset)obj;
+        if (dto.Offset == TimeSpan.Zero)
+        {
+            return dto.ToString("yyyy-MM-dd HH:mm:ss") + "Z";
+        }
+
+        var offset = dto.Offset.ToString(format: "c");
+        if (!offset.StartsWith(value: "+"))
+        {
+            offset = "+" + offset;
+        }
+
+        return dto.ToString("yyyy-MM-dd HH:mm:ss") + offset;
     }
 }
 
 [ReprFormatter(typeof(TimeSpan))]
+[ReprOptions(needsPrefix: true)]
 public class TimeSpanFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -32,6 +55,7 @@ public class TimeSpanFormatter : IReprFormatter
 
 #if NET6_0_OR_GREATER
 [ReprFormatter(typeof(DateOnly))]
+[ReprOptions(needsPrefix: true)]
 public class DateOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -41,6 +65,7 @@ public class DateOnlyFormatter : IReprFormatter
 }
 
 [ReprFormatter(typeof(TimeOnly))]
+[ReprOptions(needsPrefix: true)]
 public class TimeOnlyFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

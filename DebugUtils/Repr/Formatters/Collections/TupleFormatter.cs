@@ -1,10 +1,12 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;
 
+[ReprOptions(false)]
 public class TupleFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -24,7 +26,7 @@ public class TupleFormatter : IReprFormatter
             }
 
             sb.Append(value: tuple[index: i]
-                .Repr(config: config, visited: visited));
+               .Repr(config: config, visited: visited));
         }
 
         sb.Append(value: ")");

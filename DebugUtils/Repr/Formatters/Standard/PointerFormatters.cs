@@ -1,9 +1,13 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Formatters.Attributes;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+// ReSharper disable BuiltInTypeReferenceStyle
+
+namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(IntPtr))]
+[ReprOptions(needsPrefix:true)]
 public class IntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -15,6 +19,7 @@ public class IntPtrFormatter : IReprFormatter
 }
 
 [ReprFormatter(typeof(UIntPtr))]
+[ReprOptions(needsPrefix:true)]
 public class UIntPtrFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

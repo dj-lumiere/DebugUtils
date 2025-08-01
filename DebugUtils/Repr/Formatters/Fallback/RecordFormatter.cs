@@ -1,17 +1,15 @@
-#region
-
 using System.Reflection;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-#endregion
-
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Fallback;
 
 /// <summary>
 ///     A generic formatter for any record type.
 ///     It uses reflection to represent the record's public properties.
 /// </summary>
+[ReprOptions(needsPrefix:true)]
 public class RecordFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -23,8 +21,8 @@ public class RecordFormatter : IReprFormatter
 
         // Get public properties with getters
         var properties = type
-            .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
-            .Where(predicate: p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
+                        .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                        .Where(predicate: p => p.CanRead && (p.GetMethod?.IsPublic ?? false));
 
         foreach (var prop in properties)
         {

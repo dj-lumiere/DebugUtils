@@ -21,7 +21,10 @@ public struct CustomStruct
 {
     public string Name;
     public int Value;
-    public override string ToString() => $"Custom({Name}, {Value})";
+    public override string ToString()
+    {
+        return $"Custom({Name}, {Value})";
+    }
 }
 
 public class Person
@@ -33,7 +36,10 @@ public class Person
         Name = name;
         Age = age;
     }
-    public override string ToString() => $"{Name}({Age})";
+    public override string ToString()
+    {
+        return $"{Name}({Age})";
+    }
 }
 
 public class NoToStringClass
@@ -47,7 +53,7 @@ public class NoToStringClass
     }
 }
 
-public record TestSettings(string EquipmentName, Dictionary<String, double> EquipmentSettings);
+public record TestSettings(string EquipmentName, Dictionary<string, double> EquipmentSettings);
 
 public enum Colors
 {
@@ -58,53 +64,118 @@ public enum Colors
 
 public class ReprTest
 {
+    [Fact]
+    public void ExampleTestRepr()
+    {
+        var arr = new int[] { 1, 2, 3, 4 };
+        Assert.Equal(expected: "System.Int32[]", actual: arr.ToString());
+
+        var dict = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
+        Assert.Equal(
+            expected: "System.Collections.Generic.Dictionary`2[System.String,System.Int32]",
+            actual: dict.ToString());
+
+        var data = new { Name = "Alice", Age = 30, Scores = new[] { 95, 87, 92 } };
+        Assert.Equal(
+            expected:
+            "Anonymous({ Name: \"Alice\", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]) })",
+            actual: data.Repr());
+
+        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+            actual: new[] { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "2DArray([[int(1), int(2)], [int(3), int(4)]])",
+            actual: new[,] { { 1, 2 }, { 3, 4 } }.Repr());
+        Assert.Equal(expected: "JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])",
+            actual: new int[][] { new[] { 1, 2 }, new[] { 3, 4, 5 } }.Repr());
+        
+        Assert.Equal(expected: "[int(1), int(2), int(3)]",
+            actual: new List<int> { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "{\"a\", \"b\"}",
+            actual: new HashSet<string> { "a", "b" }.Repr());
+        Assert.Equal(expected: "{\"x\": int(1)}",
+            actual: new Dictionary<string, int> { { "x", 1 } }.Repr());
+
+        Assert.Equal(expected: "int(42)", actual: 42.Repr());
+        Assert.Equal(expected: "int(0x2A)",
+            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Hex)));
+        Assert.Equal(expected: "int(0b101010)",
+            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Binary)));
+
+        Assert.Equal(expected: "double(3.000000000000000444089209850062616169452667236328125E-1)",
+            actual: (0.1 + 0.2)
+           .Repr());
+        Assert.Equal(
+            expected: "double(2.99999999999999988897769753748434595763683319091796875E-1)",
+            actual: 0.3.Repr());
+        Assert.Equal(expected: "double(0.30000000000000004)",
+            actual: (0.1 + 0.2)
+           .Repr(config: new ReprConfig(FloatMode: FloatReprMode.General)));
+
+        var hideTypes = new ReprConfig(
+            TypeMode: TypeReprMode.AlwaysHide,
+            ContainerReprMode: ContainerReprMode.UseParentConfig
+        );
+        Assert.Equal(expected: "[1, 2, 3]", actual: new[] { 1, 2, 3 }.Repr(config: hideTypes));
+
+        var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
+        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+            actual: new[] { 1, 2, 3 }.Repr(config: showTypes));
+    }
+
     // Basic Types
     [Fact]
     public void TestNullRepr()
     {
-        Assert.Equal("null", ((string?)null).Repr());
+        Assert.Equal(expected: "null", actual: ((string?)null).Repr());
     }
 
     [Fact]
     public void TestStringRepr()
     {
-        Assert.Equal("\"hello\"", "hello".Repr());
-        Assert.Equal("\"\"", "".Repr());
+        Assert.Equal(expected: "\"hello\"", actual: "hello".Repr());
+        Assert.Equal(expected: "\"\"", actual: "".Repr());
     }
 
     [Fact]
     public void TestCharRepr()
     {
-        Assert.Equal("'A'", 'A'.Repr());
-        Assert.Equal("'\\n'", '\n'.Repr());
-        Assert.Equal("'\\u007F'", '\u007F'.Repr());
-        Assert.Equal("'아'", '아'.Repr());
+        Assert.Equal(expected: "'A'", actual: 'A'.Repr());
+        Assert.Equal(expected: "'\\n'", actual: '\n'.Repr());
+        Assert.Equal(expected: "'\\u007F'", actual: '\u007F'.Repr());
+        Assert.Equal(expected: "'아'", actual: '아'.Repr());
     }
 
     [Fact]
     public void TestRuneRepr()
     {
-        Assert.Equal("Rune(💜 @ \\U0001F49C)", (new Rune(0x1f49c)).Repr());
+        Assert.Equal(expected: "Rune(💜 @ \\U0001F49C)", actual: new Rune(value: 0x1f49c).Repr());
     }
 
     [Fact]
     public void TestBoolRepr()
     {
-        Assert.Equal("true", true.Repr());
+        Assert.Equal(expected: "true", actual: true.Repr());
     }
 
     [Fact]
     public void TestDateTimeRepr()
     {
-        Assert.Equal("DateTime(2025-01-01 00:00:00)", DateTime.Parse("2025-01-01")
-            .Repr());
+        var dateTime = new DateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0);
+        var localDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Local);
+        var utcDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Utc);
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Unspecified)", actual:
+            dateTime.Repr());
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Local)", actual:
+            localDateTime.Repr());
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 UTC)", actual:
+            utcDateTime.Repr());
     }
 
     [Fact]
     public void TestTimeSpanRepr()
     {
-        Assert.Equal("TimeSpan(1800.000s)", TimeSpan.FromMinutes(30)
-            .Repr());
+        Assert.Equal(expected: "TimeSpan(1800.000s)", actual: TimeSpan.FromMinutes(minutes: 30)
+           .Repr());
     }
 
     // Integer Types
@@ -116,7 +187,7 @@ public class ReprTest
     public void TestByteRepr(IntReprMode mode, string expected)
     {
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, ((byte)42).Repr(config: config));
+        Assert.Equal(expected: expected, actual: ((byte)42).Repr(config: config));
     }
 
     [Theory]
@@ -127,42 +198,15 @@ public class ReprTest
     public void TestIntRepr(IntReprMode mode, string expected)
     {
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, (-42).Repr(config: config));
+        Assert.Equal(expected: expected, actual: (-42).Repr(config: config));
     }
-
-#if NET7_0_OR_GREATER
-    [Theory]
-    [InlineData(IntReprMode.Binary,
-        "Int128(-0b10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)")]
-    [InlineData(IntReprMode.Decimal, "Int128(-170141183460469231731687303715884105728)")]
-    [InlineData(IntReprMode.Hex, "Int128(-0x80000000000000000000000000000000)")]
-    [InlineData(IntReprMode.HexBytes, "Int128(0x80000000000000000000000000000000)")]
-    public void TestInt128Repr(IntReprMode mode, string expected)
-    {
-        var i128 = Int128.MinValue;
-        var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, i128.Repr(config: config));
-    }
-
-    [Theory]
-    [InlineData(IntReprMode.Binary,
-        "Int128(0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)")]
-    [InlineData(IntReprMode.Decimal, "Int128(170141183460469231731687303715884105727)")]
-    [InlineData(IntReprMode.Hex, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
-    [InlineData(IntReprMode.HexBytes, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
-    public void TestInt128Repr2(IntReprMode mode, string expected)
-    {
-        var i128 = Int128.MaxValue;
-        var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected, i128.Repr(config: config));
-    }
-#endif
 
     [Fact]
     public void TestBigIntRepr()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal("BigInteger(-42)", new BigInteger(-42).Repr(config: config));
+        Assert.Equal(expected: "BigInteger(-42)",
+            actual: new BigInteger(value: -42).Repr(config: config));
     }
 
     // Floating Point Types
@@ -170,100 +214,109 @@ public class ReprTest
     public void TestFloatRepr_Exact()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
-        Assert.Equal("float(3.1415927410125732421875E0)", Single.Parse("3.1415926535")
-            .Repr(config));
+        Assert.Equal(expected: "float(3.1415927410125732421875E0)", actual: Single
+           .Parse(s: "3.1415926535")
+           .Repr(config: config));
     }
 
     [Fact]
     public void TestDoubleRepr_Round()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 5);
-        Assert.Equal("double(3.14159)", double.Parse("3.1415926535")
-            .Repr(config));
+        Assert.Equal(expected: "double(3.14159)", actual: Double.Parse(s: "3.1415926535")
+                                                                .Repr(config: config));
     }
 
     [Fact]
     public void TestHalfRepr_Scientific()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.Scientific, FloatPrecision: 5);
-        Assert.Equal("Half(3.1406E+000)", Half.Parse("3.14159")
-            .Repr(config));
+        Assert.Equal(expected: "Half(3.1406E+000)", actual: Half.Parse(s: "3.14159")
+                                                                .Repr(config: config));
     }
 
     [Fact]
     public void TestDecimalRepr_RawHex()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.HexBytes);
-        Assert.Equal("decimal(0x001C00006582A5360B14388541B65F29)",
-            3.1415926535897932384626433832795m.Repr(config));
+        Assert.Equal(expected: "decimal(0x001C00006582A5360B14388541B65F29)",
+            actual: 3.1415926535897932384626433832795m.Repr(config: config));
     }
 
     [Fact]
     public void TestHalfRepr_BitField()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.BitField);
-        Assert.Equal("Half(0|10000|1001001000)", Half.Parse("3.14159")
-            .Repr(config));
+        Assert.Equal(expected: "Half(0|10000|1001001000)", actual: Half.Parse(s: "3.14159")
+           .Repr(config: config));
     }
 
     // Collections
     [Fact]
     public void TestListRepr()
     {
-        Assert.Equal("[]", new List<int>().Repr());
-        Assert.Equal("[int(1), int(2), int(3)]", new List<int> { 1, 2, 3 }.Repr());
-        Assert.Equal("[\"a\", null, \"c\"]", new List<string?> { "a", null, "c" }.Repr());
+        Assert.Equal(expected: "[]", actual: new List<int>().Repr());
+        Assert.Equal(expected: "[int(1), int(2), int(3)]",
+            actual: new List<int> { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "[\"a\", null, \"c\"]",
+            actual: new List<string?> { "a", null, "c" }.Repr());
     }
 
     [Fact]
     public void TestEnumerableRepr()
     {
-        Assert.Equal("RangeIterator([int(1), int(2), int(3)])", Enumerable.Range(1, 3)
-            .Repr());
+        Assert.Equal(expected: "RangeIterator([int(1), int(2), int(3)])", actual: Enumerable
+           .Range(start: 1, count: 3)
+           .Repr());
     }
 
     [Fact]
     public void TestNestedListRepr()
     {
         var nestedList = new List<List<int>> { new() { 1, 2 }, new() { 3, 4, 5 }, new() };
-        Assert.Equal("[[int(1), int(2)], [int(3), int(4), int(5)], []]", nestedList.Repr());
+        Assert.Equal(expected: "[[int(1), int(2)], [int(3), int(4), int(5)], []]",
+            actual: nestedList.Repr());
     }
 
     // Arrays
     [Fact]
     public void TestArrayRepr()
     {
-        Assert.Equal("1DArray([])", Array.Empty<int>()
-            .Repr());
-        Assert.Equal("1DArray([int(1), int(2), int(3)])", new[] { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "1DArray([])", actual: Array.Empty<int>()
+                                                           .Repr());
+        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+            actual: new[] { 1, 2, 3 }.Repr());
     }
 
     [Fact]
     public void TestJaggedArrayRepr()
     {
-        var jagged2D = new int[][] { new[] { 1, 2 }, new[] { 3 } };
-        Assert.Equal("JaggedArray([[int(1), int(2)], [int(3)]])", jagged2D.Repr());
+        var jagged2D = new[]
+            { new[] { 1, 2 }, new[] { 3 } };
+        Assert.Equal(expected: "JaggedArray([[int(1), int(2)], [int(3)]])",
+            actual: jagged2D.Repr());
     }
 
     [Fact]
     public void TestMultidimensionalArrayRepr()
     {
-        var array2D = new int[,] { { 1, 2 }, { 3, 4 } };
-        Assert.Equal("2DArray([[int(1), int(2)], [int(3), int(4)]])", array2D.Repr());
+        var array2D = new[,] { { 1, 2 }, { 3, 4 } };
+        Assert.Equal(expected: "2DArray([[int(1), int(2)], [int(3), int(4)]])",
+            actual: array2D.Repr());
     }
 
     // Dictionaries, Sets, Queues
     [Fact]
     public void TestDictionaryRepr()
     {
-        var dict = new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 };
+        var dict = new Dictionary<string, int> { [key: "a"] = 1, [key: "b"] = 2 };
         // Note: Dictionary order is not guaranteed, so we check for both possibilities
         var possibleOutputs = new[]
         {
             "{\"a\": int(1), \"b\": int(2)}",
             "{\"b\": int(2), \"a\": int(1)}"
         };
-        Assert.Contains(dict.Repr(), possibleOutputs);
+        Assert.Contains(expected: dict.Repr(), collection: possibleOutputs);
     }
 
     [Fact]
@@ -277,7 +330,7 @@ public class ReprTest
             "{int(1), int(2)}",
             "{int(2), int(1)}"
         };
-        Assert.Contains(repr, possibleOutputs);
+        Assert.Contains(expected: repr, collection: possibleOutputs);
     }
 
     [Fact]
@@ -285,25 +338,25 @@ public class ReprTest
     {
         var set = new SortedSet<int> { 3, 1, 2 };
         var repr = set.Repr();
-        Assert.Equal("SortedSet({int(1), int(2), int(3)})", repr);
+        Assert.Equal(expected: "SortedSet({int(1), int(2), int(3)})", actual: repr);
     }
 
     [Fact]
     public void TestQueueRepr()
     {
         var queue = new Queue<string>();
-        queue.Enqueue("first");
-        queue.Enqueue("second");
-        Assert.Equal("Queue([\"first\", \"second\"])", queue.Repr());
+        queue.Enqueue(item: "first");
+        queue.Enqueue(item: "second");
+        Assert.Equal(expected: "Queue([\"first\", \"second\"])", actual: queue.Repr());
     }
 
     [Fact]
     public void TestStackRepr()
     {
         var stack = new Stack<int>();
-        stack.Push(1);
-        stack.Push(2);
-        Assert.Equal("Stack([int(2), int(1)])", stack.Repr());
+        stack.Push(item: 1);
+        stack.Push(item: 2);
+        Assert.Equal(expected: "Stack([int(2), int(1)])", actual: stack.Repr());
     }
 
     // Custom Types
@@ -311,74 +364,222 @@ public class ReprTest
     public void TestCustomStructRepr_NoToString()
     {
         var point = new Point { X = 10, Y = 20 };
-        Assert.Equal("Point(X: int(10), Y: int(20))", point.Repr());
+        Assert.Equal(expected: "Point(X: int(10), Y: int(20))", actual: point.Repr());
     }
 
     [Fact]
     public void TestCustomStructRepr_WithToString()
     {
         var custom = new CustomStruct { Name = "test", Value = 42 };
-        Assert.Equal("Custom(test, 42)", custom.Repr());
+        Assert.Equal(expected: "Custom(test, 42)", actual: custom.Repr());
     }
 
     [Fact]
     public void TestClassRepr_WithToString()
     {
-        var person = new Person("Alice", 30);
-        Assert.Equal("Alice(30)", person.Repr());
+        var person = new Person(name: "Alice", age: 30);
+        Assert.Equal(expected: "Alice(30)", actual: person.Repr());
     }
 
     [Fact]
     public void TestClassRepr_NoToString()
     {
-        var noToString = new NoToStringClass("data", 123);
-        Assert.Equal("NoToStringClass(Data: \"data\", Number: int(123))", noToString.Repr());
+        var noToString = new NoToStringClass(data: "data", number: 123);
+        Assert.Equal(expected: "NoToStringClass(Data: \"data\", Number: int(123))",
+            actual: noToString.Repr());
     }
 
     [Fact]
     public void TestRecordRepr()
     {
-        var settings = new TestSettings("Printer",
-            new Dictionary<string, double> { ["Temp (C)"] = 200.0, ["PrintSpeed (mm/s)"] = 30.0 });
+        var settings = new TestSettings(EquipmentName: "Printer",
+            EquipmentSettings: new Dictionary<string, double>
+                { [key: "Temp (C)"] = 200.0, [key: "PrintSpeed (mm/s)"] = 30.0 });
         // Note: Dictionary order is not guaranteed, so we check for both possibilities
         var possibleOutputs = new[]
         {
             "TestSettings({ EquipmentName: \"Printer\", EquipmentSettings: {\"PrintSpeed (mm/s)\": double(3.0E1), \"Temp (C)\": double(2.0E2)} })",
             "TestSettings({ EquipmentName: \"Printer\", EquipmentSettings: {\"Temp (C)\": double(2.0E2), \"PrintSpeed (mm/s)\": double(3.0E1)} })"
         };
-        Assert.Contains(settings.Repr(), possibleOutputs);
+        Assert.Contains(expected: settings.Repr(), collection: possibleOutputs);
     }
 
     [Fact]
     public void TestEnumRepr()
     {
-        Assert.Equal("Colors.GREEN", Colors.GREEN.Repr());
+        Assert.Equal(expected: "Colors.GREEN", actual: Colors.GREEN.Repr());
     }
 
     [Fact]
     public void TestTupleRepr()
     {
-        Assert.Equal("(int(1), \"hello\")", (1, "hello").Repr());
+        Assert.Equal(expected: "(int(1), \"hello\")", actual: (1, "hello").Repr());
     }
 
     // Nullable Types
     [Fact]
     public void TestNullableStructRepr()
     {
-        Assert.Equal("int?(123)", ((int?)123).Repr());
-        Assert.Equal("int?(null)", ((int?)null).Repr());
+        Assert.Equal(expected: "int?(123)", actual: ((int?)123).Repr());
+        Assert.Equal(expected: "int?(null)", actual: ((int?)null).Repr());
     }
 
     [Fact]
     public void TestNullableClassRepr()
     {
-        Assert.Equal("null", ((List<int>?)null).Repr());
+        Assert.Equal(expected: "null", actual: ((List<int>?)null).Repr());
     }
 
     [Fact]
     public void TestListWithNullElements()
     {
         var listWithNull = new List<List<int>?> { new() { 1 }, null };
-        Assert.Equal("[[int(1)], null]", listWithNull.Repr());
+        Assert.Equal(expected: "[[int(1)], null]", actual: listWithNull.Repr());
+    }
+
+    #if NET7_0_OR_GREATER
+    [Theory]
+    [InlineData(IntReprMode.Binary,
+        "Int128(-0b10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)")]
+    [InlineData(IntReprMode.Decimal, "Int128(-170141183460469231731687303715884105728)")]
+    [InlineData(IntReprMode.Hex, "Int128(-0x80000000000000000000000000000000)")]
+    [InlineData(IntReprMode.HexBytes, "Int128(0x80000000000000000000000000000000)")]
+    public void TestInt128Repr(IntReprMode mode, string expected)
+    {
+        var i128 = Int128.MinValue;
+        var config = new ReprConfig(IntMode: mode);
+        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+    }
+
+    [Theory]
+    [InlineData(IntReprMode.Binary,
+        "Int128(0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)")]
+    [InlineData(IntReprMode.Decimal, "Int128(170141183460469231731687303715884105727)")]
+    [InlineData(IntReprMode.Hex, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
+    [InlineData(IntReprMode.HexBytes, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
+    public void TestInt128Repr2(IntReprMode mode, string expected)
+    {
+        var i128 = Int128.MaxValue;
+        var config = new ReprConfig(IntMode: mode);
+        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+    }
+    #endif
+
+    [Fact]
+    public void TestGuidRepr()
+    {
+        var guid = Guid.NewGuid();
+        Assert.Equal(expected: $"Guid({guid})", actual: guid.Repr());
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Negative()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(-1800.000s)", actual: TimeSpan.FromMinutes(minutes: -30)
+           .Repr(config: config));
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Zero()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(0.000s)", actual: TimeSpan.Zero.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Positive()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(1800.000s)", actual: TimeSpan.FromMinutes(minutes: 30)
+           .Repr(config: config));
+    }
+
+    [Fact]
+    public void TestDateTimeOffsetRepr()
+    {
+        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00Z)",
+            actual: new DateTimeOffset(dateTime: new DateTime(
+                date: new DateOnly(year: 2025, month: 1, day: 1),
+                time: new TimeOnly(hour: 0, minute: 0, second: 0),
+                kind: DateTimeKind.Utc)).Repr());
+    }
+
+    [Fact]
+    public void TestDateTimeOffsetRepr_WithOffset()
+    {
+        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00+01:00:00)",
+            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
+                offset: TimeSpan.FromHours(hours: 1)).Repr());
+    }
+
+    [Fact]
+    public void TestDateOnly()
+    {
+        Assert.Equal(expected: "DateOnly(2025-01-01)",
+            actual: new DateOnly(year: 2025, month: 1, day: 1).Repr());
+    }
+
+    [Fact]
+    public void TestTimeOnly()
+    {
+        Assert.Equal(expected: "TimeOnly(00:00:00)",
+            actual: new TimeOnly(hour: 0, minute: 0, second: 0).Repr());
+    }
+
+    public static int Add(int a, int b)
+    {
+        return a + b;
+    }
+
+    internal static long Add2(int a)
+    {
+        return a;
+    }
+
+    private T Add3<T>(T a)
+    {
+        return a;
+    }
+
+    private static void Add4(in int a, out int b)
+    {
+        b = a + 1;
+    }
+
+    private async Task<int> Lambda(int a)
+    {
+        return a;
+    }
+
+    [Fact]
+    public void TestFunction()
+    {
+        var Add5 = (int a) => a + 11;
+        var a = Add;
+        var b = Add2;
+        var c = Add3<short>;
+        var d = Add4;
+        var e = Lambda;
+
+        Assert.Equal(expected: "public static int Add(int a, int b)", actual: a.Repr());
+        Assert.Equal(expected: "internal static long Add2(int a)", actual: b.Repr());
+        Assert.Equal(expected: "private generic short Add3(short a)", actual: c.Repr());
+        Assert.Equal(expected: "private static void Add4(in ref int a, out ref int b)",
+            actual: d.Repr());
+        Assert.Equal(expected: "internal int Lambda(int a)", actual: Add5.Repr());
+        Assert.Equal(expected: "private async Task<int> Lambda(int a)", actual: e.Repr());
+    }
+
+    [Fact]
+    public void TestCircularReference()
+    {
+        var a = new List<object>();
+        a.Add(item: a);
+        var repr = a.Repr();
+        // object hash code can be different.
+        Assert.StartsWith(expectedStartString: "[<Circular Reference to List @",
+            actualString: repr);
+        Assert.EndsWith(expectedEndString: ">]", actualString: repr);
     }
 }

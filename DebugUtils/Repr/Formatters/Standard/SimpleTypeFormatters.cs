@@ -1,9 +1,11 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Formatters.Attributes;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(bool))]
+[ReprOptions(needsPrefix:false)]
 public class BoolFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
@@ -15,6 +17,7 @@ public class BoolFormatter : IReprFormatter
 }
 
 [ReprFormatter(typeof(Enum))]
+[ReprOptions(needsPrefix:false)]
 public class EnumFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)

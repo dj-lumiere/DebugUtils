@@ -2,8 +2,11 @@ using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Formatters.Collections;
-using DebugUtils.Repr.Formatters.Primitive;
+using DebugUtils.Repr.Formatters.Fallback;
+using DebugUtils.Repr.Formatters.Functions;
+using DebugUtils.Repr.Formatters.Standard;
 using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
 
 namespace DebugUtils.Repr.Formatters;
@@ -12,17 +15,20 @@ public static class ReprFormatterRegistry
 {
     private static readonly Dictionary<Type, IReprFormatter> Formatters = new();
 
-    private static readonly Lazy<EnumFormatter> enumFormatter =
+    private static readonly Lazy<EnumFormatter> EnumFormatter =
         new(valueFactory: () => new EnumFormatter());
 
-    private static readonly Lazy<RecordFormatter> recordFormatter =
+    private static readonly Lazy<RecordFormatter> RecordFormatter =
         new(valueFactory: () => new RecordFormatter());
 
-    private static readonly Lazy<ReflectionFormatter> reflectionFormatter =
-        new(valueFactory: () => new ReflectionFormatter());
+    private static readonly Lazy<ObjectFormatter> ObjectFormatter =
+        new(valueFactory: () => new ObjectFormatter());
 
-    private static readonly IReprFormatter toStringFormatter = new ToStringFormatter();
-    private static readonly IReprFormatter setFormatter = new SetFormatter();
+    private static readonly Lazy<ObjectJsonFormatter> ObjectJsonFormatter =
+        new(valueFactory: () => new ObjectJsonFormatter());
+
+    private static readonly IReprFormatter ToStringFormatter = new ToStringFormatter();
+    private static readonly IReprFormatter SetFormatter = new SetFormatter();
 
     static ReprFormatterRegistry()
     {
@@ -34,8 +40,11 @@ public static class ReprFormatterRegistry
     {
         // Only register exact type matches from attributes
         var formatterTypes = typeof(ReprFormatterRegistry).Assembly
-            .GetTypes()
-            .Where(predicate: t => t.GetCustomAttribute<ReprFormatterAttribute>() != null);
+                                                          .GetTypes()
+                                                          .Where(predicate: t =>
+                                                               t.GetCustomAttribute<
+                                                                   ReprFormatterAttribute>() !=
+                                                               null);
 
         foreach (var type in formatterTypes)
         {
@@ -59,55 +68,31 @@ public static class ReprFormatterRegistry
         Formatters[key: typeof(IDictionary)] = new DictionaryFormatter();
         Formatters[key: typeof(IEnumerable)] = new EnumerableFormatter();
         Formatters[key: typeof(ITuple)] = new TupleFormatter();
-        Formatters[key: typeof(Enum)] = enumFormatter.Value;
+        Formatters[key: typeof(Enum)] = EnumFormatter.Value;
+        Formatters[key: typeof(Delegate)] = new FunctionFormatter();
     }
-    public static IReprFormatter GetFormatter(Type type)
+    public static IReprFormatter GetFormatter(Type type, ReprConfig config)
     {
-        if (Formatters.TryGetValue(key: type, value: out var formatter))
+        var formatter = (config.FormattingMode, type) switch
         {
-            return formatter;
-        }
+            (FormattingMode.Json, _) => ObjectJsonFormatter.Value,
+            (FormattingMode.Reflection, _) => ObjectFormatter.Value,
+            (_, { } t) when Formatters.TryGetValue(key: t, value: out var result) => result,
+            (_, { } t) when t.IsEnum => Formatters[key: typeof(Enum)],
+            (_, { } t) when t.IsRecordType() => RecordFormatter.Value,
+            (_, { } t) when t.IsDictionaryType() => Formatters[key: typeof(IDictionary)],
+            (_, { } t) when t.IsTupleType() => Formatters[key: typeof(ITuple)],
+            (_, { } t) when t.IsArray => Formatters[key: typeof(Array)],
+            (_, { } t) when t.IsSetType() => SetFormatter,
+            (_, { } t) when t.IsAssignableTo(targetType: typeof(Delegate)) => Formatters[
+                key: typeof(Delegate)],
+            (_, { } t) when t.IsAssignableTo(targetType: typeof(IEnumerable)) => Formatters[
+                key: typeof(IEnumerable)],
+            (_, { } t) when t.IsAnonymousType() => RecordFormatter.Value,
+            (_, { } t) when t.OverridesToStringType() => ToStringFormatter,
+            (_, _) => ObjectFormatter.Value
+        };
 
-        if (type.IsEnum)
-        {
-            return Formatters[key: typeof(Enum)];
-        }
-
-        if (type.IsRecordType())
-        {
-            return recordFormatter.Value;
-        }
-
-        if (type.IsDictionaryType())
-        {
-            return Formatters[key: typeof(IDictionary)];
-        }
-
-        if (type.IsTupleType())
-        {
-            return Formatters[key: typeof(ITuple)];
-        }
-
-        if (type.IsArray)
-        {
-            return Formatters[key: typeof(Array)];
-        }
-
-        if (type.IsSetType())
-        {
-            return setFormatter;
-        }
-
-        if (typeof(IEnumerable).IsAssignableFrom(c: type))
-        {
-            return Formatters[key: typeof(IEnumerable)];
-        }
-
-        if (type.OverridesToStringType())
-        {
-            return toStringFormatter;
-        }
-
-        return reflectionFormatter.Value;
+        return formatter;
     }
 }

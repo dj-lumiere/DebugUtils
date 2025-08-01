@@ -1,14 +1,16 @@
 ﻿using System.Reflection;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Primitive;
+namespace DebugUtils.Repr.Formatters.Fallback;
 
 /// <summary>
-/// The default object pointer that handles any type not specifically registered.
-/// It uses reflection to represent the record's public properties.
+///     The default object pointer that handles any type not specifically registered.
+///     It uses reflection to represent the record's public properties.
 /// </summary>
-public class ReflectionFormatter : IReprFormatter
+[ReprOptions(needsPrefix:true)]
+public class ObjectFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -26,8 +28,8 @@ public class ReflectionFormatter : IReprFormatter
 
         // Get public properties with getters
         var properties = type
-            .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
-            .Where(predicate: p => p is { CanRead: true, GetMethod.IsPublic: true });
+                        .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                        .Where(predicate: p => p is { CanRead: true, GetMethod.IsPublic: true });
         foreach (var prop in properties)
         {
             try
