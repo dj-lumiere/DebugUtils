@@ -49,12 +49,15 @@ public static class ReprFormatterRegistry
         foreach (var type in formatterTypes)
         {
             var attr = type.GetCustomAttribute<ReprFormatterAttribute>();
-            var formatter = Activator.CreateInstance(type: type) as IReprFormatter;
-
-            foreach (var targetType in attr.TargetTypes)
+            if (Activator.CreateInstance(type: type) is not IReprFormatter formatter)
+            {
+                continue;
+            }
+            var targetTypes = attr?.TargetTypes ?? Array.Empty<Type>();
+            foreach (var targetType in targetTypes)
             {
                 // Only register concrete types, not interfaces/base classes
-                if (!targetType.IsInterface && !targetType.IsAbstract)
+                if (targetType is { IsInterface: false, IsAbstract: false })
                 {
                     Formatters[key: targetType] = formatter;
                 }
