@@ -75,7 +75,7 @@ public static class ReprFormatterRegistry
     {
         var formatter = (config.FormattingMode, type) switch
         {
-            (FormattingMode.ReflectionJson, _) => ObjectJsonFormatter.Value,
+            (FormattingMode.Json, _) => ObjectJsonFormatter.Value,
             (FormattingMode.Reflection, _) => ObjectFormatter.Value,
             (_, { } t) when Formatters.TryGetValue(key: t, value: out var result) => result,
             (_, { } t) when t.IsEnum => Formatters[key: typeof(Enum)],

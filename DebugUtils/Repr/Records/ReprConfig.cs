@@ -95,12 +95,6 @@ public enum FormattingMode
     Smart,
 
     /// <summary>
-    ///     Uses custom formatter with ToString fallback, with JSON-friendly output formatting.
-    ///     Output: JSON objects like {"type":"1DArray", "value":[{"type":"char", "value":"a"}, ...]}
-    /// </summary>
-    SmartJson,
-
-    /// <summary>
     ///     Always uses reflection-based custom formatting, never falls back to ToString.
     /// </summary>
     Reflection,
@@ -109,7 +103,7 @@ public enum FormattingMode
     ///     Always uses reflection-based custom formatting with JSON-friendly output.
     ///     Output: JSON objects with type and value information for all objects.
     /// </summary>
-    ReflectionJson
+    Json
 }
 
 /// <summary>

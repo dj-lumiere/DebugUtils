@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
+using DebugUtils.Repr.Formatters.Functions;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Fallback;
@@ -43,7 +44,8 @@ internal static class ObjectJsonExtensions
         {
             if (!visited.Add(item: objHash))
             {
-                json["type"] = $"Circular Reference to {json["type"]} @ {objHash:X8}";
+                json[propertyName: "type"] =
+                    $"Circular Reference to {json[propertyName: "type"]} @ {objHash:X8}";
                 return json;
             }
         }
@@ -53,7 +55,6 @@ internal static class ObjectJsonExtensions
         {
             case Array array:
             {
-                // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} is array");
                 var rank = array.Rank;
                 json.Add(propertyName: "elements",
                     value: array.GetJsonFromArrayRecursive(config: config, visited: visited,
@@ -62,7 +63,6 @@ internal static class ObjectJsonExtensions
             }
             case ITuple tuple:
             {
-                // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} is tuple");
                 var entries = new JsonArray();
                 for (var i = 0; i < tuple.Length; i++)
                 {
@@ -76,7 +76,6 @@ internal static class ObjectJsonExtensions
             }
             case IDictionary dict:
             {
-                // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} is list");
                 var entries = new JsonArray();
                 foreach (DictionaryEntry entry in dict)
                 {
@@ -96,7 +95,6 @@ internal static class ObjectJsonExtensions
             }
             case IEnumerable list:
             {
-                // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} is list");
                 var jsonlist = new JsonArray();
                 var count = 0;
                 foreach (var item in list)
@@ -110,8 +108,16 @@ internal static class ObjectJsonExtensions
                 json.Add(propertyName: "value", value: jsonlist);
                 return json;
             }
+            case Delegate del:
+            {
+                var functionDetails = del.Method.ToFunctionDetails();
+                json[propertyName: "type"] = "Function";
+                json.Add(propertyName: "properties",
+                    value: functionDetails.GetJson(config: config, visited: visited,
+                        depth: depth));
+                return json;
+            }
         }
-
 
         // Get public fields
         var fields = type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance);

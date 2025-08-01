@@ -18,8 +18,7 @@ public static partial class ReprExtensions
         config ??= ReprConfig.GlobalDefaults;
         visited ??= new HashSet<int>();
 
-        if (config.FormattingMode == FormattingMode.ReflectionJson ||
-            config.FormattingMode == FormattingMode.SmartJson)
+        if (config.FormattingMode == FormattingMode.Json)
         {
             config = config with { TypeMode = TypeReprMode.AlwaysHide };
         }
@@ -89,8 +88,7 @@ public static partial class ReprExtensions
         var reprName = underlyingType.GetReprTypeNameByTypeName();
 
         // Handle JSON modes
-        if (config.FormattingMode == FormattingMode.SmartJson ||
-            config.FormattingMode == FormattingMode.ReflectionJson)
+        if (config.FormattingMode == FormattingMode.Json)
         {
             return nullable.FormatNullableAsJson(reprName: reprName,
                 config: config with { TypeMode = TypeReprMode.AlwaysHide });
@@ -125,11 +123,7 @@ public static partial class ReprExtensions
         var valueRepr = value.Repr(config: config with
         {
             TypeMode = TypeReprMode.AlwaysHide,
-            FormattingMode =
-            config.FormattingMode == FormattingMode.ReflectionJson ||
-            config.FormattingMode == FormattingMode.Reflection
-                ? FormattingMode.ReflectionJson
-                : FormattingMode.SmartJson
+            FormattingMode = FormattingMode.Json
         });
         Console.WriteLine(value: valueRepr);
         // Parse the JSON and extract the value part
