@@ -26,7 +26,19 @@ public class DateTimeOffsetFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
-        return ((DateTimeOffset)obj).ToString(format: "yyyy-MM-dd HH:mm:ss");
+        var dto = (DateTimeOffset)obj;
+        if (dto.Offset == TimeSpan.Zero)
+        {
+            return dto.ToString("yyyy-MM-dd HH:mm:ss") + "Z";
+        }
+
+        var offset = dto.Offset.ToString(format: "c");
+        if (!offset.StartsWith(value: "+"))
+        {
+            offset = "+" + offset;
+        }
+
+        return dto.ToString("yyyy-MM-dd HH:mm:ss") + offset;
     }
 }
 
