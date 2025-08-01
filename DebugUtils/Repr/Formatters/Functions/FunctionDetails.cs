@@ -22,23 +22,25 @@ public class FunctionDetails
         var parameterStr = String.Join(separator: ", ",
             values: Parameters.Select(selector: p => p.ToString()));
         var parts = new List<string>();
-        if (String.IsNullOrEmpty(value: Modifiers.ToString()))
+        if (!String.IsNullOrEmpty(value: Modifiers.ToString()))
         {
             parts.Add(item: Modifiers.ToString());
+            parts.Add(" ");
         }
 
-        if (String.IsNullOrEmpty(value: ReturnTypeReprName))
+        if (!String.IsNullOrEmpty(value: ReturnTypeReprName))
         {
             parts.Add(item: ReturnTypeReprName);
+            parts.Add(" ");
         }
 
-        if (String.IsNullOrEmpty(value: Name))
+        if (!String.IsNullOrEmpty(value: Name))
         {
             parts.Add(item: Name);
         }
 
         parts.Add(item: "(" + parameterStr + ")");
-        return String.Join(separator: " ", values: parts);
+        return String.Join(separator: "", values: parts);
     }
 }
 
