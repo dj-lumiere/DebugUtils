@@ -1,6 +1,7 @@
-# DebugUtils
+# DebugUtils for C#
 
-A comprehensive debugging toolkit for C# developers. **Stop wasting time with useless `ToString()` output and unclear error logs.**
+A comprehensive debugging toolkit for C# developers. **Stop wasting time with useless `ToString()` output and unclear
+error logs.**
 
 ## Core Features
 
@@ -12,6 +13,7 @@ A comprehensive debugging toolkit for C# developers. **Stop wasting time with us
 ## The Problems We Solve
 
 ### 1. Useless ToString() Output
+
 ```csharp
 var arr = new int[] {1, 2, 3, 4};
 Console.WriteLine(arr.ToString());  // 😞 "System.Int32[]"
@@ -21,6 +23,7 @@ Console.WriteLine(dict.ToString()); // 😞 "System.Collections.Generic.Dictiona
 ```
 
 ### 2. Mystery Error Locations
+
 ```csharp
 public void ProcessData()
 {
@@ -32,17 +35,19 @@ public void ProcessData()
 ## The Solutions
 
 ### 1. Meaningful Data Representation
+
 ```csharp
 using DebugUtils;
 
 var arr = new int[] {1, 2, 3, 4};
-Console.WriteLine(arr.Repr());  // 😍 "[1, 2, 3, 4]"
+Console.WriteLine(arr.Repr());  // 😍 "[int(1), int(2), int(3), int(4)]"
 
 var dict = new Dictionary<string, int> {{"a", 1}, {"b", 2}};
-Console.WriteLine(dict.Repr()); // 😍 "{"a": 1, "b": 2}"
+Console.WriteLine(dict.Repr()); // 😍 "{"a": int(1), "b": int(2)}"
 ```
 
 ### 2. Instant Error Location Tracking
+
 ```csharp
 using DebugUtils;
 
@@ -78,19 +83,23 @@ using DebugUtils;
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
 Console.WriteLine(data.Repr());
-// Output: { Name: "Alice", Age: 30, Scores: 1DArray([95, 87, 92]) }
+// Output: { Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]) }
 
 // 📍 Caller tracking for debugging
-public void MyAlgorithm()
+public class Program
 {
-    Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Starting algorithm...");
-    
-    var result = ComputeResult();
-    Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Result: {result.Repr()}");
+    public void MyAlgorithm()
+    {
+        Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Starting algorithm...");
+        
+        var result = ComputeResult();
+        Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] Result: {result.Repr()}");
+    }
 }
 
-// Output: [Program.Main] Starting algorithm...  
-// Output: [Program.Main] Result: [1, 4, 9, 16, 25]
+
+// Output: [Program.MyAlgorithm] Starting algorithm...  
+// Output: [Program.MyAlgorithm] Result: [int(1), int(4), int(9), int(16), int(25)]
 ```
 
 ## Features
@@ -100,19 +109,21 @@ public void MyAlgorithm()
 Works with any type - see actual data instead of useless type names.
 
 ### Collections
+
 ```csharp
 // Arrays (1D, 2D, jagged)
-new[] {1, 2, 3}.Repr()                    // 1DArray([1, 2, 3])
-new[,] {{1,2}, {3,4}}.Repr()              // 2DArray([[1, 2], [3, 4]])
-new[][] {{1,2}, {3,4,5}}.Repr()           // 3DArray([[1, 2], [3, 4, 5]])
+new[] {1, 2, 3}.Repr()                    // 1DArray([int(1), int(2), int(3)])
+new[,] {{1, 2}, {3, 4}}.Repr()              // 2DArray([[int(1), int(2)], [int(3), int(4)]])
+new[][] {{1, 2}, {3, 4, 5}}.Repr()           // JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])
 
 // Lists, Sets, Dictionaries
-new List<int> {1, 2, 3}.Repr()           // [1, 2, 3]
+new List<int> {1, 2, 3}.Repr()           // [int(1), int(2), int(3)]
 new HashSet<string> {"a", "b"}.Repr()    // {"a", "b"}
-new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": 1}
+new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
 ```
 
 ### Numeric Types
+
 ```csharp
 // Integers with different representations
 42.Repr()                                              // int(42)
@@ -120,8 +131,15 @@ new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": 1}
 42.Repr(new ReprConfig(IntMode: IntReprMode.Binary))   // int(0b101010)
 
 // Floating point with exact representation
-(0.1 + 0.2).Repr()                            // double(3.0000000000000004E-1)
-(0.1 + 0.2).Repr(new ReprConfig(FloatMode: FloatReprMode.General))  // 0.30000000000000004
+// You can now recognize the real floating point value
+// and find what went wrong when doing arithmetics!
+(0.1 + 0.2).Repr()                            
+// double(3.00000000000000444089209850062616169452667236328125E-1)
+0.3.Repr()                                    
+// double(2.99999999999999988897769753748434595763683319091796875E-1)
+
+(0.1 + 0.2).Repr(new ReprConfig(FloatMode: FloatReprMode.General))
+// double(0.30000000000000004)
 ```
 
 ### 📍 Caller Method Tracking (`GetCallerMethod()`)
@@ -155,12 +173,12 @@ public class DataProcessor
     }
 }
 
-// When called from Main():
-// Output: [Program.Main] Processing file: data.txt
-// Output: [Program.Main] Loaded 150 records
+// Output: [DataProcessor.ProcessFile] Processing file: data.txt
+// Output: [DataProcessor.ProcessFile] Loaded 150 records
 ```
 
 **Use cases:**
+
 - **Error tracking** - Know exactly which method failed
 - **Performance logging** - Track execution flow
 - **Debugging algorithms** - See the call chain in complex recursion
@@ -169,9 +187,10 @@ public class DataProcessor
 ## Configuration Options
 
 ### Float Formatting
+
 ```csharp
 var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
-3.14159.Repr(config);     // Exact decimal representation
+3.14159.Repr(config);     // Exact decimal representation down to very last digit.
 
 var scientific = new ReprConfig(FloatMode: FloatReprMode.Scientific);  
 3.14159.Repr(scientific); // Scientific notation
@@ -181,6 +200,7 @@ var rounded = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 2);
 ```
 
 ### Integer Formatting
+
 ```csharp
 var hex = new ReprConfig(IntMode: IntReprMode.Hex);
 255.Repr(hex);            // Hexadecimal Representation
@@ -193,41 +213,47 @@ var bytes = new ReprConfig(IntMode: IntReprMode.HexBytes);
 ```
 
 ### Type Display
+
 ```csharp
-var hideTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysHide);
-new[] {1, 2, 3}.Repr(hideTypes);  // [1, 2, 3] (no type prefix)
+var hideTypes = new ReprConfig(
+    TypeMode: TypeReprMode.AlwaysHide,
+    ContainerReprMode: ContainerReprMode.UseParentConfig
+    );
+new[] {1, 2, 3}.Repr(hideTypes);  // [1, 2, 3] (no type prefix to child element.)
 
 var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
-new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([1, 2, 3])
+new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([int(1), int(2), int(3)])
 ```
 
 ## Real-World Use Cases
 
 ### Competitive Programming
+
 Debug algorithms instantly without writing custom debug code:
 
 ```csharp
 // Debug your DP table
 int[,] dp = new int[n, m];
 // ... fill DP table ...
-Console.WriteLine($"[{DebugUtils.GetCallerMethod()}] DP: {dp.Repr()}");
+Console.WriteLine($"[{CallStack.GetCallerMethod()}] DP: {dp.Repr()}");
 
 // Track algorithm execution
 public int Solve(int[] arr)
 {
-    Console.WriteLine($"[{DbgUtils.GetCallerMethod()}] Input: {arr.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Input: {arr.Repr()}");
     
     var result = ProcessArray(arr);
-    Console.WriteLine($"[{DbgUtils.GetCallerMethod()}] Result: {result}");
+    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Result: {result}");
     return result;
 }
 ```
 
 ### Production Debugging
+
 ```csharp
 public async Task<ApiResponse> ProcessRequest(RequestData request)
 {
-    var caller = DbgUtils.GetCallerMethod();
+    var caller = CallStack.GetCallerMethod();
     logger.Info($"[{caller}] Request: {request.Repr()}");
     
     try 
@@ -246,6 +272,7 @@ public async Task<ApiResponse> ProcessRequest(RequestData request)
 ```
 
 ### Unit Testing
+
 ```csharp
 [Fact]
 public void TestComplexAlgorithm()
@@ -256,9 +283,9 @@ public void TestComplexAlgorithm()
     var actual = MyAlgorithm(input);
     
     // Amazing error messages when tests fail
-    Console.WriteLine($"[{DbgUtils.GetCallerMethod()}] Input: {input.Repr()}");
-    Console.WriteLine($"[{DbgUtils.GetCallerMethod()}] Expected: {expected.Repr()}");
-    Console.WriteLine($"[{DbgUtils.GetCallerMethod()}] Actual: {actual.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Input: {input.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Expected: {expected.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerMethod()}] Actual: {actual.Repr()}");
     
     Assert.Equal(expected, actual);
 }
@@ -268,31 +295,36 @@ public void TestComplexAlgorithm()
 
 - .NET 6.0 (compatible with BOJ and older systems)
 - .NET 7.0 (includes Int128 support, compatible with AtCoder)
-- .NET 8.0 
+- .NET 8.0
 - .NET 9.0 (compatible with Codeforces)
 
 ## Roadmap
 
 **Current Features:**
+
 - ✅ `.Repr()` - Comprehensive object representation
 - ✅ `GetCallerMethod()` - Call stack tracking
 - ✅ Multi-framework support (.NET 6-9)
 - ✅ Zero dependencies
 
 **Planned Features:**
+
 - 🔄 Performance profiling utilities
 - 🔄 Memory usage tracking
 - 🔄 Advanced logging helpers
 - 🔄 Unity debugging extensions
 - 🔄 Benchmark timing utilities
 
-*This library started as a solution to competitive programming debugging but is growing into a comprehensive debugging toolkit.*
+*This library started as a solution to competitive programming debugging but is growing into a comprehensive debugging
+toolkit.*
 
 ## Contributing
 
-Built out of frustration with C# debugging pain points. If you have ideas for additional debugging utilities or find bugs, contributions are welcome!
+Built out of frustration with C# debugging pain points. If you have ideas for additional debugging utilities or find
+bugs, contributions are welcome!
 
 **Ideas for new features:**
+
 - Timer/stopwatch utilities for performance testing
 - Memory allocation tracking
 - Advanced stack trace analysis
