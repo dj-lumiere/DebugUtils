@@ -35,9 +35,9 @@ public static class CallStack
 
             return $"{method.DeclaringType.Name}.{method.Name}";
         }
-        catch (Exception _)
+        catch (Exception ex)
         {
-            return "[error getting caller]";
+            return $"[error getting caller: {ex.Message}]";
         }
     }
 }
