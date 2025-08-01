@@ -9,7 +9,14 @@ public class DateTimeFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
-        return ((DateTime)obj).ToString(format: "yyyy-MM-dd HH:mm:ss");
+        var datetime = (DateTime)obj;
+        var kindSuffix = datetime.Kind switch
+        {
+            DateTimeKind.Utc => " UTC",
+            DateTimeKind.Local => " Local",
+            _ => " Unspecified"
+        };
+        return datetime.ToString(format: "yyyy-MM-dd HH:mm:ss") + kindSuffix;
     }
 }
 
