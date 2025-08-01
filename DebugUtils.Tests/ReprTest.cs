@@ -577,6 +577,24 @@ public class ReprTest
     }
 
     [Fact]
+    public void TestFunctionHierarchical()
+    {
+        var Add5 = (int a) => a + 11;
+        var a = Add;
+        var b = Add2;
+        var c = Add3<short>;
+        var d = Add4;
+        var e = Lambda;
+        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
+        Assert.Contains("\"type\": \"Function\"", a.Repr(config));
+        Assert.Contains("\"type\": \"Function\"", Add5.Repr(config));
+        Assert.Contains("\"type\": \"Function\"", b.Repr(config));
+        Assert.Contains("\"type\": \"Function\"", c.Repr(config));
+        Assert.Contains("\"type\": \"Function\"", d.Repr(config));
+        Assert.Contains("\"type\": \"Function\"", e.Repr(config));
+    }
+
+    [Fact]
     public void TestCircularReference()
     {
         var a = new List<object>();
@@ -589,7 +607,7 @@ public class ReprTest
     }
 
     [Fact]
-    public void TestJsonRepr()
+    public void TestObjectReprHierarchical()
     {
         var data = new { Name = "Alice", Age = 30 };
         var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
