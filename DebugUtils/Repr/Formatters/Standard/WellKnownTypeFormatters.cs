@@ -6,7 +6,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(Guid))]
 [ReprOptions(needsPrefix: true)]
-public class GuidFormatter : IReprFormatter
+internal class GuidFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

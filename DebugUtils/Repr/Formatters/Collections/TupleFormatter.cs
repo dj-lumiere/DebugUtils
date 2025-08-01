@@ -7,7 +7,7 @@ using DebugUtils.Repr.Records;
 namespace DebugUtils.Repr.Formatters.Collections;
 
 [ReprOptions(needsPrefix: false)]
-public class TupleFormatter : IReprFormatter
+internal class TupleFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {

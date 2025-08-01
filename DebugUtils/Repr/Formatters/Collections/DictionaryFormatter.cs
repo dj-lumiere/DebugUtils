@@ -4,7 +4,7 @@ using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;
 
-public class DictionaryFormatter : IReprFormatter
+internal class DictionaryFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
