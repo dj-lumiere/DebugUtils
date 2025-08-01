@@ -550,6 +550,10 @@ public class ReprTest
 
     private async Task<int> Lambda(int a)
     {
+        // Added delay for truly async function.
+        // However, this would not do much because it is only used for testing purposes
+        // and not being called, only investigated the metadata of it.
+        await Task.Delay(millisecondsDelay: 1);
         return a;
     }
 
