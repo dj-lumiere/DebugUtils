@@ -4,23 +4,6 @@ namespace DebugUtils.Repr;
 
 public static partial class ReprExtensions
 {
-    private static string GetArrayTypeName(this Array array)
-    {
-        var rank = array.Rank;
-        if (rank != 1)
-        {
-            return $"{rank}DArray";
-        }
-
-        if (array.GetType()
-                 .GetElementType()
-                ?.IsArray ?? false)
-        {
-            return "JaggedArray";
-        }
-
-        return "1DArray";
-    }
     private static string GetArrayTypeNameByTypeName(this Type type)
     {
         if (!type.IsArray)
@@ -46,24 +29,7 @@ public static partial class ReprExtensions
     public static string GetReprTypeName<T>(this T obj)
     {
         var type = obj?.GetType() ?? typeof(T);
-
-        if (CSharpTypeNames.TryGetValue(key: type, value: out var typeName))
-        {
-            return typeName;
-        }
-
-        if (obj is Array array)
-        {
-            return $"{array.GetArrayTypeName()}";
-        }
-
-        var result = type.Name;
-        if (result.Contains(value: '`'))
-        {
-            result = result.Split(separator: '`')[0];
-        }
-
-        return result;
+        return type.GetReprTypeNameByTypeName();
     }
     public static string GetReprTypeNameByTypeName(this Type type)
     {
