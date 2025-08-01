@@ -9,7 +9,7 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 
 internal static class HierarchicalObjectExtensions
 {
-    public static JsonObject GetJson(this object obj, ReprConfig config, HashSet<int>? visited,
+    public static JsonObject ToJsonObject(this object obj, ReprConfig config, HashSet<int>? visited,
         int depth)
     {
         var type = obj.GetType();
@@ -67,7 +67,7 @@ internal static class HierarchicalObjectExtensions
                 for (var i = 0; i < tuple.Length; i++)
                 {
                     entries.Add(value: tuple[index: i]
-                      ?.GetJson(config: config, visited: visited, depth: depth + 1) ?? null);
+                      ?.ToJsonObject(config: config, visited: visited, depth: depth + 1) ?? null);
                 }
 
                 json.Add(propertyName: "count", value: tuple.Length);
@@ -81,9 +81,9 @@ internal static class HierarchicalObjectExtensions
                 {
                     var entryJson = new JsonObject
                     {
-                        [propertyName: "key"] = entry.Key.GetJson(config: config,
+                        [propertyName: "key"] = entry.Key.ToJsonObject(config: config,
                             visited: visited, depth: depth + 1),
-                        [propertyName: "value"] = entry.Value?.GetJson(config: config,
+                        [propertyName: "value"] = entry.Value?.ToJsonObject(config: config,
                             visited: visited, depth: depth + 1) ?? null
                     };
                     entries.Add(value: entryJson);
@@ -100,7 +100,7 @@ internal static class HierarchicalObjectExtensions
                 foreach (var item in list)
                 {
                     count += 1;
-                    jsonlist.Add(value: item?.GetJson(config: config, visited: visited,
+                    jsonlist.Add(value: item?.ToJsonObject(config: config, visited: visited,
                         depth: depth + 1) ?? null);
                 }
 
@@ -113,7 +113,7 @@ internal static class HierarchicalObjectExtensions
                 var functionDetails = del.Method.ToFunctionDetails();
                 json[propertyName: "type"] = "Function";
                 json.Add(propertyName: "properties",
-                    value: functionDetails.GetJson(config: config, visited: visited,
+                    value: functionDetails.ToJsonObject(config: config, visited: visited,
                         depth: depth + 1));
                 return json;
             }
@@ -124,7 +124,7 @@ internal static class HierarchicalObjectExtensions
         foreach (var field in fields)
         {
             var value = field.GetValue(obj: obj);
-            var addingValue = value?.GetJson(config: config, visited: visited, depth: depth + 1)
+            var addingValue = value?.ToJsonObject(config: config, visited: visited, depth: depth + 1)
                               ?? null;
             json.Add(propertyName: field.Name, value: addingValue);
         }
@@ -139,7 +139,7 @@ internal static class HierarchicalObjectExtensions
             {
                 var value = prop.GetValue(obj: obj);
                 var addingValue =
-                    value?.GetJson(config: config, visited: visited, depth: depth + 1) ?? null;
+                    value?.ToJsonObject(config: config, visited: visited, depth: depth + 1) ?? null;
                 json.Add(propertyName: prop.Name, value: addingValue);
             }
             catch (Exception ex)
@@ -181,7 +181,7 @@ internal static class HierarchicalObjectExtensions
                 {
                     // Otherwise, format the element normally.
                     items.Add(
-                        item: value?.GetJson(config: config, visited: visited, depth: depth + 1));
+                        item: value?.ToJsonObject(config: config, visited: visited, depth: depth + 1));
                 }
             }
 
