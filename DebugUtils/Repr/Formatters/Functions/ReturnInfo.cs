@@ -19,13 +19,7 @@ public class ReturnInfo
 
     public override string ToString()
     {
-        var result = IsRef
-            ? "ref "
-            : "";
-        result += IsAsync
-            ? $"async Task<{TypeName}>"
-            : TypeName;
-        return result;
+        return TypeName;
     }
 }
 

@@ -13,7 +13,7 @@ public static partial class ReprExtensions
         }
 
         if (array.GetType()
-                .GetElementType()
+                 .GetElementType()
                 ?.IsArray ?? false)
         {
             return "JaggedArray";
@@ -93,17 +93,60 @@ public static partial class ReprExtensions
             return $"{type.GetArrayTypeNameByTypeName()}";
         }
 
+        var isRefType = type.IsByRef;
+
+        if (isRefType)
+        {
+            return type.ProcessRefType();
+        }
+
+        var isTaskType = type == typeof(Task);
+        var isGenericTaskType =
+            type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>);
+        var isValueTask = type == typeof(ValueTask);
+        var isGenericValueTask = type.IsGenericType &&
+                                 type.GetGenericTypeDefinition() == typeof(ValueTask<>);
+
+        if (isTaskType || isGenericTaskType || isValueTask || isGenericValueTask)
+        {
+            return type.ProcessTaskType();
+        }
+
         var result = type.Name;
         if (result.Contains(value: '`'))
         {
             result = result.Split(separator: '`')[0];
         }
 
-        if (result.EndsWith("&"))
+        return result;
+    }
+
+    public static string ProcessRefType(this Type type)
+    {
+        var innerType = type?.GetElementType() ?? null;
+        return $"ref {innerType?.GetReprTypeNameByTypeName() ?? "null"}";
+    }
+
+    public static string ProcessTaskType(this Type type)
+    {
+        // For Task (non-generic)
+        if (type == typeof(Task) || type == typeof(ValueTask))
         {
-            result = string.Concat("ref ", result.AsSpan(start: 0, length: result.Length - 1));
+            return type.Name; // "Task" or "ValueTask"
         }
 
-        return result;
+        // For Task<T> or ValueTask<T>
+        if (type.IsGenericType)
+        {
+            var genericDef = type.GetGenericTypeDefinition();
+            if (genericDef == typeof(Task<>) || genericDef == typeof(ValueTask<>))
+            {
+                var innerType = type.GetGenericArguments()[0]; // ✅ Use this instead!
+                var innerTypeReprName = innerType.GetReprTypeNameByTypeName();
+                return $"{genericDef.Name.Split(separator: '`')[0]}<{innerTypeReprName}>";
+            }
+        }
+
+        return type.Name;
     }
 }
