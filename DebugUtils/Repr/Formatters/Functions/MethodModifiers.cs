@@ -16,14 +16,8 @@ public class MethodModifiers
     public bool IsSealed { get; }
     public bool IsAsync { get; }
     public bool IsGeneric { get; }
-    public bool IsExtension { get; }
     public bool IsExtern { get; }
     public bool IsUnsafe { get; }
-
-    // Special cases
-    public bool IsConstructor { get; }
-    public bool IsOperator { get; }
-    public bool IsProperty { get; }
 
     public MethodModifiers(MethodInfo method)
     {
@@ -35,10 +29,6 @@ public class MethodModifiers
         IsSealed = method.IsFinal && method.IsVirtual; // Sealed override
         IsAsync = IsAsyncMethod(method);
         IsGeneric = method.IsGenericMethod;
-        IsExtension = IsExtensionMethod(method);
-        IsConstructor = method.IsConstructor;
-        IsOperator = IsOperatorMethod(method);
-        IsProperty = IsPropertyMethod(method);
         IsExtern = IsExternMethod(method);
         IsUnsafe = IsUnsafeMethod(method);
     }
