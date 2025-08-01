@@ -125,7 +125,6 @@ internal static class ObjectJsonExtensions
         {
             var value = field.GetValue(obj: obj);
             var addingValue = value.GetJson(config: config, visited: visited, depth: depth + 1);
-            // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} {field.Name} {addingValue}");
             json.Add(propertyName: field.Name, value: addingValue);
         }
 
@@ -151,12 +150,11 @@ internal static class ObjectJsonExtensions
                 var value = prop.GetValue(obj: obj);
                 var addingValue =
                     value.GetJson(config: config, visited: visited, depth: depth + 1);
-                // Console.WriteLine(value: $"[{GetCallerMethod()}] {obj} {prop.Name} {addingValue}");
                 json.Add(propertyName: prop.Name, value: addingValue);
             }
             catch (Exception ex)
             {
-                // json.Add(propertyName: prop.Name, value: $"Error: {ex.Message}");
+                json.Add(propertyName: prop.Name, value: $"Error: {ex.Message}");
             }
         }
 
@@ -173,8 +171,6 @@ internal static class ObjectJsonExtensions
         HashSet<int>? visited, int dimension, int[] indices,
         int depth = 0)
     {
-        // Console.WriteLine(
-        //     value: $"[{GetCallerMethod()}] {array} {array.Rank} {indices.Repr(config: null)}");
         if (dimension == array.Rank - 1)
         {
             // Last dimension - collect actual values
