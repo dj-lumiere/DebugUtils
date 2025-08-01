@@ -1,4 +1,5 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using DebugUtils.Repr.Formatters.Attributes;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;

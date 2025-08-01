@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Numerics;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 

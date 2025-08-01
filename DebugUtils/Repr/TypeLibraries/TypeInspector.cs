@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Formatters;
+using DebugUtils.Repr.Formatters.Attributes;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.TypeLibraries;

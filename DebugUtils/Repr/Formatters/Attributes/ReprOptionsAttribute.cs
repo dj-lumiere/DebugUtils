@@ -1,4 +1,4 @@
-namespace DebugUtils.Repr.Formatters;
+namespace DebugUtils.Repr.Formatters.Attributes;
 
 /// <summary>
 ///     Provides options for customizing the representation of a type.
