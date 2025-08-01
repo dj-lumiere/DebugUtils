@@ -36,7 +36,10 @@ public class Person
         Name = name;
         Age = age;
     }
-    public override string ToString() => $"{Name}({Age})";
+    public override string ToString()
+    {
+        return $"{Name}({Age})";
+    }
 }
 
 public class NoToStringClass
@@ -99,8 +102,15 @@ public class ReprTest
     [Fact]
     public void TestDateTimeRepr()
     {
-        Assert.Equal("DateTime(2025-01-01 00:00:00)", DateTime.Parse("2025-01-01")
-            .Repr());
+        var dateTime = new DateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0);
+        var localDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Local);
+        var utcDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Utc);
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Unspecified)", actual:
+            dateTime.Repr());
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Local)", actual:
+            localDateTime.Repr());
+        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 UTC)", actual:
+            utcDateTime.Repr());
     }
 
     [Fact]
@@ -366,8 +376,152 @@ public class ReprTest
     public void TestListWithNullElements()
     {
         var listWithNull = new List<List<int>?> { new() { 1 }, null };
-        Assert.Equal("[[int(1)], null]", listWithNull.Repr());
         Assert.Equal(expected: "[[int(1)], null]", actual: listWithNull.Repr());
     }
+
+    #if NET7_0_OR_GREATER
+    [Theory]
+    [InlineData(IntReprMode.Binary,
+        "Int128(-0b10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)")]
+    [InlineData(IntReprMode.Decimal, "Int128(-170141183460469231731687303715884105728)")]
+    [InlineData(IntReprMode.Hex, "Int128(-0x80000000000000000000000000000000)")]
+    [InlineData(IntReprMode.HexBytes, "Int128(0x80000000000000000000000000000000)")]
+    public void TestInt128Repr(IntReprMode mode, string expected)
+    {
+        var i128 = Int128.MinValue;
+        var config = new ReprConfig(IntMode: mode);
+        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+    }
+
+    [Theory]
+    [InlineData(IntReprMode.Binary,
+        "Int128(0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)")]
+    [InlineData(IntReprMode.Decimal, "Int128(170141183460469231731687303715884105727)")]
+    [InlineData(IntReprMode.Hex, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
+    [InlineData(IntReprMode.HexBytes, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
+    public void TestInt128Repr2(IntReprMode mode, string expected)
+    {
+        var i128 = Int128.MaxValue;
+        var config = new ReprConfig(IntMode: mode);
+        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+    }
+    #endif
+
+    [Fact]
+    public void TestGuidRepr()
+    {
+        var guid = Guid.NewGuid();
+        Assert.Equal(expected: $"Guid(\"{guid}\")", actual: guid.Repr());
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Negative()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(-1800.000s)", actual: TimeSpan.FromMinutes(minutes: -30)
+           .Repr(config: config));
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Zero()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(0.000s)", actual: TimeSpan.Zero.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Positive()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(1800.000s)", actual: TimeSpan.FromMinutes(minutes: 30)
+           .Repr(config: config));
+    }
+
+    [Fact]
+    public void TestDateTimeOffsetRepr()
+    {
+        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00Z)",
+            actual: new DateTimeOffset(dateTime: new DateTime(
+                date: new DateOnly(year: 2025, month: 1, day: 1),
+                time: new TimeOnly(hour: 0, minute: 0, second: 0),
+                kind: DateTimeKind.Utc)).Repr());
+    }
+
+    [Fact]
+    public void TestDateTimeOffsetRepr_WithOffset()
+    {
+        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00+01:00:00)",
+            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
+                offset: TimeSpan.FromHours(hours: 1)).Repr());
+    }
+
+    [Fact]
+    public void TestDateOnly()
+    {
+        Assert.Equal(expected: "DateOnly(2025-01-01)",
+            actual: new DateOnly(year: 2025, month: 1, day: 1).Repr());
+    }
+
+    [Fact]
+    public void TestTimeOnly()
+    {
+        Assert.Equal(expected: "TimeOnly(00:00:00)",
+            actual: new TimeOnly(hour: 0, minute: 0, second: 0).Repr());
+    }
+
+    public static int Add(int a, int b)
+    {
+        return a + b;
+    }
+
+    internal static long Add2(int a)
+    {
+        return a;
+    }
+
+    private T Add3<T>(T a)
+    {
+        return a;
+    }
+
+    private static void Add4(in int a, out int b)
+    {
+        b = a + 1;
+    }
+
+    private async Task<int> Lambda(int a)
+    {
+        return a;
+    }
+
+    [Fact]
+    public void TestFunction()
+    {
+        var Add5 = (int a) => a + 11;
+        var a = Add;
+        var b = Add2;
+        var c = Add3<short>;
+        var d = Add4;
+        var e = Lambda;
+
+        Assert.Equal(expected: "public static int Add(int a, int b)", actual: a.Repr());
+        Assert.Equal(expected: "internal static long Add2(int a)", actual: b.Repr());
+        Assert.Equal(expected: "private generic short Add3(short a)", actual: c.Repr());
+        Assert.Equal(expected: "private static void Add4(in ref int a, out ref int b)",
+            actual: d.Repr());
+        Assert.Equal(expected: "internal int Lambda(int a)", actual: Add5.Repr());
+        Assert.Equal(expected: "private async Task<int> Lambda(int a)", actual: e.Repr());
+    }
+
+    [Fact]
+    public void TestCircularReference()
+    {
+        var a = new List<object>();
+        a.Add(item: a);
+        var repr = a.Repr();
+        // object hash code can be different.
+        Assert.StartsWith(expectedStartString: "[<Circular Reference to List @",
+            actualString: repr);
+        Assert.EndsWith(expectedEndString: ">]", actualString: repr);
     }
 }
