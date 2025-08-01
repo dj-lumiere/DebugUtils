@@ -64,6 +64,64 @@ public enum Colors
 
 public class ReprTest
 {
+    [Fact]
+    public void ExampleTestRepr()
+    {
+        var arr = new int[] { 1, 2, 3, 4 };
+        Assert.Equal(expected: "System.Int32[]", actual: arr.ToString());
+
+        var dict = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
+        Assert.Equal(
+            expected: "System.Collections.Generic.Dictionary`2[System.String,System.Int32]",
+            actual: dict.ToString());
+
+        var data = new { Name = "Alice", Age = 30, Scores = new[] { 95, 87, 92 } };
+        Assert.Equal(
+            expected:
+            "Anonymous({ Name: \"Alice\", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]) })",
+            actual: data.Repr());
+
+        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+            actual: new[] { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "2DArray([[int(1), int(2)], [int(3), int(4)]])",
+            actual: new[,] { { 1, 2 }, { 3, 4 } }.Repr());
+        Assert.Equal(expected: "JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])",
+            actual: new int[][] { new[] { 1, 2 }, new[] { 3, 4, 5 } }.Repr());
+        
+        Assert.Equal(expected: "[int(1), int(2), int(3)]",
+            actual: new List<int> { 1, 2, 3 }.Repr());
+        Assert.Equal(expected: "{\"a\", \"b\"}",
+            actual: new HashSet<string> { "a", "b" }.Repr());
+        Assert.Equal(expected: "{\"x\": int(1)}",
+            actual: new Dictionary<string, int> { { "x", 1 } }.Repr());
+
+        Assert.Equal(expected: "int(42)", actual: 42.Repr());
+        Assert.Equal(expected: "int(0x2A)",
+            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Hex)));
+        Assert.Equal(expected: "int(0b101010)",
+            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Binary)));
+
+        Assert.Equal(expected: "double(3.000000000000000444089209850062616169452667236328125E-1)",
+            actual: (0.1 + 0.2)
+           .Repr());
+        Assert.Equal(
+            expected: "double(2.99999999999999988897769753748434595763683319091796875E-1)",
+            actual: 0.3.Repr());
+        Assert.Equal(expected: "double(0.30000000000000004)",
+            actual: (0.1 + 0.2)
+           .Repr(config: new ReprConfig(FloatMode: FloatReprMode.General)));
+
+        var hideTypes = new ReprConfig(
+            TypeMode: TypeReprMode.AlwaysHide,
+            ContainerReprMode: ContainerReprMode.UseParentConfig
+        );
+        Assert.Equal(expected: "[1, 2, 3]", actual: new[] { 1, 2, 3 }.Repr(config: hideTypes));
+
+        var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
+        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+            actual: new[] { 1, 2, 3 }.Repr(config: showTypes));
+    }
+
     // Basic Types
     [Fact]
     public void TestNullRepr()
@@ -411,7 +469,7 @@ public class ReprTest
     public void TestGuidRepr()
     {
         var guid = Guid.NewGuid();
-        Assert.Equal(expected: $"Guid(\"{guid}\")", actual: guid.Repr());
+        Assert.Equal(expected: $"Guid({guid})", actual: guid.Repr());
     }
 
     [Fact]
