@@ -41,7 +41,7 @@ public static partial class ReprExtensions
             var id = RuntimeHelpers.GetHashCode(o: obj);
             if (!visited.Add(item: id))
             {
-                return $"<circular @{id:X8}>";
+                return $"<Circular Reference to {obj.GetReprTypeName()} @{id:X8}>";
             }
         }
 
