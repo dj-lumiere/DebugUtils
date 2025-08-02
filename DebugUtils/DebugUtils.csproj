@@ -5,16 +5,25 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>DebugUtils.CSharp</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Lumi</Authors>
-    <Description>Debugging suite for C#.</Description>
+    <Description>Essential debugging utilities for C# - Python-style repr(), caller info, and object inspection tools. Stop struggling with useless ToString() output!</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/dj-lumiere/DebugUtils-CSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dj-lumiere/DebugUtils-CSharp.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>debug;logging;utilities;repr;inspector</PackageTags>
+    <PackageTags>debugging;repr;python;toString;object-inspection;logging;utilities;csharp;dotnet</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>
+      See CHANGELOG.md for detailed release notes: https://github.com/dj-lumiere/DebugUtils-CSharp/blob/main/CHANGELOG.md
+    </PackageReleaseNotes>
+    
+    <!-- Source Linking -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
