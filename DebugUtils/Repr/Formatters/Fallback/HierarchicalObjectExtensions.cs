@@ -45,8 +45,11 @@ internal static class HierarchicalObjectExtensions
         {
             if (!visited.Add(item: objHash))
             {
-                json[propertyName: "type"] =
-                    $"Circular Reference to {json[propertyName: "type"]} @ {objHash:X8}";
+                var result = new JsonObject();
+                result.Add(propertyName: "type", value: type.GetReprTypeName());
+                result.Add(propertyName: "hashCode", value: $"0x{objHash:X8}");
+                json["type"] = "CircularReference";
+                json.Add("target", result);
                 return json;
             }
         }
