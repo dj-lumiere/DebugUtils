@@ -330,6 +330,7 @@ public enum FormattingMode
     Reflection,
 
     /// <summary>
+    /// <para><strong>⚠️ EXPERIMENTAL:</strong> This feature is experimental and may change in future versions.</para> 
     /// Always uses reflection-based formatting with hierarchical JSON-like output.
     /// Produces structured data suitable for analysis, tooling, and machine processing.
     /// </summary>
