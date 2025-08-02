@@ -701,8 +701,18 @@ public class ReprTest
         a.Add(item: a);
         var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
         var actualJsonString = a.Repr(config: config);
-        Assert.Contains(expectedSubstring: "Circular Reference to List @",
-            actualString: actualJsonString);
-        Assert.Contains(expectedSubstring: "]", actualString: actualJsonString);
+    
+        // Parse the JSON to verify structure
+        var json = JsonNode.Parse(actualJsonString);
+    
+        // Verify top-level structure
+        Assert.Equal("List", json?["type"]?.ToString());
+        Assert.Equal(1, json?["count"]?.GetValue<int>());
+    
+        // Verify circular reference structure
+        var firstElement = json?["value"]?[0];
+        Assert.Equal("CircularReference", firstElement?["type"]?.ToString());
+        Assert.Equal("List", firstElement?["target"]?["type"]?.ToString());
+        Assert.StartsWith("0x", firstElement?["target"]?["hashCode"]?.ToString());
     }
 }
