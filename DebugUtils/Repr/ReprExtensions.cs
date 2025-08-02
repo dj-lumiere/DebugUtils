@@ -157,7 +157,7 @@ public static partial class ReprExtensions
         {
             if (!visited.Add(item: id))
             {
-                return $"<Circular Reference to {obj.GetReprTypeName()} @{id:X8}>";
+                return $"<Circular Reference to {obj.GetReprTypeName()} @0x{id:X8}>";
             }
         }
 
