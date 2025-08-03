@@ -217,8 +217,10 @@ internal static class HierarchicalObjectExtensions
                 else
                 {
                     // Otherwise, format the element normally.
+                    // Also, visited must be not null at this point, because the Repr call
+                    // at the first time should have made visited not null.
                     items.Add(
-                        item: value?.ToJsonObject(config: config, visited: visited,
+                        item: value?.ToJsonObject(config: config, visited: visited!,
                             depth: depth + 1));
                 }
             }
