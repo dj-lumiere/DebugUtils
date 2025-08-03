@@ -143,7 +143,7 @@ public static partial class ReprExtensions
 
         if (obj.IsNullableStruct())
         {
-            return obj.FormatNullableValueType(config: config);
+            return obj.FormatNullableValueType(config: config, visited: visited);
         }
 
         if (obj is null)
@@ -225,7 +225,8 @@ public static partial class ReprExtensions
     }
 
     // This method remains as it is, correctly handling the logic for Nullable<T>.
-    private static string FormatNullableValueType<T>(this T nullable, ReprConfig config)
+    private static string FormatNullableValueType<T>(this T nullable, ReprConfig config,
+        HashSet<int> visited)
     {
         var type = typeof(T);
         var reprName = type.GetReprTypeName();
@@ -234,7 +235,7 @@ public static partial class ReprExtensions
         if (config.FormattingMode == FormattingMode.Hierarchical)
         {
             return nullable.FormatNullableAsHierarchical(reprName: reprName,
-                config: config with { TypeMode = TypeReprMode.AlwaysHide });
+                config: config with { TypeMode = TypeReprMode.AlwaysHide }, visited: visited);
         }
 
         if (nullable == null)
@@ -262,7 +263,7 @@ public static partial class ReprExtensions
 
         var type = typeof(T);
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
-        var valueRepr = value.ToJsonObject(config: config, visited: visited, depth: 0);
+        var valueRepr = value.ToJsonObject(config: config, visited: visited!, depth: 0);
         valueRepr[propertyName: "type"] = $"{reprName}";
 
         return valueRepr.ToString();
