@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
+using DebugUtils.Repr.Formatters.Fallback;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeLibraries;
@@ -138,7 +139,7 @@ public static partial class ReprExtensions
 
         if (config.FormattingMode == FormattingMode.Hierarchical)
         {
-            config = config with { TypeMode = TypeReprMode.AlwaysHide };
+            config = ReprConfig.HierarchicalDefaults;
         }
 
         if (obj.IsNullableStruct())
@@ -175,8 +176,10 @@ public static partial class ReprExtensions
                     formatter: reprFormatter,
                     id: id);
             }
-
-            result = reprFormatter.ToRepr(obj: obj, config: config, visited: visited);
+            else
+            {
+                result = reprFormatter.ToRepr(obj: obj, config: config, visited: visited);
+            }
         }
         else
         {
@@ -246,14 +249,13 @@ public static partial class ReprExtensions
     }
 
     private static string FormatNullableAsHierarchical<T>(this T nullable, string reprName,
-        ReprConfig config)
+        ReprConfig config, HashSet<int>? visited = null)
     {
         if (nullable == null)
         {
             var nullJson = new JsonObject
             {
-                [propertyName: "type"] = $"{reprName}?",
-                [propertyName: "hasValue"] = false,
+                [propertyName: "type"] = $"{reprName}",
                 [propertyName: "value"] = null
             };
             return nullJson.ToString();
@@ -261,44 +263,9 @@ public static partial class ReprExtensions
 
         var type = typeof(T);
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
-        var valueRepr = value.Repr(config: config with
-        {
-            TypeMode = TypeReprMode.AlwaysHide,
-            FormattingMode = FormattingMode.Hierarchical
-        });
-        Console.WriteLine(value: valueRepr);
-        // Parse the JSON and extract the value part
-        string innerValue;
-        try
-        {
-            var parsed = JsonNode.Parse(json: valueRepr);
-            if (parsed is JsonObject jsonObj && jsonObj.ContainsKey(propertyName: "value"))
-            {
-                // CLONE the node to avoid parent ownership issues
-                var originalValue = jsonObj[propertyName: "value"];
-                innerValue = originalValue?.ToString() ?? valueRepr;
-            }
-            else
-            {
-                // If no "value" field, clone the whole object
-                innerValue = parsed?.ToString() ?? valueRepr;
-            }
-        }
-        catch
-        {
-            // Fallback - shouldn't happen in pure JSON mode, but just in case
-            innerValue = valueRepr;
-        }
-
-        Console.WriteLine(value: innerValue.GetType());
-        Console.WriteLine(value: innerValue);
-
-        var hasValueJson = new JsonObject
-        {
-            [propertyName: "type"] = $"{reprName}?",
-            [propertyName: "hasValue"] = true,
-            [propertyName: "value"] = innerValue
-        };
-        return hasValueJson.ToString();
+        var valueRepr = value.ToJsonObject(config: config, visited: visited, depth: 0);
+        valueRepr["type"] = $"{reprName}";
+        
+        return valueRepr.ToString();
     }
 }

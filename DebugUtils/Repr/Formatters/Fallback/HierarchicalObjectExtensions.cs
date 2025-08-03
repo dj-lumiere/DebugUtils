@@ -10,17 +10,16 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 internal static class HierarchicalObjectExtensions
 {
     public static JsonObject ToJsonObject(this object obj, ReprConfig config,
-        HashSet<int>? visited,
+        HashSet<int> visited,
         int depth)
     {
         var type = obj.GetType();
-        visited ??= new HashSet<int>();
         var objHash = RuntimeHelpers.GetHashCode(o: obj);
         var json = new JsonObject();
 
         json.Add(propertyName: "type", value: type.GetReprTypeName());
 
-        if (depth > 10)
+        if (depth > 5)
         {
             json.Add(propertyName: "value", value: "Truncated for brevity.");
             return json;
