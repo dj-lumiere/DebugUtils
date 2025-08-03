@@ -32,29 +32,24 @@ internal class CharFormatter : IReprFormatter
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
         var value = (char)obj;
-        switch (value)
+        return value switch
         {
-            case '\'': return "'''"; // Single quote
-            case '\"': return "'\"'"; // Double quote
-            case '\\': return @"'\\'"; // Backslash
-            case '\0': return @"'\0'"; // Null
-            case '\a': return @"'\a'"; // Alert
-            case '\b': return @"'\b'"; // Backspace
-            case '\f': return @"'\f'"; // Form feed
-            case '\n': return @"'\n'"; // Newline
-            case '\r': return @"'\r'"; // Carriage return
-            case '\t': return @"'\t'"; // Tab
-            case '\v': return @"'\v'"; // Vertical tab
-            case '\u00a0': return "'nbsp'"; // Non-breaking space
-            case '\u00ad': return "'shy'"; // Soft Hyphen
-        }
-
-        if (Char.IsControl(c: value))
-        {
-            return $"'\\u{(int)value:X4}'";
-        }
-
-        return $"'{value}'";
+            '\'' => "'''", // Single quote
+            '\"' => "'\"'", // Double quote
+            '\\' => @"'\\'", // Backslash
+            '\0' => @"'\0'", // Null
+            '\a' => @"'\a'", // Alert
+            '\b' => @"'\b'", // Backspace
+            '\f' => @"'\f'", // Form feed
+            '\n' => @"'\n'", // Newline
+            '\r' => @"'\r'", // Carriage return
+            '\t' => @"'\t'", // Tab
+            '\v' => @"'\v'", // Vertical tab
+            '\u00a0' => "'nbsp'", // Non-breaking space
+            '\u00ad' => "'shy'", // Soft Hyphen
+            _ when Char.IsControl(c: value) => $"'\\u{(int)value:X4}'", // Control character
+            _ => $"'{value}'"
+        };
     }
 }
 
