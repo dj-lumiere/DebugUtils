@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters.Functions;
 using DebugUtils.Repr.Records;
@@ -26,14 +27,45 @@ internal static class HierarchicalObjectExtensions
         }
 
         // Handle primitives specially
-        if (type.IsPrimitive || type == typeof(string))
+        if (type.IsPrimitive || type == typeof(string) || type == typeof(Rune) ||
+            type == typeof(char))
         {
-            var repr = obj.Repr(
-                config: config with { FormattingMode = FormattingMode.Smart },
-                visited: visited);
-            if (obj is string str)
+            string repr;
+            switch (obj)
             {
-                repr = repr.Substring(startIndex: 1, length: repr.Length - 2);
+                case string str:
+                    repr = str;
+                    break;
+                case Rune rune:
+                    repr = rune.ToString();
+                    json.Add("Unicode Value", $"0x{rune.Value:X8}");
+                    break;
+                case char c:
+                    repr = c switch
+                    {
+                        '\'' => "'''", // Single quote
+                        '\"' => "'\"'", // Double quote
+                        '\\' => @"'\\'", // Backslash
+                        '\0' => @"'\0'", // Null
+                        '\a' => @"'\a'", // Alert
+                        '\b' => @"'\b'", // Backspace
+                        '\f' => @"'\f'", // Form feed
+                        '\n' => @"'\n'", // Newline
+                        '\r' => @"'\r'", // Carriage return
+                        '\t' => @"'\t'", // Tab
+                        '\v' => @"'\v'", // Vertical tab
+                        '\u00a0' => "'nbsp'", // Non-breaking space
+                        '\u00ad' => "'shy'", // Soft Hyphen
+                        _ when Char.IsControl(c: c) => $"'\\u{(int)c:x4}'", // Control character
+                        _ => $"'{c}'"
+                    };
+                    json.Add("Unicode Value", $"0x{c:x4}");
+                    break;
+                default:
+                    repr = obj.Repr(
+                        config: config with { FormattingMode = FormattingMode.Smart },
+                        visited: visited);
+                    break;
             }
 
             json.Add(propertyName: "value", value: repr);
