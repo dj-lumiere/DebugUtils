@@ -136,10 +136,9 @@ public static partial class ReprExtensions
         config ??= ReprConfig.GlobalDefaults;
         visited ??= new HashSet<int>();
         var id = RuntimeHelpers.GetHashCode(o: obj);
-
         if (config.FormattingMode == FormattingMode.Hierarchical)
         {
-            config = ReprConfig.HierarchicalDefaults;
+            config = config with { TypeMode = TypeReprMode.AlwaysHide };
         }
 
         if (obj.IsNullableStruct())
