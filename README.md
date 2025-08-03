@@ -228,6 +228,25 @@ var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
 new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([int(1), int(2), int(3)])
 ```
 
+### Hierarchical Display
+
+```csharp
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}
+var a = new Person(name: "Lumi", age: 28);
+var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
+a.Repr(config: config); //{"type":"Person","Name":{"type":"string","value":"Lumi"},"Age":{"type":"int","value":"28"}}
+```
+
 ## Real-World Use Cases
 
 ### Competitive Programming

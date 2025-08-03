@@ -1,4 +1,5 @@
-﻿using DebugUtils.Repr.Interfaces;
+﻿using System.Text.Json;
+using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Fallback;
@@ -12,8 +13,8 @@ internal class HierarchicalObjectFormatter : IReprFormatter
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
         config = config.GetContainerConfig() with { TypeMode = TypeReprMode.AlwaysHide };
-        var visited2 = new HashSet<int>();
-        return obj.ToJsonObject(config: config, visited: visited2, depth: 0)
-                  .ToString();
+        visited ??= new HashSet<int>();
+        return obj.ToJsonObject(config: config, visited: visited, depth: 0)
+                  .ToJsonString(options: new JsonSerializerOptions { WriteIndented = false });
     }
 }

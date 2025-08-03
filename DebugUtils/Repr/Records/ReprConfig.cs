@@ -330,24 +330,30 @@ public enum FormattingMode
     Reflection,
 
     /// <summary>
-    /// <para><strong>⚠️ EXPERIMENTAL:</strong> This feature is experimental and may change in future versions.</para> 
-    /// Always uses reflection-based formatting with hierarchical JSON-like output.
-    /// Produces structured data suitable for analysis, tooling, and machine processing.
+    /// Produces structured, JSON-like output optimized for debugging and analysis.
+    /// Shows object hierarchy, type information, and handles circular references.
+    /// <para><strong>Why Use This:</strong> Unlike standard JSON serializers, hierarchical mode 
+    /// preserves debugging information like exact numeric representations, handles circular 
+    /// references gracefully, and provides type metadata for every value.</para>
     /// </summary>
     /// <remarks>
-    /// <para>Generates JSON-compatible output with type and value information:</para>
+    /// <para>Output uses JSON-style syntax but includes debugging extensions that may not be valid JSON:</para>
     /// <list type="bullet">
-    /// <item><description>Each object includes type metadata</description></item>
-    /// <item><description>Values are structured for easy parsing</description></item>
-    /// <item><description>Maintains object hierarchy and relationships</description></item>
-    /// <item><description>Suitable for integration with analysis tools</description></item>
+    /// <item><description>Type metadata for all values</description></item>
+    /// <item><description>Special numeric formats (hex, binary, exact floats)</description></item>
+    /// <item><description>Error information for problematic properties</description></item>
+    /// <item><description>Circular reference detection and markers</description></item>
     /// </list>
-    /// <para>Ideal for automated processing, data export, and structured debugging scenarios.</para>
+    /// 
+    /// <para><strong>Ideal for:</strong> IDE integration, automated analysis, complex debugging scenarios.</para>
+    /// <para><strong>Not for:</strong> Data interchange, API responses, or storage. Use dedicated JSON serializers for those cases.</para>
     /// </remarks>
     /// <example>
-    /// Standard mode: Person(Name: "John", Age: 30)
-    /// Hierarchical mode: {"type":"Person","value":{"Name":"John","Age":30}}
+    /// Standard mode: Person(Name: "John", Age: int(30))
+    /// Hierarchical mode: {"type":"Person","Name":{"type":"string","value":"John"},"Age":{"type":"int","value":"30"}}
     /// </example>
+    /// <seealso cref="System.Text.Json.JsonSerializer"/>
+    /// <seealso cref="ReprConfig.HierarchicalDefaults"/>
     Hierarchical
 }
 
@@ -492,4 +498,17 @@ public record ReprConfig(
         ContainerReprMode: ContainerReprMode.UseDefaultConfig,
         IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious);
+
+    /// <summary>
+    /// Default configuration for hierarchical JSON-style output.
+    /// Optimized for structured readability and JSON compatibility.
+    /// </summary>
+    public static ReprConfig HierarchicalDefaults => new(
+        FloatMode: FloatReprMode.Exact, // ✅ JSON-friendly float formatting
+        FloatPrecision: -1, // ✅ Reasonable precision for JSON
+        IntMode: IntReprMode.Decimal, // ✅ JSON standard - no hex
+        ContainerReprMode: ContainerReprMode.UseParentConfig,
+        TypeMode: TypeReprMode.AlwaysHide, // ✅ JSON has type info in structure
+        FormattingMode: FormattingMode.Hierarchical
+    );
 }

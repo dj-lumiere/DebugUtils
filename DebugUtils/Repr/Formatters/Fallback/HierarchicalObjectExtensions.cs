@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters.Functions;
 using DebugUtils.Repr.Records;
@@ -10,31 +11,61 @@ namespace DebugUtils.Repr.Formatters.Fallback;
 internal static class HierarchicalObjectExtensions
 {
     public static JsonObject ToJsonObject(this object obj, ReprConfig config,
-        HashSet<int>? visited,
+        HashSet<int> visited,
         int depth)
     {
         var type = obj.GetType();
-        visited ??= new HashSet<int>();
         var objHash = RuntimeHelpers.GetHashCode(o: obj);
         var json = new JsonObject();
 
         json.Add(propertyName: "type", value: type.GetReprTypeName());
 
-        if (depth > 10)
+        if (depth > 5)
         {
             json.Add(propertyName: "value", value: "Truncated for brevity.");
             return json;
         }
 
         // Handle primitives specially
-        if (type.IsPrimitive || type == typeof(string))
+        if (type.IsPrimitive || type == typeof(string) || type == typeof(Rune) ||
+            type == typeof(char))
         {
-            var repr = obj.Repr(
-                config: config with { FormattingMode = FormattingMode.Smart },
-                visited: visited);
-            if (obj is string str)
+            string repr;
+            switch (obj)
             {
-                repr = repr.Substring(startIndex: 1, length: repr.Length - 2);
+                case string str:
+                    repr = str;
+                    break;
+                case Rune rune:
+                    repr = rune.ToString();
+                    json.Add(propertyName: "Unicode Value", value: $"0x{rune.Value:X8}");
+                    break;
+                case char c:
+                    repr = c switch
+                    {
+                        '\'' => "'''", // Single quote
+                        '\"' => "'\"'", // Double quote
+                        '\\' => @"'\\'", // Backslash
+                        '\0' => @"'\0'", // Null
+                        '\a' => @"'\a'", // Alert
+                        '\b' => @"'\b'", // Backspace
+                        '\f' => @"'\f'", // Form feed
+                        '\n' => @"'\n'", // Newline
+                        '\r' => @"'\r'", // Carriage return
+                        '\t' => @"'\t'", // Tab
+                        '\v' => @"'\v'", // Vertical tab
+                        '\u00a0' => "'nbsp'", // Non-breaking space
+                        '\u00ad' => "'shy'", // Soft Hyphen
+                        _ when Char.IsControl(c: c) => $"'\\u{(int)c:x4}'", // Control character
+                        _ => $"'{c}'"
+                    };
+                    json.Add(propertyName: "Unicode Value", value: $"0x{c:x4}");
+                    break;
+                default:
+                    repr = obj.Repr(
+                        config: config with { FormattingMode = FormattingMode.Smart },
+                        visited: visited);
+                    break;
             }
 
             json.Add(propertyName: "value", value: repr);
@@ -48,8 +79,8 @@ internal static class HierarchicalObjectExtensions
                 var result = new JsonObject();
                 result.Add(propertyName: "type", value: type.GetReprTypeName());
                 result.Add(propertyName: "hashCode", value: $"0x{objHash:X8}");
-                json["type"] = "CircularReference";
-                json.Add("target", result);
+                json[propertyName: "type"] = "CircularReference";
+                json.Add(propertyName: "target", value: result);
                 return json;
             }
         }

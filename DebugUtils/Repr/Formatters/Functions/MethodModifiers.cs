@@ -45,75 +45,27 @@ internal class MethodModifiers
     {
         var modifiers = new List<string>();
 
-        // 1. Add Access Modifier
-        if (IsPublic)
+        foreach (var (condition, name) in new[]
+                 {
+                     (IsPublic, "public"),
+                     (IsPrivate, "private"),
+                     (IsProtected, "protected"),
+                     (IsInternal, "internal"),
+                     (IsStatic, "static"),
+                     (IsAbstract, "abstract"),
+                     (IsVirtual, "virtual"),
+                     (IsOverride, "override"),
+                     (IsSealed, "sealed"),
+                     (IsAsync, "async"),
+                     (IsExtern, "extern"),
+                     (IsUnsafe, "unsafe"),
+                     (IsGeneric, "generic")
+                 })
         {
-            modifiers.Add(item: "public");
-        }
-
-        if (IsPrivate)
-        {
-            modifiers.Add(item: "private");
-        }
-
-        if (IsProtected)
-        {
-            modifiers.Add(item: "protected");
-        }
-
-        if (IsInternal)
-        {
-            modifiers.Add(item: "internal");
-        }
-
-        // 2. Add Scope/Inheritance Modifiers
-        // Note: C# syntax doesn't allow 'virtual' and 'abstract' with 'sealed'
-        // so the order here handles the common combinations correctly.
-
-        if (IsStatic)
-        {
-            modifiers.Add(item: "static");
-        }
-
-        if (IsAbstract)
-        {
-            modifiers.Add(item: "abstract");
-        }
-
-        if (IsVirtual)
-        {
-            modifiers.Add(item: "virtual");
-        }
-
-        if (IsOverride)
-        {
-            modifiers.Add(item: "override");
-        }
-
-        if (IsSealed)
-        {
-            modifiers.Add(item: "sealed");
-        }
-
-        // 3. Add Other Modifiers
-        if (IsAsync)
-        {
-            modifiers.Add(item: "async");
-        }
-
-        if (IsExtern)
-        {
-            modifiers.Add(item: "extern");
-        }
-
-        if (IsUnsafe)
-        {
-            modifiers.Add(item: "unsafe");
-        }
-
-        if (IsGeneric)
-        {
-            modifiers.Add(item: "generic");
+            if (condition)
+            {
+                modifiers.Add(item: name);
+            }
         }
 
         // Join the list into a single string
@@ -130,47 +82,32 @@ internal static class MethodModifiersExtensions
     public static JsonObject ToJsonObject(this MethodModifiers methodModifiers, ReprConfig config,
         HashSet<int> visited, int depth)
     {
-        var result = new JsonObject();
-        result.Add(propertyName: "isPublic",
-            value: methodModifiers.IsPublic.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isPrivate",
-            value: methodModifiers.IsPrivate.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isProtected",
-            value: methodModifiers.IsProtected.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isInternal",
-            value: methodModifiers.IsInternal.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isStatic",
-            value: methodModifiers.IsStatic.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isVirtual",
-            value: methodModifiers.IsVirtual.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isOverride",
-            value: methodModifiers.IsOverride.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isAbstract",
-            value: methodModifiers.IsAbstract.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isSealed",
-            value: methodModifiers.IsSealed.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isAsync",
-            value: methodModifiers.IsAsync.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isGeneric",
-            value: methodModifiers.IsGeneric.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isExtern",
-            value: methodModifiers.IsExtern.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "isUnsafe",
-            value: methodModifiers.IsUnsafe.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        return result;
+        var modifiers = new JsonArray();
+
+        foreach (var (condition, name) in new[]
+                 {
+                     (methodModifiers.IsPublic, "public"),
+                     (methodModifiers.IsPrivate, "private"),
+                     (methodModifiers.IsProtected, "protected"),
+                     (methodModifiers.IsInternal, "internal"),
+                     (methodModifiers.IsStatic, "static"),
+                     (methodModifiers.IsAbstract, "abstract"),
+                     (methodModifiers.IsVirtual, "virtual"),
+                     (methodModifiers.IsOverride, "override"),
+                     (methodModifiers.IsSealed, "sealed"),
+                     (methodModifiers.IsAsync, "async"),
+                     (methodModifiers.IsExtern, "extern"),
+                     (methodModifiers.IsUnsafe, "unsafe"),
+                     (methodModifiers.IsGeneric, "generic")
+                 })
+        {
+            if (condition)
+            {
+                modifiers.Add(value: name);
+            }
+        }
+
+        return new JsonObject { [propertyName: "modifiers"] = modifiers };
     }
 
     public static bool IsOverrideMethod(this MethodInfo method)
