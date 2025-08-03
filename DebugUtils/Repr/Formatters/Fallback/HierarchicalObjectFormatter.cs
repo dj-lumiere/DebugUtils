@@ -15,6 +15,6 @@ internal class HierarchicalObjectFormatter : IReprFormatter
         config = config.GetContainerConfig() with { TypeMode = TypeReprMode.AlwaysHide };
         visited ??= new HashSet<int>();
         return obj.ToJsonObject(config: config, visited: visited, depth: 0)
-                  .ToJsonString(new JsonSerializerOptions { WriteIndented = false });
+                  .ToJsonString(options: new JsonSerializerOptions { WriteIndented = false });
     }
 }

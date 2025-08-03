@@ -263,8 +263,8 @@ public static partial class ReprExtensions
         var type = typeof(T);
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
         var valueRepr = value.ToJsonObject(config: config, visited: visited, depth: 0);
-        valueRepr["type"] = $"{reprName}";
-        
+        valueRepr[propertyName: "type"] = $"{reprName}";
+
         return valueRepr.ToString();
     }
 }

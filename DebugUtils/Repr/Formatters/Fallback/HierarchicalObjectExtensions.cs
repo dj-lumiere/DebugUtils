@@ -38,7 +38,7 @@ internal static class HierarchicalObjectExtensions
                     break;
                 case Rune rune:
                     repr = rune.ToString();
-                    json.Add("Unicode Value", $"0x{rune.Value:X8}");
+                    json.Add(propertyName: "Unicode Value", value: $"0x{rune.Value:X8}");
                     break;
                 case char c:
                     repr = c switch
@@ -59,7 +59,7 @@ internal static class HierarchicalObjectExtensions
                         _ when Char.IsControl(c: c) => $"'\\u{(int)c:x4}'", // Control character
                         _ => $"'{c}'"
                     };
-                    json.Add("Unicode Value", $"0x{c:x4}");
+                    json.Add(propertyName: "Unicode Value", value: $"0x{c:x4}");
                     break;
                 default:
                     repr = obj.Repr(
@@ -79,8 +79,8 @@ internal static class HierarchicalObjectExtensions
                 var result = new JsonObject();
                 result.Add(propertyName: "type", value: type.GetReprTypeName());
                 result.Add(propertyName: "hashCode", value: $"0x{objHash:X8}");
-                json["type"] = "CircularReference";
-                json.Add("target", result);
+                json[propertyName: "type"] = "CircularReference";
+                json.Add(propertyName: "target", value: result);
                 return json;
             }
         }

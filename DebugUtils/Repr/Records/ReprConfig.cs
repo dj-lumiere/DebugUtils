@@ -498,16 +498,17 @@ public record ReprConfig(
         ContainerReprMode: ContainerReprMode.UseDefaultConfig,
         IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious);
+
     /// <summary>
     /// Default configuration for hierarchical JSON-style output.
     /// Optimized for structured readability and JSON compatibility.
     /// </summary>
     public static ReprConfig HierarchicalDefaults => new(
-        FloatMode: FloatReprMode.Exact,      // ✅ JSON-friendly float formatting
-        FloatPrecision: -1,                     // ✅ Reasonable precision for JSON
-        IntMode: IntReprMode.Decimal,          // ✅ JSON standard - no hex
+        FloatMode: FloatReprMode.Exact, // ✅ JSON-friendly float formatting
+        FloatPrecision: -1, // ✅ Reasonable precision for JSON
+        IntMode: IntReprMode.Decimal, // ✅ JSON standard - no hex
         ContainerReprMode: ContainerReprMode.UseParentConfig,
-        TypeMode: TypeReprMode.AlwaysHide,     // ✅ JSON has type info in structure
+        TypeMode: TypeReprMode.AlwaysHide, // ✅ JSON has type info in structure
         FormattingMode: FormattingMode.Hierarchical
     );
 }
