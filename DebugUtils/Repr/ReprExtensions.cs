@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
 using DebugUtils.Repr.Formatters.Fallback;
@@ -139,6 +140,15 @@ public static partial class ReprExtensions
         if (config.FormattingMode == FormattingMode.Hierarchical)
         {
             config = config with { TypeMode = TypeReprMode.AlwaysHide };
+
+            if (!obj.IsNullableStruct())
+            {
+                return new HierarchicalObjectFormatter().ToRepr(obj: obj!, config: config, visited: visited);
+            }
+
+            var reprTypeName = typeof(T).GetReprTypeName();
+            return obj.FormatNullableAsHierarchical(config: config, visited: visited,
+                reprName: reprTypeName);
         }
 
         if (obj.IsNullableStruct())
@@ -164,26 +174,9 @@ public static partial class ReprExtensions
         // 3. Get the correct formatter from the registry.
         var formatter = ReprFormatterRegistry.GetFormatter(type: obj.GetType(), config: config);
 
-        string result;
         // 4. Call the formatter with the correct arguments.
-
-        if (formatter is { } reprFormatter)
-        {
-            if (config.FormattingMode == FormattingMode.Hierarchical)
-            {
-                result = obj.InvokeHierarchicalFormatter(config: config, visited: visited,
-                    formatter: reprFormatter,
-                    id: id);
-            }
-            else
-            {
-                result = reprFormatter.ToRepr(obj: obj, config: config, visited: visited);
-            }
-        }
-        else
-        {
-            result = obj.ToString() ?? "";
-        }
+        var result =
+            formatter.ToRepr(obj: obj, config: config, visited: visited);
 
         // 5. Cleanup and apply type prefix.
         try
@@ -205,23 +198,6 @@ public static partial class ReprExtensions
                 visited.Remove(item: RuntimeHelpers.GetHashCode(o: obj));
             }
         }
-    }
-
-    private static string InvokeHierarchicalFormatter<T>(this T obj, ReprConfig config,
-        HashSet<int> visited,
-        IReprFormatter formatter, int id)
-    {
-        // prevent immediate circular reference crashing
-        if (!obj?.GetType()
-                 .IsValueType ?? false)
-        {
-            visited.Remove(item: id);
-        }
-
-        // Since I handled null checking at the first stage of repr.
-        var result = formatter.ToRepr(obj: obj!, config: config, visited: visited);
-        visited.Add(item: id);
-        return result;
     }
 
     // This method remains as it is, correctly handling the logic for Nullable<T>.
@@ -266,6 +242,7 @@ public static partial class ReprExtensions
         var valueRepr = value.ToJsonObject(config: config, visited: visited!, depth: 0);
         valueRepr[propertyName: "type"] = $"{reprName}";
 
-        return valueRepr.ToString();
+        return valueRepr
+           .ToJsonString(options: new JsonSerializerOptions { WriteIndented = false });
     }
 }
