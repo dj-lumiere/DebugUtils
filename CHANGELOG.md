@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.3] Released at 2025.08.04
+
+### 🐛 Bug Fixes
+-  Removed indents and line feeds when in hierarchical mode for nullable structs
+
+
 ## [v1.0.2] Released at 2025.08.04
 
 ### 🐛 Bug Fixes
