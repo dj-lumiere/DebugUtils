@@ -643,17 +643,17 @@ public class ReprTest
         var d = Add4;
         var e = Lambda;
         var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: a.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: Add5.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: b.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: c.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: d.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\": \"Function\"",
+        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
             actualString: e.Repr(config: config));
     }
 
