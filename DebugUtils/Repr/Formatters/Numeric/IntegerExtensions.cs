@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Text;
-using DebugUtils.Repr.TypeLibraries;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Numeric;
 
