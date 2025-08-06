@@ -103,12 +103,12 @@ internal class CharFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var c = (char)obj;
-        var json = new JsonObject();
-        json.Add(propertyName: "type", value: "char");
-        json.Add(propertyName: "kind", value: "struct");
-        json.Add(propertyName: "value", value: c.ToString());
-        json.Add(propertyName: "unicodeValue", value: $"0x{(int)c:X4}");
-        return json;
+        var result = new JsonObject();
+        result.Add(propertyName: "type", value: "char");
+        result.Add(propertyName: "kind", value: "struct");
+        result.Add(propertyName: "value", value: c.ToString());
+        result.Add(propertyName: "unicodeValue", value: $"0x{(int)c:X4}");
+        return result;
     }
 }
 
@@ -124,11 +124,11 @@ internal class RuneFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var rune = (Rune)obj;
-        var json = new JsonObject();
-        json.Add(propertyName: "type", value: "Rune");
-        json.Add(propertyName: "kind", value: "struct");
-        json.Add(propertyName: "value", value: rune.ToString());
-        json.Add(propertyName: "unicodeValue", value: $"0x{rune.Value:X8}");
-        return json;
+        var result = new JsonObject();
+        result.Add(propertyName: "type", value: "Rune");
+        result.Add(propertyName: "kind", value: "struct");
+        result.Add(propertyName: "value", value: rune.ToString());
+        result.Add(propertyName: "unicodeValue", value: $"0x{rune.Value:X8}");
+        return result;
     }
 }

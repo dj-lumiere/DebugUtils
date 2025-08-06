@@ -58,13 +58,13 @@ internal class VersionFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var v = (Version)obj;
-        var json = new JsonObject();
-        json.Add(propertyName: "type", value: "Version");
-        json.Add(propertyName: "kind", value: "class");
-        json.Add(propertyName: "major", value: v.Major);
-        json.Add(propertyName: "minor", value: v.Minor);
-        json.Add(propertyName: "build", value: v.Build);
-        json.Add(propertyName: "revision", value: v.Revision);
-        return json;
+        var result = new JsonObject();
+        result.Add(propertyName: "type", value: "Version");
+        result.Add(propertyName: "kind", value: "class");
+        result.Add(propertyName: "major", value: v.Major);
+        result.Add(propertyName: "minor", value: v.Minor);
+        result.Add(propertyName: "build", value: v.Build);
+        result.Add(propertyName: "revision", value: v.Revision);
+        return result;
     }
 }
