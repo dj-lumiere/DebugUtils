@@ -72,8 +72,8 @@ internal class FunctionDetailsFormatter : IReprFormatter, IReprTreeFormatter
             {
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = true,
-                [propertyName: "depth"] = context.Depth
+                [propertyName: "maxDepthReached"] = "true",
+                [propertyName: "depth"] = context.Depth.ToString()
             };
         }
 
