@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Records;
+﻿namespace DebugUtils.Repr.Formatters.Numeric;
 
 internal enum FloatTypeKind
 {

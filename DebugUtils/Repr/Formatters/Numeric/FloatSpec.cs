@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Records;
+﻿namespace DebugUtils.Repr.Formatters.Numeric;
 
 /// <summary>
 ///     Encapsulates IEEE 754 floating-point format specifications.
