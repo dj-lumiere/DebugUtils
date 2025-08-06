@@ -29,7 +29,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         foreach (var item in list)
         {
             if (context.Config.MaxElementsPerCollection >= 0 &&
-                count > context.Config.MaxElementsPerCollection)
+                count >= context.Config.MaxElementsPerCollection)
             {
                 hitLimit = true;
                 break;
