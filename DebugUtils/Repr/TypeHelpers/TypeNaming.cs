@@ -1,9 +1,49 @@
-﻿using DebugUtils.Repr.TypeLibraries;
-using static DebugUtils.Repr.TypeLibraries.TypeNameMappings;
+﻿namespace DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr;
-
-public static partial class ReprExtensions
+/// <summary>
+/// Provides utilities for generating human-readable type names and categorizing types
+/// for the Repr system. This class handles the complex logic of converting .NET's
+/// technical type names into clean, developer-friendly representations.
+/// </summary>
+/// <remarks>
+/// <para>This class is the core of type name resolution in the Repr system, handling:</para>
+/// <list type="bullet">
+/// <item><description><strong>C# Type Aliases:</strong> Converting System.Int32 to "int"</description></item>
+/// <item><description><strong>Generic Types:</strong> Simplifying List&lt;T&gt; to "List"</description></item>
+/// <item><description><strong>Nullable Types:</strong> Adding "?" suffix for nullable value types</description></item>
+/// <item><description><strong>Array Types:</strong> Categorizing as 1D, multidimensional, or jagged</description></item>
+/// <item><description><strong>Task Types:</strong> Showing result types for async operations</description></item>
+/// <item><description><strong>Anonymous Types:</strong> Providing consistent "Anonymous" labels</description></item>
+/// </list>
+/// </remarks>
+/// <example>
+/// <code>
+/// // Basic type name resolution
+/// Console.WriteLine(typeof(int).GetReprTypeName());              // "int"
+/// Console.WriteLine(typeof(List&lt;string&gt;).GetReprTypeName());     // "List"
+/// Console.WriteLine(typeof(Dictionary&lt;int, string&gt;).GetReprTypeName()); // "Dictionary"
+/// 
+/// // Nullable type handling
+/// Console.WriteLine(typeof(int?).GetReprTypeName());             // "int?"
+/// Console.WriteLine(typeof(DateTime?).GetReprTypeName());        // "DateTime?"
+/// 
+/// // Array type categorization
+/// Console.WriteLine(typeof(int[]).GetReprTypeName());            // "1DArray"
+/// Console.WriteLine(typeof(int[,]).GetReprTypeName());           // "2DArray"
+/// Console.WriteLine(typeof(int[][]).GetReprTypeName());          // "JaggedArray"
+/// 
+/// // Task type resolution
+/// Console.WriteLine(typeof(Task&lt;bool&gt;).GetReprTypeName());        // "Task&lt;bool&gt;"
+/// Console.WriteLine(typeof(ValueTask&lt;int&gt;).GetReprTypeName());    // "ValueTask&lt;int&gt;"
+/// 
+/// // Type kind categorization
+/// Console.WriteLine(typeof(MyClass).GetTypeKind());              // "class"
+/// Console.WriteLine(typeof(MyRecord).GetTypeKind());             // "record class"
+/// Console.WriteLine(typeof(MyStruct).GetTypeKind());             // "struct"
+/// Console.WriteLine(typeof(MyEnum).GetTypeKind());               // "enum"
+/// </code>
+/// </example>
+public static class TypeNaming
 {
     /// <summary>
     /// Gets a human-readable representation name for the specified type.
@@ -47,12 +87,13 @@ public static partial class ReprExtensions
             return $"{underlyingType.GetReprTypeName()}?";
         }
 
-        if (CSharpTypeNames.TryGetValue(key: type, value: out var typeName))
+        if (TypeNameMappings.CSharpTypeNames.TryGetValue(key: type, value: out var typeName))
         {
             return typeName;
         }
 
-        if (FriendlyTypeNames.TryGetValue(key: type, value: out var friendlyTypeName))
+        if (TypeNameMappings.FriendlyTypeNames.TryGetValue(key: type,
+                value: out var friendlyTypeName))
         {
             return friendlyTypeName;
         }
@@ -123,6 +164,29 @@ public static partial class ReprExtensions
         return type.GetReprTypeName();
     }
 
+    /// <summary>
+    /// Gets the kind/category of the specified type (class, struct, record, enum, etc.).
+    /// This determines the fundamental nature of the type for debugging purposes.
+    /// </summary>
+    /// <param name="type">The type to categorize.</param>
+    /// <returns>
+    /// A string describing the type kind: "enum", "interface", "record struct", "struct", 
+    /// "record class", "class", or "unknown" for unrecognized types.
+    /// </returns>
+    public static string GetTypeKind(this Type type)
+    {
+        return type switch
+        {
+            _ when type.IsEnum => "enum",
+            _ when type.IsInterface => "interface",
+            _ when type.IsValueType && type.IsRecordType() => "record struct",
+            _ when type.IsValueType => "struct",
+            _ when type.IsRecordType() => "record class",
+            _ when type.IsClass => "class",
+            _ => "unknown"
+        };
+    }
+
     private static string GetArrayTypeNameByTypeName(this Type type)
     {
         if (!type.IsArray)
@@ -146,7 +210,7 @@ public static partial class ReprExtensions
     }
     private static string GetRefTypeReprName(this Type type)
     {
-        var innerType = type?.GetElementType() ?? null;
+        var innerType = type.GetElementType() ?? null;
         return $"ref {innerType?.GetReprTypeName() ?? "null"}";
     }
     private static string GetTaskTypeReprName(this Type type)

@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Formatters.Attributes;
+﻿namespace DebugUtils.Repr.Attributes;
 
 /// <summary>
 /// Marks a class as a formatter for specific types in the Repr system.
@@ -14,18 +14,14 @@
 /// </remarks>
 /// <example>
 /// <code>
-/// [ReprFormatter(typeof(Person), typeof(Employee))]
+/// [ReprFormatter(typeof(MyCustomType))]
 /// [ReprOptions(needsPrefix: false)]
-/// public class PersonFormatter : IReprFormatter
+/// public class MyCustomFormatter : IReprFormatter
 /// {
-///     public string ToRepr(object obj, ReprConfig config, HashSet&lt;int&gt;? visited = null)
+///     public string ToRepr(object obj, ReprContext context)  // ✅ Fixed signature
 ///     {
-///         // Handle both Person and Employee types
-///         if (obj is Person person)
-///         {
-///             return $"{person.Name} (ID: {person.Id})";
-///         }
-///         return obj.ToString() ?? "";
+///         var custom = (MyCustomType)obj;
+///         return $"MyCustom({custom.ImportantProperty})";
 ///     }
 /// }
 /// </code>

@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.TypeLibraries;
+﻿namespace DebugUtils.Repr.TypeHelpers;
 
 internal static class TypeNameMappings
 {

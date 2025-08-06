@@ -1,78 +1,16 @@
 # DebugUtils for C#
 
-A comprehensive debugging toolkit for C# developers. **Stop wasting time with useless `ToString()` output and unclear
-error logs.**
+A collection of debugging utilities for C# developers.
 
 ## Core Features
 
-🔍 **`.Repr()`** - See actual content instead of type names  
-📍 **`GetCallerName()`** - Know exactly where errors/logs originated  
-⚡ **Performance-focused** - Built for competitive programming and production debugging  
-🎯 **Zero dependencies** - Just add to your project and go
+## 🔍 Object Representation ([Repr Documentation](Repr/README.md))
 
-## The Problems We Solve
+Stop getting useless `ToString()` output. See actual object contents.
 
-### 1. Useless ToString() Output
+## 📍 Call Stack Tracking ([CallStack Documentation](CallStack/README.md))
 
-```csharp
-var arr = new int[] {1, 2, 3, 4};
-Console.WriteLine(arr.ToString());  // 😞 "System.Int32[]"
-
-var dict = new Dictionary<string, int> {{"a", 1}, {"b", 2}};
-Console.WriteLine(dict.ToString()); // 😞 "System.Collections.Generic.Dictionary`2[System.String,System.Int32]"
-```
-
-### 2. Mystery Error Locations
-
-```csharp
-public void ProcessData()
-{
-    // Something fails deep in call stack
-    throw new Exception("Data processing failed"); // 😞 Where did this come from?
-}
-```
-
-## The Solutions
-
-### 1. Meaningful Data Representation
-
-```csharp
-using DebugUtils;
-
-var arr = new int[] {1, 2, 3, 4};
-Console.WriteLine(arr.Repr());  // 😍 "[int(1), int(2), int(3), int(4)]"
-
-var dict = new Dictionary<string, int> {{"a", 1}, {"b", 2}};
-Console.WriteLine(dict.Repr()); // 😍 "{"a": int(1), "b": int(2)}"
-```
-
-### 2. Instant Error Location Tracking
-
-```csharp
-using DebugUtils;
-
-public class MainClass
-{
-    public void ProcessData()
-    {
-        var caller = CallStack.GetCallerName();
-        Console.WriteLine($"[{caller}] Processing started...");
-        
-        try 
-        {
-            // Your code here
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[{caller}] Error: {ex.Message}");
-            throw;
-        }
-    }
-}
-
-// Output: [MainClass.ProcessData] Processing started...
-// Output: [MainClass.ProcessData] Error: Invalid input format
-```
+Know exactly where your code is executing and which methods are calling what.
 
 ## Installation
 
@@ -81,12 +19,33 @@ Add this project as a reference or copy the source files to your project.
 ## Quick Start
 
 ```csharp
-using DebugUtils;
+using DebugUtils.CallStack;
+using DebugUtils.Repr;
 
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
 Console.WriteLine(data.Repr());
 // Output: Anonymous(Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))
+
+// 🌳 Structured tree output for complex analysis
+Console.WriteLine(data.ReprTree());
+// Output: {
+//   "type": "Anonymous",
+//   "kind": "class",
+//   "Name": { "type": "string", "kind": "class", "value": "Alice" },
+//   "Age": { "type": "int", "kind": "struct", "value": "30" },
+//   "Scores": {
+//     "type": "1DArray",
+//     "kind": "class",
+//     "count": 3,
+//     "itemsShown": 3,
+//     "value": [
+//       { "type": "int", "kind": "struct", "value": "95" },
+//       { "type": "int", "kind": "struct", "value": "87" },
+//       { "type": "int", "kind": "struct", "value": "92" }
+//     ]
+//   }
+// }
 
 // 📍 Caller tracking for debugging
 public class Program
@@ -100,8 +59,7 @@ public class Program
     }
 }
 
-
-// Output: [Program.MyAlgorithm] Starting algorithm...  
+// Output: [Program.MyAlgorithm] Starting algorithm...
 // Output: [Program.MyAlgorithm] Result: [int(1), int(4), int(9), int(16), int(25)]
 ```
 
@@ -195,11 +153,11 @@ public class DataProcessor
 var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
 3.14159.Repr(config);     // Exact decimal representation down to very last digit.
 
-var scientific = new ReprConfig(FloatMode: FloatReprMode.Scientific);  
-3.14159.Repr(scientific); // Scientific notation
+var scientific = new ReprConfig(FloatMode: FloatReprMode.Scientific, FloatPrecision: 5);  
+3.14159.Repr(scientific); // Scientific notation with 5 valid digits.
 
 var rounded = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 2);
-3.14159.Repr(rounded);    // Rounded to 2 decimal places
+3.14159.Repr(rounded);    // Rounded to 2 decimal places.
 ```
 
 ### Integer Formatting
@@ -243,8 +201,7 @@ public class Person
     }
 }
 var a = new Person(name: "Lumi", age: 28);
-var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-a.Repr(config: config); //{"type":"Person","Name":{"type":"string","value":"Lumi"},"Age":{"type":"int","value":"28"}}
+a.ReprTree(); //{"type":"Person","kind":"class","Name":{"type":"string","kind":"class","value":"Lumi"},"Age":{"type":"int","kind":"struct","value":"28"}}
 ```
 
 ## Real-World Use Cases
@@ -324,10 +281,14 @@ public void TestComplexAlgorithm()
 
 **Current Features:**
 
-- ✅ `.Repr()` - Comprehensive object representation
-- ✅ `GetCallerName()` - Call stack tracking
-- ✅ Multi-framework support (.NET 6-9)
-- ✅ Zero dependencies
+✅ `.Repr()` - Comprehensive object representation
+✅ `.ReprTree()` - Structured JSON tree output
+✅ `.FormatAsJsonNode()` - Custom formatter building blocks
+✅ `GetCallerName()` - Call stack tracking
+✅ Multi-framework support (.NET 6-9)
+✅ Zero dependencies
+✅ Circular reference detection
+✅ Custom formatter system
 
 **Planned Features:**
 
@@ -358,4 +319,4 @@ This project follows MIT license.
 
 ---
 
-**Stop debugging blind. See your actual data and know where your code fails. 🎯**
+**Stop debugging blind. See your actual data with crystal clarity and know exactly where your code executes. 🎯**

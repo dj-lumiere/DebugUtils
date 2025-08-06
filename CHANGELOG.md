@@ -1,5 +1,59 @@
 # Changelog
 
+## [v1.1.0] Released at 2025.08.06
+
+### ✨ New Features
+- Added Features
+  - **Tree Representation (`.ReprTree()`)** - Structured JSON output for debugging tools and IDEs
+      - Complete type information for every value
+      - Hierarchical object relationships
+      - Machine-readable format perfect for analysis tools
+      - Pretty printing support with configurable indentation
+  - **Custom Formatter System** - Build your own object representations
+      - `IReprFormatter` interface for custom string formatting
+      - `IReprTreeFormatter` interface for custom JSON tree formatting
+      - `ReprFormatterAttribute` for automatic formatter registration
+      - `.FormatAsJsonNode()` method for building complex tree structures
+
+- Advanced Configuration & Limits
+
+  - **Comprehensive Limit Controls** - Prevent performance issues with large objects
+      - `MaxDepth` - Control recursion depth (supports unlimited with `-1`)
+      - `MaxElementsPerCollection` - Limit array/list elements shown
+      - `MaxPropertiesPerObject` - Limit object properties displayed
+      - `MaxStringLength` - Truncate long strings with character counts
+  - **Enhanced Type Display Options**
+      - `ShowNonPublicProperties` - Access private fields and properties for deep debugging
+      - `EnablePrettyPrintForReprTree` - Enable pretty printing for tree output
+
+### 🔧 API Improvements
+
+- **Two-Tier API Design**
+    - End-user API: Simple `ReprConfig` parameters
+    - Plugin/Formatter API: Advanced `ReprContext` state management
+    - Non-null context enforcement for formatter safety
+
+- **Enhanced Method Signatures**
+    - `obj.Repr(config)` - String representation with configuration
+    - `obj.ReprTree(config)` - JSON tree with pretty printing options
+    - `obj.Repr(context)` - Advanced context control for plugin developers
+    - `obj.FormatAsJsonNode(context)` - Building block for custom formatters
+
+### 🐛 Bug Fixes & Improvements
+
+- Fixed double circular reference checking in complex object hierarchies
+- Improved nullable struct handling in hierarchical JSON mode
+- Enhanced hash code formatting for consistent object identification
+- Resolved property counting inconsistencies in object formatters
+
+### 📋 Breaking Changes
+
+- **JSON Tree Output Format** - Tree representation now includes comprehensive metadata
+    - Added `type`, `kind` fields for all objects
+
+**Migration Notes:** Existing `.Repr()` calls remain unchanged. New `.ReprTree()` method provides additional 
+JSON tree functionality. Custom formatters can be gradually adopted using the new interface system.
+
 ## [v1.0.3] Released at 2025.08.04
 
 ### 🐛 Bug Fixes

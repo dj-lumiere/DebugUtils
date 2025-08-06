@@ -14,14 +14,16 @@ namespace DebugUtils.Repr.Interfaces;
 /// </remarks>
 /// <example>
 /// <code>
-/// [ReprFormatter(typeof(MyCustomType))]
+/// [ReprFormatter(typeof(Person))]
 /// [ReprOptions(needsPrefix: false)]
-/// public class MyCustomFormatter : IReprFormatter
+/// public class PersonFormatter : IReprFormatter
 /// {
-///     public string ToRepr(object obj, ReprConfig config, HashSet&lt;int&gt;? visited = null)
+///     public string ToRepr(object obj, ReprContext context)
 ///     {
-///         var custom = (MyCustomType)obj;
-///         return $"MyCustom({custom.ImportantProperty})";
+///         var person = (Person)obj;
+///         var nameRepr = person.Name?.Repr(context.WithIncrementedDepth()) ?? "null";
+///         var ageRepr = person.Age.Repr(context.WithIncrementedDepth());
+///         return $"Name: {nameRepr}, Age: {ageRepr}";
 ///     }
 /// }
 /// </code>
@@ -35,14 +37,9 @@ public interface IReprFormatter
     /// The object to format. Guaranteed to be non-null and of a type this formatter handles.
     /// The formatter should cast this to the expected type.
     /// </param>
-    /// <param name="config">
-    /// The configuration settings controlling formatting behavior. Contains settings for
-    /// numeric formatting, type display, container handling, and output mode.
-    /// </param>
-    /// <param name="visited">
-    /// Optional set of object hash codes currently being processed, used for circular reference detection.
-    /// When formatting child objects, pass this parameter to their Repr() calls to maintain
-    /// the circular reference detection chain.
+    /// <param name="context">
+    /// Optional context controlling formatting behavior and tracking state. If null, uses default configuration.
+    /// Contains configuration settings, circular reference tracking, and depth management.
     /// </param>
     /// <returns>
     /// A string representation of the object. Should not include type prefixes if
@@ -52,7 +49,7 @@ public interface IReprFormatter
     /// <para>Implementation guidelines:</para>
     /// <list type="bullet">
     /// <item><description>Always respect the configuration settings when applicable</description></item>
-    /// <item><description>Pass the visited set to child object Repr() calls</description></item>
+    /// <item><description>Pass the context to child object Repr() calls</description></item>
     /// <item><description>Handle null properties gracefully</description></item>
     /// <item><description>Consider performance for frequently used formatters</description></item>
     /// <item><description>Provide meaningful output even when properties throw exceptions</description></item>
@@ -69,5 +66,5 @@ public interface IReprFormatter
     /// }
     /// </code>
     /// </example>
-    string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null);
+    string ToRepr(object obj, ReprContext context);
 }

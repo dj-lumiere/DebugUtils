@@ -1,8 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Nodes;
-using DebugUtils.Repr.Formatters.Fallback;
-using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
@@ -78,36 +75,6 @@ internal static class MethodModifiersExtensions
     public static MethodModifiers ToMethodModifiers(this MethodInfo methodInfo)
     {
         return new MethodModifiers(method: methodInfo);
-    }
-    public static JsonObject ToJsonObject(this MethodModifiers methodModifiers, ReprConfig config,
-        HashSet<int> visited, int depth)
-    {
-        var modifiers = new JsonArray();
-
-        foreach (var (condition, name) in new[]
-                 {
-                     (methodModifiers.IsPublic, "public"),
-                     (methodModifiers.IsPrivate, "private"),
-                     (methodModifiers.IsProtected, "protected"),
-                     (methodModifiers.IsInternal, "internal"),
-                     (methodModifiers.IsStatic, "static"),
-                     (methodModifiers.IsAbstract, "abstract"),
-                     (methodModifiers.IsVirtual, "virtual"),
-                     (methodModifiers.IsOverride, "override"),
-                     (methodModifiers.IsSealed, "sealed"),
-                     (methodModifiers.IsAsync, "async"),
-                     (methodModifiers.IsExtern, "extern"),
-                     (methodModifiers.IsUnsafe, "unsafe"),
-                     (methodModifiers.IsGeneric, "generic")
-                 })
-        {
-            if (condition)
-            {
-                modifiers.Add(value: name);
-            }
-        }
-
-        return new JsonObject { [propertyName: "modifiers"] = modifiers };
     }
 
     public static bool IsOverrideMethod(this MethodInfo method)

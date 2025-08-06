@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
-using System.Text.Json.Nodes;
-using DebugUtils.Repr.Formatters.Fallback;
-using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
@@ -52,26 +50,7 @@ internal static class ParameterDetailsExtensions
     {
         return new ParameterDetails(parameterInfo: parameterInfo);
     }
-    public static JsonObject ToJsonObject(this ParameterDetails details, ReprConfig config,
-        HashSet<int> visited, int depth)
-    {
-        var result = new JsonObject();
-        result.Add(propertyName: "name",
-            value: details.Name.ToJsonObject(config: config, visited: visited, depth: depth + 1));
-        result.Add(propertyName: "typeReprName",
-            value: details.TypeReprName.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "Modifier",
-            value: details.Modifier.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "HasDefaultValue",
-            value: details.HasDefaultValue.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "DefaultValue",
-            value: details.DefaultValue?.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1) ?? null);
-        return result;
-    }
+
     public static string GetParameterModifier(this ParameterInfo param)
     {
         // Check for ref/out/in modifiers

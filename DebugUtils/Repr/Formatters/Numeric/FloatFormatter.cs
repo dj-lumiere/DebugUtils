@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
-using System.Numerics;
-using DebugUtils.Repr.Formatters.Attributes;
+using System.Text.Json.Nodes;
+using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Numeric;
 
@@ -15,9 +15,9 @@ namespace DebugUtils.Repr.Formatters.Numeric;
     #endif
 )]
 [ReprOptions(needsPrefix: true)]
-internal class FloatFormatter : IReprFormatter
+internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprContext context)
     {
         var info = obj switch
         {
@@ -29,6 +29,7 @@ internal class FloatFormatter : IReprFormatter
             _ => throw new ArgumentException(message: "Invalid type")
         };
 
+        var config = context.Config;
         // those two repr modes prioritize bit perfect representation, so they are processed first.
         switch (config.FloatMode)
         {
@@ -100,12 +101,22 @@ internal class FloatFormatter : IReprFormatter
 
         return config.FloatMode switch
         {
-            FloatReprMode.Round => obj.FormatAsRounding(info: info, reprConfig: config),
-            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, reprConfig: config),
-            FloatReprMode.General => obj.FormatAsGeneral(info: info, reprConfig: config),
+            FloatReprMode.Round => obj.FormatAsRounding(info: info, context: context),
+            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, context: context),
+            FloatReprMode.General => obj.FormatAsGeneral(info: info, context: context),
             FloatReprMode.Exact => obj.FormatAsExact(info: info),
 
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
         };
+    }
+
+    public JsonNode ToReprTree(object obj, ReprContext context)
+    {
+        var result = new JsonObject();
+        var type = obj.GetType();
+        result.Add(propertyName: "type", value: type.GetReprTypeName());
+        result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
+        return result;
     }
 }

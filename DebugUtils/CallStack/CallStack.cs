@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace DebugUtils;
+namespace DebugUtils.CallStack;
 
 /// <summary>
 /// Provides utilities for inspecting the call stack and retrieving caller information.

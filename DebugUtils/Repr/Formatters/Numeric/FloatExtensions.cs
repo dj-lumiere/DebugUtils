@@ -102,10 +102,11 @@ internal static class FloatExtensions
     }
 
     public static string FormatAsRounding(this object obj, FloatInfo info,
-        ReprConfig reprConfig)
+        ReprContext context)
     {
-        var roundingFormatString = "F" + (reprConfig.FloatPrecision > 0
-            ? reprConfig.FloatPrecision
+        var config = context.Config;
+        var roundingFormatString = "F" + (config.FloatPrecision > 0
+            ? config.FloatPrecision
             : 0);
         return info.TypeName switch
         {
@@ -121,7 +122,7 @@ internal static class FloatExtensions
         };
     }
     public static string FormatAsGeneral(this object obj, FloatInfo info,
-        ReprConfig reprConfig)
+        ReprContext context)
     {
         return info.TypeName switch
         {
@@ -137,10 +138,11 @@ internal static class FloatExtensions
         };
     }
     public static string FormatAsScientific(this object obj, FloatInfo info,
-        ReprConfig reprConfig)
+        ReprContext context)
     {
-        var scientificFormatString = "E" + (reprConfig.FloatPrecision > 0
-            ? reprConfig.FloatPrecision - 1
+        var config = context.Config;
+        var scientificFormatString = "E" + (config.FloatPrecision > 0
+            ? config.FloatPrecision - 1
             : 0);
         return info.TypeName switch
         {
