@@ -16,17 +16,18 @@ internal class SetFormatter : IReprFormatter
         }
 
         var list = (IEnumerable)obj;
-        var collectable = (ICollection)obj;
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 
         var items = new List<string>();
         var count = 0;
+        var hitLimit = false;
         foreach (var item in list)
         {
             if (context.Config.MaxElementsPerCollection >= 0 &&
                 count >= context.Config.MaxElementsPerCollection)
             {
+                hitLimit = true;
                 break;
             }
 
@@ -35,12 +36,20 @@ internal class SetFormatter : IReprFormatter
             count += 1;
         }
 
-        if (context.Config.MaxElementsPerCollection >= 0 &&
-            collectable.Count > context.Config.MaxElementsPerCollection)
+        if (hitLimit)
         {
-            var truncatedItemCount = collectable.Count -
-                                     context.Config.MaxElementsPerCollection;
-            items.Add(item: $"... {truncatedItemCount} more items");
+            if (list is ICollection collection)
+            {
+                var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
+                if (remainingCount > 0)
+                {
+                    items.Add(item: $"... {remainingCount} more items");
+                }
+            }
+            else
+            {
+                items.Add(item: "... more items");
+            }
         }
 
         return "{" + String.Join(separator: ", ", values: items) + "}";
