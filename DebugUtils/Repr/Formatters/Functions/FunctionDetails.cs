@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
-using System.Text.Json.Nodes;
-using DebugUtils.Repr.Formatters.Fallback;
-using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
@@ -52,23 +50,6 @@ internal static class FunctionDetailsExtensions
     public static FunctionDetails ToFunctionDetails(this MethodInfo methodInfo)
     {
         return new FunctionDetails(methodInfo: methodInfo);
-    }
-    public static JsonObject ToJsonObject(this FunctionDetails details, ReprConfig config,
-        HashSet<int> visited, int depth)
-    {
-        var result = new JsonObject();
-        result.Add(propertyName: "name",
-            value: details.Name.ToJsonObject(config: config, visited: visited, depth: depth + 1));
-        result.Add(propertyName: "returnTypeReprName",
-            value: details.ReturnTypeReprName.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "Modifiers",
-            value: details.Modifiers.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        result.Add(propertyName: "Parameters",
-            value: details.Parameters.ToJsonObject(config: config, visited: visited,
-                depth: depth + 1));
-        return result;
     }
 
     public static string GetSanitizedName(this MethodInfo methodInfo)
