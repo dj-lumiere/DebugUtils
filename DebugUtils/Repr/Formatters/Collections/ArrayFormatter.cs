@@ -46,6 +46,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "length", value: array.Length.ToString());
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 

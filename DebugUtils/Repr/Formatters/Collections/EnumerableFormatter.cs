@@ -19,17 +19,24 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         }
 
         var list = (IEnumerable)obj;
+        var type = list.GetType();
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 
         var items = new List<string>();
+        int? itemCount = null;
 
-        var count = 0;
+        if (type.GetProperty("Count")
+               ?.GetValue(obj) is { } value)
+        {
+            itemCount = (int)value;
+        }
+        var i = 0;
         var hitLimit = false;
         foreach (var item in list)
         {
             if (context.Config.MaxElementsPerCollection >= 0 &&
-                count >= context.Config.MaxElementsPerCollection)
+                i >= context.Config.MaxElementsPerCollection)
             {
                 hitLimit = true;
                 break;
@@ -42,9 +49,9 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            if (list is ICollection collection)
+            if (itemCount is not null)
             {
-                var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
                 if (remainingCount > 0)
                 {
                     items.Add(item: $"... ({remainingCount} more items)");
@@ -63,6 +70,13 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
     {
         var list = (IEnumerable)obj;
         var type = list.GetType();
+        int? itemCount = null;
+
+        if (type.GetProperty("Count")
+               ?.GetValue(obj) is { } value)
+        {
+            itemCount = (int)value;
+        }
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
@@ -98,21 +112,20 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            if (list is ICollection collection)
+            if (itemCount is not null)
             {
-                var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
                 if (remainingCount > 0)
                 {
-                    entries.Add(value: $"... {remainingCount} more items");
+                    entries.Add(value: $"... ({remainingCount} more items)");
                 }
             }
             else
             {
-                entries.Add(value: "... more items");
+                entries.Add(value: "... (more items)");
             }
         }
 
-        result.Add(propertyName: "count", value: count);
         result.Add(propertyName: "value", value: entries);
         return result;
     }

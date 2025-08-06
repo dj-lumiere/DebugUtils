@@ -33,11 +33,12 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
             s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
 
-        var json = new JsonObject();
-        json.Add(propertyName: "type", value: "string");
-        json.Add(propertyName: "kind", value: "class");
-        json.Add(propertyName: "value", value: s);
-        return json;
+        var result = new JsonObject();
+        result.Add(propertyName: "type", value: "string");
+        result.Add(propertyName: "kind", value: "class");
+        result.Add(propertyName: "length", value: s.Length.ToString());
+        result.Add(propertyName: "value", value: s);
+        return result;
     }
 }
 
@@ -62,8 +63,11 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
     {
         var result = new JsonObject();
         var type = obj.GetType();
+        var sb = (StringBuilder)obj;
+        var s = sb.ToString();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "length", value: s.Length.ToString());
         result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
         return result;
     }

@@ -72,6 +72,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "length", value: tuple.Length.ToString());
         var entries = new JsonArray();
         for (var i = 0; i < tuple.Length; i++)
         {
@@ -92,8 +93,6 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                                      context.Config.MaxElementsPerCollection;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
-
-        result.Add(propertyName: "count", value: tuple.Length);
         result.Add(propertyName: "value", value: entries);
         return result;
     }

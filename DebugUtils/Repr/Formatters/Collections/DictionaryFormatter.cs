@@ -75,6 +75,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         var entries = new JsonArray();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "count", value: dict.Count.ToString());
         var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
@@ -103,7 +104,6 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 
-        result.Add(propertyName: "count", value: dict.Count);
         result.Add(propertyName: "value", value: entries);
         return result;
     }

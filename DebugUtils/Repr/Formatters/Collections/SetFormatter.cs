@@ -16,11 +16,19 @@ internal class SetFormatter : IReprFormatter
         }
 
         var list = (IEnumerable)obj;
+        var type = list.GetType();
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 
         var items = new List<string>();
         var count = 0;
+        int? itemCount = null;
+
+        if (type.GetProperty("Count")
+               ?.GetValue(obj) is { } value)
+        {
+            itemCount = (int)value;
+        }
         var hitLimit = false;
         foreach (var item in list)
         {
@@ -38,9 +46,9 @@ internal class SetFormatter : IReprFormatter
 
         if (hitLimit)
         {
-            if (list is ICollection collection)
+            if (itemCount is not null)
             {
-                var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
                 if (remainingCount > 0)
                 {
                     items.Add(item: $"... ({remainingCount} more items)");
