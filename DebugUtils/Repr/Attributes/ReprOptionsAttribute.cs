@@ -1,4 +1,4 @@
-namespace DebugUtils.Repr.Formatters.Attributes;
+namespace DebugUtils.Repr.Attributes;
 
 /// <summary>
 /// Provides declarative options for customizing how a type is represented in the Repr system.
