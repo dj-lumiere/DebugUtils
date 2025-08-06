@@ -21,7 +21,6 @@ internal class SetFormatter : IReprFormatter
         context = context.WithContainerConfig();
 
         var items = new List<string>();
-        var count = 0;
         int? itemCount = null;
 
         if (type.GetProperty("Count")
@@ -29,19 +28,19 @@ internal class SetFormatter : IReprFormatter
         {
             itemCount = (int)value;
         }
+        var i = 0;
         var hitLimit = false;
         foreach (var item in list)
         {
             if (context.Config.MaxElementsPerCollection >= 0 &&
-                count >= context.Config.MaxElementsPerCollection)
+                i >= context.Config.MaxElementsPerCollection)
             {
                 hitLimit = true;
                 break;
             }
 
-            items.Add(item: item?.Repr(context: context.WithIncrementedDepth()) ??
-                            "null");
-            count += 1;
+            items.Add(item: item.Repr(context: context.WithIncrementedDepth()));
+            i += 1;
         }
 
         if (hitLimit)

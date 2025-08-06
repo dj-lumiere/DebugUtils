@@ -82,8 +82,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            entries.Add(value: tuple[index: i]
-              ?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ?? null);
+            entries.Add(value: tuple[index: i].FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
         if (context.Config.MaxElementsPerCollection >= 0 &&

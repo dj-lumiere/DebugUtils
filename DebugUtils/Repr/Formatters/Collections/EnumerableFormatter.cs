@@ -42,9 +42,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            items.Add(item: item?.Repr(context: context.WithIncrementedDepth()) ??
-                            "null");
-            count += 1;
+            items.Add(item: item.Repr(context: context.WithIncrementedDepth()));
+            i += 1;
         }
 
         if (hitLimit)
@@ -93,21 +92,25 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         var entries = new JsonArray();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
-        var count = 0;
+        if (itemCount is not null)
+        {
+            result.Add(propertyName: "count", value: itemCount.ToString());
+        }
+
+        var i = 0;
         var hitLimit = false;
 
         foreach (var item in list)
         {
             if (context.Config.MaxElementsPerCollection >= 0 &&
-                count > context.Config.MaxElementsPerCollection)
+                i >= context.Config.MaxElementsPerCollection)
             {
                 hitLimit = true;
                 break;
             }
 
-            entries.Add(item: item?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ??
-                              null);
-            count += 1;
+            entries.Add(item: item.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+            i += 1;
         }
 
         if (hitLimit)
