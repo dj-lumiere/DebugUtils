@@ -1,10 +1,14 @@
 using System.Collections;
+using System.Text.Json.Nodes;
+using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Collections;
 
-internal class DictionaryFormatter : IReprFormatter
+[ReprFormatter(typeof(IDictionary))]
+internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
     {
@@ -27,5 +31,58 @@ internal class DictionaryFormatter : IReprFormatter
         }
 
         return "{" + String.Join(separator: ", ", values: items) + "}";
+    }
+
+    public JsonNode ToReprTree(object obj, ReprContext context)
+    {
+        var dict = (IDictionary)obj;
+        var type = dict.GetType();
+
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return new JsonObject
+            {
+                [propertyName: "type"] = type.GetReprTypeName(),
+                [propertyName: "kind"] = type.GetTypeKind(),
+                [propertyName: "maxDepthReached"] = true,
+                [propertyName: "depth"] = context.Depth
+            };
+        }
+
+        var result = new JsonObject();
+        var entries = new JsonArray();
+        result.Add(propertyName: "type", value: type.GetReprTypeName());
+        result.Add(propertyName: "kind", value: type.GetTypeKind());
+        var count = 0;
+        foreach (DictionaryEntry entry in dict)
+        {
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                count >= context.Config.MaxElementsPerCollection)
+            {
+                break;
+            }
+
+            var entryJson = new JsonObject
+            {
+                [propertyName: "key"] =
+                    entry.Key.FormatAsJsonNode(context: context.WithIncrementedDepth()),
+                [propertyName: "value"] =
+                    entry.Value?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ?? null
+            };
+            entries.Add(value: entryJson);
+            count += 1;
+        }
+
+        if (context.Config.MaxElementsPerCollection >= 0 &&
+            dict.Count > context.Config.MaxElementsPerCollection)
+        {
+            var truncatedItemCount = dict.Count -
+                                     context.Config.MaxElementsPerCollection;
+            entries.Add(item: $"... {truncatedItemCount} more items");
+        }
+
+        result.Add(propertyName: "count", value: dict.Count);
+        result.Add(propertyName: "value", value: entries);
+        return result;
     }
 }

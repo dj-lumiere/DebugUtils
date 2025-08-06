@@ -1,4 +1,5 @@
-﻿using DebugUtils.Repr.Records;
+﻿using System.Text.Json.Nodes;
+using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.Formatters.Collections;
 
@@ -44,5 +45,67 @@ internal static class ArrayExtensions
         }
 
         return "[" + String.Join(separator: ", ", values: subArrays) + "]";
+    }
+
+    public static JsonNode ArrayToHierarchicalReprRecursive(this Array array, int[] indices,
+        int dimension,
+        ReprContext context)
+    {
+        if (dimension == array.Rank - 1)
+        {
+            // Last dimension - collect actual values
+            var items = new JsonArray();
+            for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+            {
+                indices[dimension] = i;
+                if (context.Config.MaxElementsPerCollection >= 0 &&
+                    i >= context.Config.MaxElementsPerCollection)
+                {
+                    var truncatedItemCount = array.GetLength(dimension: dimension) -
+                                             context.Config.MaxElementsPerCollection;
+                    items.Add(item: $"... {truncatedItemCount} more items");
+                    break;
+                }
+
+                var value = array.GetValue(indices: indices);
+                if (value is Array innerArray)
+                {
+                    // If the element is a jagged array, recurse directly to format its content
+                    // without adding another "Array(...)" wrapper.
+                    items.Add(item: innerArray.ArrayToHierarchicalReprRecursive(
+                        indices: new int[innerArray.Rank], dimension: 0,
+                        context: context.WithIncrementedDepth()));
+                }
+                else
+                {
+                    // Otherwise, format the element normally.
+                    // Also, visited must be not null at this point, because the Repr call
+                    // at the first time should have made visited not null.
+                    items.Add(
+                        item: value?.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+                }
+            }
+
+            return items;
+        } // Not last dimension - recurse deeper
+
+        var subArrays = new JsonArray();
+        for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+        {
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                i >= context.Config.MaxElementsPerCollection)
+            {
+                var truncatedItemCount = array.GetLength(dimension: dimension) -
+                                         context.Config.MaxElementsPerCollection;
+                subArrays.Add(item: $"... {truncatedItemCount} more items");
+                break;
+            }
+
+            indices[dimension] = i;
+            subArrays.Add(item: array.ArrayToHierarchicalReprRecursive(indices: indices,
+                dimension: dimension + 1, context: context.WithIncrementedDepth()));
+        }
+
+        return subArrays;
     }
 }

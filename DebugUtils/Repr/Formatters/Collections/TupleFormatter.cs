@@ -32,4 +32,48 @@ internal class TupleFormatter : IReprFormatter
         sb.Append(value: ")");
         return sb.ToString();
     }
+
+    public JsonNode ToReprTree(object obj, ReprContext context)
+    {
+        var tuple = (ITuple)obj;
+        var type = tuple.GetType();
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return new JsonObject
+            {
+                [propertyName: "type"] = type.GetReprTypeName(),
+                [propertyName: "kind"] = type.GetTypeKind(),
+                [propertyName: "maxDepthReached"] = true,
+                [propertyName: "depth"] = context.Depth
+            };
+        }
+
+        var result = new JsonObject();
+        result.Add(propertyName: "type", value: type.GetReprTypeName());
+        result.Add(propertyName: "kind", value: type.GetTypeKind());
+        var entries = new JsonArray();
+        for (var i = 0; i < tuple.Length; i++)
+        {
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                i >= context.Config.MaxElementsPerCollection)
+            {
+                break;
+            }
+
+            entries.Add(value: tuple[index: i]
+              ?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ?? null);
+        }
+
+        if (context.Config.MaxElementsPerCollection >= 0 &&
+            tuple.Length > context.Config.MaxElementsPerCollection)
+        {
+            var truncatedItemCount = tuple.Length -
+                                     context.Config.MaxElementsPerCollection;
+            entries.Add(item: $"... {truncatedItemCount} more items");
+        }
+
+        result.Add(propertyName: "count", value: tuple.Length);
+        result.Add(propertyName: "value", value: entries);
+        return result;
+    }
 }
