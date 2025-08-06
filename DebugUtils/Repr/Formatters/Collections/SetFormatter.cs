@@ -43,12 +43,12 @@ internal class SetFormatter : IReprFormatter
                 var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
                 if (remainingCount > 0)
                 {
-                    items.Add(item: $"... {remainingCount} more items");
+                    items.Add(item: $"... ({remainingCount} more items)");
                 }
             }
             else
             {
-                items.Add(item: "... more items");
+                items.Add(item: "... (more items)");
             }
         }
 

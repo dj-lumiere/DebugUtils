@@ -90,7 +90,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         {
             var truncatedItemCount = tuple.Length -
                                      context.Config.MaxElementsPerCollection;
-            entries.Add(item: $"... {truncatedItemCount} more items");
+            entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 
         result.Add(propertyName: "count", value: tuple.Length);

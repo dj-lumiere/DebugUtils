@@ -100,7 +100,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         {
             var truncatedItemCount = dict.Count -
                                      context.Config.MaxElementsPerCollection;
-            entries.Add(item: $"... {truncatedItemCount} more items");
+            entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 
         result.Add(propertyName: "count", value: dict.Count);

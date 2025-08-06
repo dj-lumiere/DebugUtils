@@ -80,7 +80,7 @@ internal static class ArrayExtensions
                 {
                     var truncatedItemCount = array.GetLength(dimension: dimension) -
                                              context.Config.MaxElementsPerCollection;
-                    items.Add(item: $"... {truncatedItemCount} more items");
+                    items.Add(item: $"... ({truncatedItemCount} more items)");
                     break;
                 }
 
@@ -114,7 +114,7 @@ internal static class ArrayExtensions
             {
                 var truncatedItemCount = array.GetLength(dimension: dimension) -
                                          context.Config.MaxElementsPerCollection;
-                subArrays.Add(item: $"... {truncatedItemCount} more items");
+                subArrays.Add(item: $"... ({truncatedItemCount} more items)");
                 break;
             }
 

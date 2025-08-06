@@ -21,7 +21,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
 
         var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
         s = s[..context.Config.MaxStringLength];
-        return $"\"{s}...({truncatedLetterCount} more letters)\"";
+        return $"\"{s}... ({truncatedLetterCount} more letters)\"";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
@@ -30,7 +30,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
         if (s.Length > context.Config.MaxStringLength)
         {
             var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
-            s = s[..context.Config.MaxStringLength] + $"...({truncatedLetterCount} more letters)";
+            s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
 
         var json = new JsonObject();
@@ -52,7 +52,7 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
         if (s.Length > context.Config.MaxStringLength)
         {
             var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
-            s = s[..context.Config.MaxStringLength] + $"...({truncatedLetterCount} more letters)";
+            s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
 
         return $"{s}";
