@@ -327,34 +327,7 @@ public enum FormattingMode
     /// through reflection. Useful for debugging scenarios where ToString() might hide
     /// important details or when you need consistent formatting across all types.
     /// </remarks>
-    Reflection,
-
-    /// <summary>
-    /// Produces structured, JSON-like output optimized for debugging and analysis.
-    /// Shows object hierarchy, type information, and handles circular references.
-    /// <para><strong>Why Use This:</strong> Unlike standard JSON serializers, hierarchical mode 
-    /// preserves debugging information like exact numeric representations, handles circular 
-    /// references gracefully, and provides type metadata for every value.</para>
-    /// </summary>
-    /// <remarks>
-    /// <para>Output uses JSON-style syntax but includes debugging extensions that may not be valid JSON:</para>
-    /// <list type="bullet">
-    /// <item><description>Type metadata for all values</description></item>
-    /// <item><description>Special numeric formats (hex, binary, exact floats)</description></item>
-    /// <item><description>Error information for problematic properties</description></item>
-    /// <item><description>Circular reference detection and markers</description></item>
-    /// </list>
-    /// 
-    /// <para><strong>Ideal for:</strong> IDE integration, automated analysis, complex debugging scenarios.</para>
-    /// <para><strong>Not for:</strong> Data interchange, API responses, or storage. Use dedicated JSON serializers for those cases.</para>
-    /// </remarks>
-    /// <example>
-    /// Standard mode: Person(Name: "John", Age: int(30))
-    /// Hierarchical mode: {"type":"Person","Name":{"type":"string","value":"John"},"Age":{"type":"int","value":"30"}}
-    /// </example>
-    /// <seealso cref="System.Text.Json.JsonSerializer"/>
-    /// <seealso cref="ReprConfig.HierarchicalDefaults"/>
-    Hierarchical
+    Reflection
 }
 
 /// <summary>
@@ -368,7 +341,8 @@ public enum FormattingMode
 /// </param>
 /// <param name="FloatPrecision">
 /// Number of decimal places for floating-point formatting when applicable.
-/// Used by Round and Scientific modes. Set to -1 for automatic precision.
+/// Used by Round and Scientific modes.
+/// Set to a negative integer (e.g., -1) for automatic precision.
 /// </param>
 /// <param name="IntMode">
 /// Specifies how integers should be formatted.
@@ -386,6 +360,35 @@ public enum FormattingMode
 /// Specifies the overall formatting strategy and output mode.
 /// Controls how the system chooses between different representation approaches.
 /// </param>
+/// <param name="ShowNonPublicProperties">
+/// Specifies whether non-public properties and fields should be included in the output.
+/// May expose sensitive internal data - use with caution in production environments.
+/// </param>
+/// <param name="MaxDepth">
+/// Specifies the maximum recursion depth for nested objects.
+/// Higher values may significantly increase processing time and memory usage.
+/// Set to a negative integer (e.g., -1) to disable depth limiting entirely.
+/// </param>
+/// <param name="MaxElementsPerCollection">
+/// Specifies the maximum number of elements to include per collection (arrays, lists, etc.).
+/// Higher values may significantly increase processing time and output size.
+/// Set to a negative integer (e.g., -1) to disable element limiting entirely.
+/// </param>
+/// <param name="MaxPropertiesPerObject">
+/// Specifies the maximum number of properties and fields to include per object.
+/// Higher values may significantly increase processing time and output size.
+/// Set to a negative integer (e.g., -1) to disable property limiting entirely.
+/// </param>
+/// <param name="MaxStringLength">
+/// Specifies the maximum length for a string to be visible.
+/// Strings exceeding this length will be truncated with a suffix like "...{count} more characters".
+/// Higher values may significantly increase processing time and output size.
+/// Set to a negative integer (e.g., -1) to disable string length limiting entirely.
+/// </param>
+/// <param name="EnablePrettyPrintForReprTree">
+/// Specifies whether to format ReprTree output with indentation and line breaks for readability.
+/// Enabling this significantly increases output size but improves human readability.
+/// </param>
 /// <param name="CustomContainerConfig">
 /// The configuration to use when ContainerReprMode is set to UseCustomConfig.
 /// Allows different formatting rules for container contents versus their parents.
@@ -396,7 +399,7 @@ public enum FormattingMode
 /// <list type="bullet">
 /// <item><description><strong>Debugging:</strong> Use Exact floats, Hex integers, AlwaysShow types for maximum detail</description></item>
 /// <item><description><strong>Logging:</strong> Use General floats, Decimal integers, HideObvious types for clean output</description></item>
-/// <item><description><strong>Analysis:</strong> Use Hierarchical mode for structured, machine-readable output</description></item>
+/// <item><description><strong>Analysis:</strong> Use ReprTree() for structured, tree-like output</description></item>
 /// <item><description><strong>Development:</strong> Use Smart mode with balanced settings for general development work</description></item>
 /// </list>
 /// 
@@ -430,11 +433,8 @@ public enum FormattingMode
 ///     ContainerReprMode: ContainerReprMode.UseSimpleFormats
 /// );
 /// 
-/// // Structured analysis configuration
-/// var analysisConfig = new ReprConfig(
-///     FormattingMode: FormattingMode.Hierarchical,
-///     TypeMode: TypeReprMode.AlwaysHide
-/// );
+/// // For structured tree analysis, use ReprTree() method:
+/// // var treeOutput = obj.ReprTree(new ReprContext(new ReprConfig(EnablePrettyPrintForReprTree: true)));
 /// 
 /// // Custom container formatting
 /// var customConfig = new ReprConfig(
@@ -448,12 +448,18 @@ public enum FormattingMode
 /// </code>
 /// </example>
 public record ReprConfig(
-    FloatReprMode FloatMode = FloatReprMode.General,
-    int FloatPrecision = 2,
+    FloatReprMode FloatMode = FloatReprMode.Exact,
+    int FloatPrecision = -1,
     IntReprMode IntMode = IntReprMode.Decimal,
     ContainerReprMode ContainerReprMode = ContainerReprMode.UseSimpleFormats,
     TypeReprMode TypeMode = TypeReprMode.HideObvious,
     FormattingMode FormattingMode = FormattingMode.Smart,
+    bool ShowNonPublicProperties = false,
+    int MaxDepth = 5,
+    int MaxPropertiesPerObject = 10,
+    int MaxElementsPerCollection = 50,
+    int MaxStringLength = 120,
+    bool EnablePrettyPrintForReprTree = false,
     ReprConfig? CustomContainerConfig = null
 )
 {
@@ -476,7 +482,13 @@ public record ReprConfig(
         FloatPrecision: 2,
         ContainerReprMode: ContainerReprMode.UseSimpleFormats,
         IntMode: IntReprMode.Decimal,
-        TypeMode: TypeReprMode.HideObvious);
+        TypeMode: TypeReprMode.HideObvious,
+        ShowNonPublicProperties: false,
+        MaxDepth: 5,
+        MaxPropertiesPerObject: 10,
+        MaxElementsPerCollection: 50,
+        MaxStringLength: 120
+    );
 
     /// <summary>
     /// Gets the default configuration for top-level object representation.
@@ -497,18 +509,11 @@ public record ReprConfig(
         FloatPrecision: -1,
         ContainerReprMode: ContainerReprMode.UseDefaultConfig,
         IntMode: IntReprMode.Decimal,
-        TypeMode: TypeReprMode.HideObvious);
-
-    /// <summary>
-    /// Default configuration for hierarchical JSON-style output.
-    /// Optimized for structured readability and JSON compatibility.
-    /// </summary>
-    public static ReprConfig HierarchicalDefaults => new(
-        FloatMode: FloatReprMode.Exact, // ✅ JSON-friendly float formatting
-        FloatPrecision: -1, // ✅ Reasonable precision for JSON
-        IntMode: IntReprMode.Decimal, // ✅ JSON standard - no hex
-        ContainerReprMode: ContainerReprMode.UseParentConfig,
-        TypeMode: TypeReprMode.AlwaysHide, // ✅ JSON has type info in structure
-        FormattingMode: FormattingMode.Hierarchical
+        TypeMode: TypeReprMode.HideObvious,
+        ShowNonPublicProperties: false,
+        MaxDepth: 5,
+        MaxPropertiesPerObject: 10,
+        MaxElementsPerCollection: 50,
+        MaxStringLength: 120
     );
 }
