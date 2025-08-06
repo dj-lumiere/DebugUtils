@@ -19,11 +19,6 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(paramName: nameof(obj));
-        }
-
         return context.Config.IntMode switch
         {
             IntReprMode.Binary => obj.FormatAsBinary(),

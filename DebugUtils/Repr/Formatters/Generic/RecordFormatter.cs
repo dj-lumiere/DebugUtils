@@ -81,9 +81,7 @@ internal class RecordFormatter : IReprFormatter
 
             var fieldName = field.Name;
             var value = field.GetValue(obj: obj);
-            var addingValue =
-                value?.Repr(context: context.WithIncrementedDepth())
-                ?? "null";
+            var addingValue = value.Repr(context: context.WithIncrementedDepth());
             parts.Add(item: $"private_{fieldName}: {addingValue}");
             propertyCount += 1;
         }

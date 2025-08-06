@@ -187,8 +187,8 @@ internal class ParameterDetailsFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "modifier",
             value: details.Modifier);
         result.Add(propertyName: "defaultValue",
-            value: details.DefaultValue?.FormatAsJsonNode(
-                context: context.WithIncrementedDepth()) ?? null);
+            value: details.DefaultValue.FormatAsJsonNode(
+                context: context.WithIncrementedDepth()));
         return result;
     }
 }

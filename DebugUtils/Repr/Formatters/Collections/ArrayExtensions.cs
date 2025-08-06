@@ -99,7 +99,7 @@ internal static class ArrayExtensions
                     // Also, visited must be not null at this point, because the Repr call
                     // at the first time should have made visited not null.
                     items.Add(
-                        item: value?.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+                        item: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
                 }
             }
 

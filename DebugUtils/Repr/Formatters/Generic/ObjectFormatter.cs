@@ -101,9 +101,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             }
 
             var value = field.GetValue(obj: obj);
-            var addingValue =
-                value?.Repr(context: context.WithIncrementedDepth())
-                ?? "null";
+            var addingValue = value.Repr(context: context.WithIncrementedDepth());
             var fieldName = field.Name;
 
             if (accessedFieldNames.Contains(item: fieldName))
@@ -144,9 +142,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             try
             {
                 var value = prop.GetValue(obj: obj);
-                var addingValue =
-                    value?.Repr(context: context.WithIncrementedDepth())
-                    ?? "null";
+                var addingValue = value.Repr(context: context.WithIncrementedDepth());
                 parts.Add(item: $"private_{propName}: {addingValue}");
             }
             catch (Exception ex)
@@ -178,8 +174,8 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             {
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = true,
-                [propertyName: "depth"] = context.Depth
+                [propertyName: "maxDepthReached"] = "true",
+                [propertyName: "depth"] = context.Depth.ToString()
             };
         }
 
@@ -200,8 +196,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             }
 
             var value = field.GetValue(obj: obj);
-            var addingValue = value?.FormatAsJsonNode(context: context.WithIncrementedDepth())
-                              ?? null;
+            var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
             result.Add(propertyName: field.Name, value: addingValue);
             propertyCount += 1;
         }
@@ -222,9 +217,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             try
             {
                 var value = prop.GetValue(obj: obj);
-                var addingValue =
-                    value?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ??
-                    null;
+                var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
                 result.Add(propertyName: prop.Name, value: addingValue);
             }
             catch (Exception ex)
@@ -258,9 +251,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             }
 
             var value = field.GetValue(obj: obj);
-            var addingValue =
-                value?.FormatAsJsonNode(context: context.WithIncrementedDepth())
-                ?? null;
+            var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
             var fieldName = field.Name;
             result.Add(propertyName: $"private_{fieldName}", value: addingValue);
             propertyCount += 1;
@@ -284,8 +275,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             try
             {
                 var value = prop.GetValue(obj: obj);
-                var addingValue =
-                    value?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ?? null;
+                var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
                 result.Add(propertyName: $"private_{prop.Name}", value: addingValue);
             }
             catch (Exception ex)
