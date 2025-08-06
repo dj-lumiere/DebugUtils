@@ -1,15 +1,12 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using DebugUtils.Repr.Formatters;
-using DebugUtils.Repr.Formatters.Attributes;
+using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.TypeLibraries;
+namespace DebugUtils.Repr.TypeHelpers;
 
-internal static class TypeInspector
+internal static class TypeClassifier
 {
-    #region Type Check By Type
-
     public static bool IsSignedPrimitiveType(this Type type)
     {
 
@@ -45,14 +42,14 @@ internal static class TypeInspector
     }
     public static bool IsDictionaryType(this Type type)
     {
-        return type?.IsGenericType == true &&
+        return type.IsGenericType &&
                type.GetInterfaces()
                    .Any(predicate: i => i.IsGenericType &&
                                         i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
     }
     public static bool IsSetType(this Type type)
     {
-        return type?.IsGenericType == true &&
+        return type.IsGenericType &&
                type.GetInterfaces()
                    .Any(predicate: i => i.IsGenericType &&
                                         i.GetGenericTypeDefinition() == typeof(ISet<>));
@@ -124,7 +121,7 @@ internal static class TypeInspector
 
         // Check if the formatter for this type has a ReprOptions attribute
         var formatter =
-            ReprFormatterRegistry.GetFormatter(type: type, config: ReprConfig.GlobalDefaults);
+            ReprFormatterRegistry.GetStandardFormatter(type: type, context: new ReprContext());
         var formatterAttr = formatter.GetType()
                                      .GetCustomAttribute<ReprOptionsAttribute>();
         if (formatterAttr != null)
@@ -149,69 +146,7 @@ internal static class TypeInspector
         return Attribute.IsDefined(element: type,
                    attributeType: typeof(CompilerGeneratedAttribute))
                && type.IsGenericType
-               && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic
                && type.Name.Contains(value: "AnonymousType")
                && (type.Name.StartsWith(value: "<>") || type.Name.StartsWith(value: "VB$"));
     }
-
-    #endregion
-
-    #region Type Check By Object
-
-    public static bool IsSignedPrimitive<T>(this T obj)
-    {
-        var type = obj?.GetType();
-        return type?.IsSignedPrimitiveType() ?? false;
-    }
-    public static bool IsIntegerPrimitive<T>(this T obj)
-    {
-        var type = obj?.GetType();
-        return type?.IsIntegerPrimitiveType() ?? false;
-    }
-    public static bool IsFloat<T>(this T obj)
-    {
-        var type = obj?.GetType();
-        return type?.IsFloatType() ?? false;
-    }
-    public static bool IsDictionary<T>(this T obj)
-    {
-        var type = obj?.GetType();
-        return type?.IsDictionaryType() ?? false;
-    }
-    public static bool IsSet<T>(this T obj)
-    {
-        var type = obj?.GetType();
-        return type?.IsSetType() ?? false;
-    }
-    public static bool IsRecord<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.IsRecordType();
-    }
-    public static bool IsEnum<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.IsEnumType();
-    }
-    public static bool IsNullableStruct<T>(this T obj)
-    {
-        // Check the generic parameter first
-        var compileType = typeof(T);
-        // For cases where T is object but obj is actually nullable
-        var runtimeType = obj?.GetType();
-        return compileType.IsNullableStructType() ||
-               (runtimeType?.IsNullableStructType() ?? false);
-    }
-    public static bool OverridesToString<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.OverridesToStringType();
-    }
-    public static bool NeedsTypePrefix<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.NeedsTypePrefixType();
-    }
-
-    #endregion
 }
