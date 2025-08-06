@@ -11,11 +11,12 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 [ReprOptions(needsPrefix: true)]
 internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprContext context)
     {
         var dec = (decimal)obj;
         // Get the internal bits
         var bits = Decimal.GetBits(d: dec);
+        var config = context.Config;
 
         // Extract components
         var lo = (uint)bits[0]; // Low 32 bits of 96-bit integer

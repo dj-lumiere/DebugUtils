@@ -6,7 +6,7 @@ namespace DebugUtils.Repr.Formatters.Collections;
 internal static class ArrayExtensions
 {
     public static string ArrayToReprRecursive(this Array array, int[] indices, int dimension,
-        ReprConfig config, HashSet<int>? visited)
+        ReprContext context)
     {
         if (dimension == array.Rank - 1)
         {
@@ -15,6 +15,15 @@ internal static class ArrayExtensions
             for (var i = 0; i < array.GetLength(dimension: dimension); i++)
             {
                 indices[dimension] = i;
+                if (context.Config.MaxElementsPerCollection >= 0 &&
+                    i >= context.Config.MaxElementsPerCollection)
+                {
+                    var truncatedItemCount = array.GetLength(dimension: dimension) -
+                                             context.Config.MaxElementsPerCollection;
+                    items.Add(item: $"... {truncatedItemCount} more items");
+                    break;
+                }
+
                 var value = array.GetValue(indices: indices);
                 if (value is Array innerArray)
                 {
@@ -22,13 +31,13 @@ internal static class ArrayExtensions
                     // without adding another "Array(...)" wrapper.
                     items.Add(item: innerArray.ArrayToReprRecursive(
                         indices: new int[innerArray.Rank], dimension: 0,
-                        config: config, visited: visited));
+                        context: context.WithIncrementedDepth()));
                 }
                 else
                 {
                     // Otherwise, format the element normally.
                     items.Add(
-                        item: value?.Repr(config: config, visited: visited) ?? "null");
+                        item: value?.Repr(context: context.WithIncrementedDepth()) ?? "null");
                 }
             }
 
@@ -38,10 +47,18 @@ internal static class ArrayExtensions
         var subArrays = new List<string>();
         for (var i = 0; i < array.GetLength(dimension: dimension); i++)
         {
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                i >= context.Config.MaxElementsPerCollection)
+            {
+                var truncatedItemCount = array.GetLength(dimension: dimension) -
+                                         context.Config.MaxElementsPerCollection;
+                subArrays.Add(item: $"... {truncatedItemCount} more items");
+                break;
+            }
+
             indices[dimension] = i;
             subArrays.Add(item: ArrayToReprRecursive(array: array, indices: indices,
-                dimension: dimension + 1, config: config,
-                visited: visited));
+                dimension: dimension + 1, context: context.WithIncrementedDepth()));
         }
 
         return "[" + String.Join(separator: ", ", values: subArrays) + "]";

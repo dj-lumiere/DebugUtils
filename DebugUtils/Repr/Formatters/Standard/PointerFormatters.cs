@@ -12,7 +12,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 [ReprOptions(needsPrefix: true)]
 internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return IntPtr.Size == 4
             ? $"0x{((IntPtr)obj).ToInt32():X8}"
@@ -34,7 +34,7 @@ internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
 [ReprOptions(needsPrefix: true)]
 internal class UIntPtrFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return IntPtr.Size == 4
             ? $"0x{((UIntPtr)obj).ToUInt32():X8}"

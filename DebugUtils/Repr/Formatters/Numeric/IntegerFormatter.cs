@@ -17,14 +17,14 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 [ReprOptions(needsPrefix: true)]
 internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprContext context)
     {
         if (obj is null)
         {
             throw new ArgumentNullException(paramName: nameof(obj));
         }
 
-        return config.IntMode switch
+        return context.Config.IntMode switch
         {
             IntReprMode.Binary => obj.FormatAsBinary(),
             IntReprMode.Decimal => obj.ToString()!,

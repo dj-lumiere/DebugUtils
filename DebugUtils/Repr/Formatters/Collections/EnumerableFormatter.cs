@@ -11,15 +11,50 @@ namespace DebugUtils.Repr.Formatters.Collections;
 [ReprOptions(needsPrefix: true)]
 internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return "<Max Depth Reached>";
+        }
+
         var list = (IEnumerable)obj;
         // Apply container defaults if configured
-        config = config.GetContainerConfig();
+        context = context.WithContainerConfig();
 
-        var items = list.Cast<object>()
-                        .Select(selector: item =>
-                             item?.Repr(config: config, visited: visited) ?? "null");
+        var items = new List<string>();
+
+        var count = 0;
+        var hitLimit = false;
+        foreach (var item in list)
+        {
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                count > context.Config.MaxElementsPerCollection)
+            {
+                hitLimit = true;
+                break;
+            }
+
+            items.Add(item: item?.Repr(context: context.WithIncrementedDepth()) ??
+                            "null");
+            count += 1;
+        }
+
+        if (hitLimit)
+        {
+            if (list is ICollection collection)
+            {
+                var remainingCount = collection.Count - context.Config.MaxElementsPerCollection;
+                if (remainingCount > 0)
+                {
+                    items.Add(item: $"... {remainingCount} more items");
+                }
+            }
+            else
+            {
+                items.Add(item: "... more items");
+            }
+        }
 
         return "[" + String.Join(separator: ", ", values: items) + "]";
     }

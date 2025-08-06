@@ -10,15 +10,20 @@ namespace DebugUtils.Repr.Formatters.Collections;
 [ReprOptions(needsPrefix: true)]
 internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return "<Max Depth Reached>";
+        }
+
         var array = (Array)obj;
         // Apply container defaults if configured
-        config = config.GetContainerConfig();
+        context = context.WithContainerConfig();
 
         var rank = array.Rank;
         var content = array.ArrayToReprRecursive(indices: new int[rank], dimension: 0,
-            config: config, visited: visited);
+            context: context);
         return content;
     }
 

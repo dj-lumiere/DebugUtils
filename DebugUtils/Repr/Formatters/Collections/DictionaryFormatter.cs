@@ -10,11 +10,16 @@ namespace DebugUtils.Repr.Formatters.Collections;
 [ReprFormatter(typeof(IDictionary))]
 internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return "<Max Depth Reached>";
+        }
+
         var dict = (IDictionary)obj;
         // Apply container defaults if configured
-        config = config.GetContainerConfig();
+        context = context.WithContainerConfig();
 
         if (dict.Count == 0)
         {
@@ -23,11 +28,28 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
 
         var items = new List<string>();
 
+        var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
-            var key = entry.Key?.Repr(config: config, visited: visited) ?? "null";
-            var value = entry.Value?.Repr(config: config, visited: visited) ?? "null";
+            if (context.Config.MaxElementsPerCollection >= 0 &&
+                count >= context.Config.MaxElementsPerCollection)
+            {
+                break;
+            }
+
+            var key = entry.Key?.Repr(context: context.WithIncrementedDepth()) ?? "null";
+            var value = entry.Value?.Repr(context: context.WithIncrementedDepth()) ?? "null";
             items.Add(item: $"{key}: {value}");
+            count += 1;
+        }
+
+
+        if (context.Config.MaxElementsPerCollection >= 0 &&
+            dict.Count > context.Config.MaxElementsPerCollection)
+        {
+            var truncatedItemCount = dict.Count -
+                                     context.Config.MaxElementsPerCollection;
+            items.Add(item: $"... {truncatedItemCount} more items");
         }
 
         return "{" + String.Join(separator: ", ", values: items) + "}";

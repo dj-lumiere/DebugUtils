@@ -1,4 +1,5 @@
-﻿using DebugUtils.Repr.Formatters.Attributes;
+﻿using System.Text.Json.Nodes;
+using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
 
@@ -6,9 +7,9 @@ namespace DebugUtils.Repr.Formatters.Standard;
 
 [ReprFormatter(typeof(DateTime))]
 [ReprOptions(needsPrefix: true)]
-internal class DateTimeFormatter : IReprFormatter
+internal class DateTimeFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         var datetime = (DateTime)obj;
         var kindSuffix = datetime.Kind switch
@@ -41,9 +42,9 @@ internal class DateTimeFormatter : IReprFormatter
 
 [ReprFormatter(typeof(DateTimeOffset))]
 [ReprOptions(needsPrefix: true)]
-internal class DateTimeOffsetFormatter : IReprFormatter
+internal class DateTimeOffsetFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         var dto = (DateTimeOffset)obj;
         if (dto.Offset == TimeSpan.Zero)
@@ -83,9 +84,9 @@ internal class DateTimeOffsetFormatter : IReprFormatter
 
 [ReprFormatter(typeof(TimeSpan))]
 [ReprOptions(needsPrefix: true)]
-internal class TimeSpanFormatter : IReprFormatter
+internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return $"{((TimeSpan)obj).TotalSeconds:0.000}s";
     }
@@ -116,9 +117,9 @@ internal class TimeSpanFormatter : IReprFormatter
 #if NET6_0_OR_GREATER
 [ReprFormatter(typeof(DateOnly))]
 [ReprOptions(needsPrefix: true)]
-internal class DateOnlyFormatter : IReprFormatter
+internal class DateOnlyFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return ((DateOnly)obj).ToString(format: "yyyy-MM-dd");
     }
@@ -138,9 +139,9 @@ internal class DateOnlyFormatter : IReprFormatter
 
 [ReprFormatter(typeof(TimeOnly))]
 [ReprOptions(needsPrefix: true)]
-internal class TimeOnlyFormatter : IReprFormatter
+internal class TimeOnlyFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return ((TimeOnly)obj).ToString(format: "HH:mm:ss");
     }

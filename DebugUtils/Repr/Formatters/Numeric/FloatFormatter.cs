@@ -17,7 +17,7 @@ namespace DebugUtils.Repr.Formatters.Numeric;
 [ReprOptions(needsPrefix: true)]
 internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited = null)
+    public string ToRepr(object obj, ReprContext context)
     {
         var info = obj switch
         {
@@ -29,6 +29,7 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
             _ => throw new ArgumentException(message: "Invalid type")
         };
 
+        var config = context.Config;
         // those two repr modes prioritize bit perfect representation, so they are processed first.
         switch (config.FloatMode)
         {
@@ -100,9 +101,9 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
 
         return config.FloatMode switch
         {
-            FloatReprMode.Round => obj.FormatAsRounding(info: info, reprConfig: config),
-            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, reprConfig: config),
-            FloatReprMode.General => obj.FormatAsGeneral(info: info, reprConfig: config),
+            FloatReprMode.Round => obj.FormatAsRounding(info: info, context: context),
+            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, context: context),
+            FloatReprMode.General => obj.FormatAsGeneral(info: info, context: context),
             FloatReprMode.Exact => obj.FormatAsExact(info: info),
 
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")

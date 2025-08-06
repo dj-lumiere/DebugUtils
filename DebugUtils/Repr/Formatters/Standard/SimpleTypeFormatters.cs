@@ -10,7 +10,7 @@ namespace DebugUtils.Repr.Formatters.Standard;
 [ReprOptions(needsPrefix: false)]
 internal class BoolFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return (bool)obj
             ? "true"
@@ -32,9 +32,13 @@ internal class BoolFormatter : IReprFormatter, IReprTreeFormatter
 [ReprOptions(needsPrefix: false)]
 internal class EnumFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
-        return $"{obj.GetReprTypeName()}.{obj}";
+        var e = (Enum)obj;
+        var underlyingType = Enum.GetUnderlyingType(enumType: e.GetType());
+        var numericValue = Convert.ChangeType(value: e, conversionType: underlyingType);
+        return
+            $"{e.GetReprTypeName()}.{e} ({numericValue.Repr(context: context)})";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)

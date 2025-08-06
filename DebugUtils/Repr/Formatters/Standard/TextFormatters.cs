@@ -11,9 +11,17 @@ namespace DebugUtils.Repr.Formatters.Standard;
 [ReprOptions(needsPrefix: false)]
 internal class StringFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
-        return $"\"{(string)obj}\"";
+        var s = (string)obj;
+        if (s.Length <= context.Config.MaxStringLength)
+        {
+            return $"\"{(string)obj}\"";
+        }
+
+        var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
+        s = s[..context.Config.MaxStringLength];
+        return $"\"{s}...({truncatedLetterCount} more letters)\"";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
@@ -35,12 +43,20 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
 
 [ReprFormatter(typeof(StringBuilder))]
 [ReprOptions(needsPrefix: true)]
-internal class StringBuilderFormatter : IReprFormatter
-{
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
-    {
-        return $"{((StringBuilder)obj).ToString()}";
 internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
+{
+    public string ToRepr(object obj, ReprContext context)
+    {
+        var sb = (StringBuilder)obj;
+        var s = sb.ToString();
+        if (s.Length > context.Config.MaxStringLength)
+        {
+            var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
+            s = s[..context.Config.MaxStringLength] + $"...({truncatedLetterCount} more letters)";
+        }
+
+        return $"{s}";
+    }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
@@ -57,14 +73,14 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
 [ReprOptions(needsPrefix: false)]
 internal class CharFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         var value = (char)obj;
         return value switch
         {
             '\'' => "'''", // Single quote
             '\"' => "'\"'", // Double quote
-            '\\' => @"'\\'", // Backslash
+            '\\' => @"'\'", // Backslash
             '\0' => @"'\0'", // Null
             '\a' => @"'\a'", // Alert
             '\b' => @"'\b'", // Backspace
@@ -96,7 +112,7 @@ internal class CharFormatter : IReprFormatter, IReprTreeFormatter
 [ReprOptions(needsPrefix: true)]
 internal class RuneFormatter : IReprFormatter, IReprTreeFormatter
 {
-    public string ToRepr(object obj, ReprConfig config, HashSet<int>? visited)
+    public string ToRepr(object obj, ReprContext context)
     {
         return $"{(Rune)obj} @ \\U{((Rune)obj).Value:X8}";
     }
