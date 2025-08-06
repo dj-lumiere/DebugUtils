@@ -136,7 +136,9 @@ internal static class ReprEngine
     {
         return new JsonObject
         {
-            [propertyName: "type"] = typeof(T).GetReprTypeName(), [propertyName: "value"] = null
+            [propertyName: "type"] = typeof(T).GetReprTypeName(),
+            [propertyName: "kind"] = typeof(T).GetTypeKind(),
+            [propertyName: "value"] = null
         };
     }
 
@@ -149,7 +151,8 @@ internal static class ReprEngine
         {
             var nullJson = new JsonObject
             {
-                [propertyName: "type"] = $"{reprName}",
+                [propertyName: "type"] = reprName,
+                [propertyName: "kind"] = type.UnderlyingSystemType.GetTypeKind(),
                 [propertyName: "value"] = null
             };
             return nullJson;
@@ -159,7 +162,7 @@ internal static class ReprEngine
         var formatter =
             ReprFormatterRegistry.GetTreeFormatter(type: value.GetType(), context: context);
         var valueRepr = formatter.ToReprTree(obj: value, context: context);
-        valueRepr[propertyName: "type"] = $"{reprName}";
+        valueRepr[propertyName: "type"] = reprName;
 
         return valueRepr;
     }

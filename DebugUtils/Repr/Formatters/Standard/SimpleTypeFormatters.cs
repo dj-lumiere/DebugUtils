@@ -48,6 +48,8 @@ internal class EnumFormatter : IReprFormatter, IReprTreeFormatter
         var underlyingType = Enum.GetUnderlyingType(enumType: e.GetType());
         var numericValue = Convert.ChangeType(value: e, conversionType: underlyingType);
 
+        json.Add(propertyName: "type", value: e.GetReprTypeName());
+        json.Add(propertyName: "kind", value: "enum");
         json.Add(propertyName: "name", value: e.ToString());
         json.Add(propertyName: "value", value: numericValue.Repr(context: context));
         return json;
