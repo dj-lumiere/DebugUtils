@@ -660,15 +660,15 @@ public class ReprTreeTest
         var set = new HashSet<int> { 1, 2 };
         var actualJson = JsonNode.Parse(set.ReprTree());
 
-        Assert.Equal("HashSet", actualJson["type"]
+        Assert.Equal("HashSet", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("class", actualJson["kind"]
+        Assert.Equal("class", actualJson?["kind"]
           ?.ToString());
-        Assert.Equal("2", actualJson["count"]
+        Assert.Equal("2", actualJson?["count"]
           ?.ToString());
 
-        var valueArray = actualJson["value"]
-          ?.AsArray();
+        var valueArray = actualJson?["value"]
+          ?.AsArray() ?? new JsonArray();
         Assert.Contains(valueArray, item => item?["value"]
           ?.ToString() == "1");
         Assert.Contains(valueArray, item => item?["value"]
@@ -1489,34 +1489,34 @@ public class ReprTreeTest
             { 1, new List<object> { 2, new List<object> { 3 } } };
         var config = new ReprConfig(MaxDepth: 1);
         var actualJson = JsonNode.Parse(nestedList.ReprTree(config: config));
-        Assert.Equal("List", actualJson["type"]
+        Assert.Equal("List", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("2", actualJson["count"]
+        Assert.Equal("2", actualJson?["count"]
           ?.ToString());
-        Assert.Equal("int", actualJson["value"]?[0]?["type"]
+        Assert.Equal("int", actualJson?["value"]?[0]?["type"]
           ?.ToString());
-        Assert.Equal("struct", actualJson["value"]?[0]?["kind"]
+        Assert.Equal("struct", actualJson?["value"]?[0]?["kind"]
           ?.ToString());
-        Assert.Equal("1", actualJson["value"]?[0]?["value"]
+        Assert.Equal("1", actualJson?["value"]?[0]?["value"]
           ?.ToString());
-        Assert.Equal("List", actualJson["value"]?[1]?["type"]
+        Assert.Equal("List", actualJson?["value"]?[1]?["type"]
           ?.ToString());
-        Assert.Equal("class", actualJson["value"]?[1]?["kind"]
+        Assert.Equal("class", actualJson?["value"]?[1]?["kind"]
           ?.ToString());
-        Assert.Equal("true", actualJson["value"]?[1]?["maxDepthReached"]
+        Assert.Equal("true", actualJson?["value"]?[1]?["maxDepthReached"]
           ?.ToString());
-        Assert.Equal("1", actualJson["value"]?[1]?["depth"]
+        Assert.Equal("1", actualJson?["value"]?[1]?["depth"]
           ?.ToString());
 
         config = new ReprConfig(MaxDepth: 0);
         actualJson = JsonNode.Parse(nestedList.ReprTree(config: config));
-        Assert.Equal("List", actualJson["type"]
+        Assert.Equal("List", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("class", actualJson["kind"]
+        Assert.Equal("class", actualJson?["kind"]
           ?.ToString());
-        Assert.Equal("true", actualJson["maxDepthReached"]
+        Assert.Equal("true", actualJson?["maxDepthReached"]
           ?.ToString());
-        Assert.Equal("0", actualJson["depth"]
+        Assert.Equal("0", actualJson?["depth"]
           ?.ToString());
     }
 
@@ -1526,27 +1526,27 @@ public class ReprTreeTest
         var list = new List<int> { 1, 2, 3, 4, 5 };
         var config = new ReprConfig(MaxElementsPerCollection: 3);
         var actualJson = JsonNode.Parse(list.ReprTree(config: config));
-        Assert.Equal("List", actualJson["type"]
+        Assert.Equal("List", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("5", actualJson["count"]
+        Assert.Equal("5", actualJson?["count"]
           ?.ToString());
-        Assert.Equal(4, actualJson["value"]
+        Assert.Equal(4, actualJson?["value"]
                       ?.AsArray()
                        .Count);
-        Assert.Equal("int", actualJson["value"]?[0]?["type"]
+        Assert.Equal("int", actualJson?["value"]?[0]?["type"]
           ?.ToString());
-        Assert.Equal("int", actualJson["value"]?[1]?["type"]
+        Assert.Equal("int", actualJson?["value"]?[1]?["type"]
           ?.ToString());
-        Assert.Equal("int", actualJson["value"]?[2]?["type"]
+        Assert.Equal("int", actualJson?["value"]?[2]?["type"]
           ?.ToString());
-        Assert.Equal("... (2 more items)", actualJson["value"]?[3]
+        Assert.Equal("... (2 more items)", actualJson?["value"]?[3]
           ?.ToString());
 
         config = new ReprConfig(MaxElementsPerCollection: 0);
         actualJson = JsonNode.Parse(list.ReprTree(config: config));
-        Assert.Equal("List", actualJson["type"]
+        Assert.Equal("List", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("... (5 more items)", actualJson["value"]?[0]
+        Assert.Equal("... (5 more items)", actualJson?["value"]?[0]
           ?.ToString());
     }
 
@@ -1556,16 +1556,16 @@ public class ReprTreeTest
         var longString = "This is a very long string that should be truncated.";
         var config = new ReprConfig(MaxStringLength: 10);
         var actualJson = JsonNode.Parse(longString.ReprTree(config: config));
-        Assert.Equal("string", actualJson["type"]
+        Assert.Equal("string", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("This is a ... (42 more letters)", actualJson["value"]
+        Assert.Equal("This is a ... (42 more letters)", actualJson?["value"]
           ?.ToString());
 
         config = new ReprConfig(MaxStringLength: 0);
         actualJson = JsonNode.Parse(longString.ReprTree(config: config));
-        Assert.Equal("string", actualJson["type"]
+        Assert.Equal("string", actualJson?["type"]
           ?.ToString());
-        Assert.Equal("... (52 more letters)", actualJson["value"]
+        Assert.Equal("... (52 more letters)", actualJson?["value"]
           ?.ToString());
     }
 }
