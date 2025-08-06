@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr;
 using DebugUtils.Repr.Records;
+using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Tests;
 
@@ -152,32 +153,11 @@ public class ReprTest
             actualString: parent.Repr());
         Assert.EndsWith(expectedEndString: ">))", actualString: parent.Repr());
 
-        var jsonConfig = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
         var obj = new { Name = "John", Age = 30 };
         Assert.Equal(
             expected:
-            "{\"type\":\"Anonymous\",\"Name\":{\"type\":\"string\",\"value\":\"John\"},\"Age\":{\"type\":\"int\",\"value\":\"30\"}}",
-            actual: obj.Repr(config: jsonConfig)
-                       .Replace(oldValue: "\r", newValue: "")
-                       .Replace(oldValue: "\n", newValue: "")
-                       .Replace(oldValue: " ", newValue: ""));
-    }
-
-    [Fact]
-    public void GetReprTypeNameTest()
-    {
-        var intType = typeof(int);
-        Assert.Equal(expected: "int", actual: intType.GetReprTypeName());
-
-        var listType = typeof(List<string>);
-        Assert.Equal(expected: "List", actual: listType.GetReprTypeName());
-
-        var intNullableType = typeof(int?);
-        Assert.Equal(expected: typeof(int?), actual: typeof(Nullable<int>));
-        Assert.Equal(expected: "int?", actual: intNullableType.GetReprTypeName());
-
-        var taskType = typeof(Task<bool>);
-        Assert.Equal(expected: "Task<bool>", actual: taskType.GetReprTypeName());
+            "{\"type\":\"Anonymous\",\"kind\":\"class\",\"Name\":{\"type\":\"string\",\"kind\":\"class\",\"length\":\"4\",\"value\":\"John\"},\"Age\":{\"type\":\"int\",\"kind\":\"struct\",\"value\":\"30\"}}",
+            actual: obj.ReprTree());
     }
 
     // Basic Types
@@ -298,7 +278,8 @@ public class ReprTest
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.HexBytes);
         Assert.Equal(expected: "decimal(0x001C00006582A5360B14388541B65F29)",
-            actual: 3.1415926535897932384626433832795m.Repr(config: config));
+            actual: 3.1415926535897932384626433832795m.Repr(
+                config: config));
     }
 
     [Fact]
@@ -308,6 +289,32 @@ public class ReprTest
         Assert.Equal(expected: "Half(0|10000|1001001000)", actual: Half.Parse(s: "3.14159")
            .Repr(config: config));
     }
+
+    [Fact]
+    public void TestFloatRepr_SpecialValues()
+    {
+        Assert.Equal(expected: "float(Quiet NaN)", actual: float.NaN.Repr());
+        Assert.Equal(expected: "float(Infinity)", actual: float.PositiveInfinity.Repr());
+        Assert.Equal(expected: "float(-Infinity)", actual: float.NegativeInfinity.Repr());
+    }
+
+    [Fact]
+    public void TestDoubleRepr_SpecialValues()
+    {
+        Assert.Equal(expected: "double(Quiet NaN)", actual: double.NaN.Repr());
+        Assert.Equal(expected: "double(Infinity)", actual: double.PositiveInfinity.Repr());
+        Assert.Equal(expected: "double(-Infinity)", actual: double.NegativeInfinity.Repr());
+    }
+
+    #if NET5_0_OR_GREATER
+    [Fact]
+    public void TestHalfRepr_SpecialValues()
+    {
+        Assert.Equal(expected: "Half(Quiet NaN)", actual: Half.NaN.Repr());
+        Assert.Equal(expected: "Half(Infinity)", actual: Half.PositiveInfinity.Repr());
+        Assert.Equal(expected: "Half(-Infinity)", actual: Half.NegativeInfinity.Repr());
+    }
+    #endif
 
     // Collections
     [Fact]
@@ -465,7 +472,7 @@ public class ReprTest
     [Fact]
     public void TestEnumRepr()
     {
-        Assert.Equal(expected: "Colors.GREEN", actual: Colors.GREEN.Repr());
+        Assert.Equal(expected: "Colors.GREEN (int(1))", actual: Colors.GREEN.Repr());
     }
 
     [Fact]
@@ -506,7 +513,8 @@ public class ReprTest
     {
         var i128 = Int128.MinValue;
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+        Assert.Equal(expected: expected,
+            actual: i128.Repr(config: config));
     }
 
     [Theory]
@@ -519,7 +527,8 @@ public class ReprTest
     {
         var i128 = Int128.MaxValue;
         var config = new ReprConfig(IntMode: mode);
-        Assert.Equal(expected: expected, actual: i128.Repr(config: config));
+        Assert.Equal(expected: expected,
+            actual: i128.Repr(config: config));
     }
     #endif
 
@@ -542,7 +551,8 @@ public class ReprTest
     public void TestTimeSpanRepr_Zero()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(0.000s)", actual: TimeSpan.Zero.Repr(config: config));
+        Assert.Equal(expected: "TimeSpan(0.000s)",
+            actual: TimeSpan.Zero.Repr(config: config));
     }
 
     [Fact]
@@ -567,7 +577,7 @@ public class ReprTest
     public void TestDateTimeOffsetRepr_WithOffset()
     {
         Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00+01:00:00)",
-            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
+            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month:1, day: 1),
                 offset: TimeSpan.FromHours(hours: 1)).Repr());
     }
 
@@ -617,44 +627,20 @@ public class ReprTest
     [Fact]
     public void TestFunction()
     {
-        var Add5 = (int a) => a + 11;
+        var Add5 = (int a) => a + 1;
         var a = Add;
         var b = Add2;
         var c = Add3<short>;
         var d = Add4;
         var e = Lambda;
 
+        Assert.Equal(expected: "internal int Lambda(int a)", actual: Add5.Repr());
         Assert.Equal(expected: "public static int Add(int a, int b)", actual: a.Repr());
         Assert.Equal(expected: "internal static long Add2(int a)", actual: b.Repr());
         Assert.Equal(expected: "private generic short Add3(short a)", actual: c.Repr());
         Assert.Equal(expected: "private static void Add4(in ref int a, out ref int b)",
             actual: d.Repr());
-        Assert.Equal(expected: "internal int Lambda(int a)", actual: Add5.Repr());
         Assert.Equal(expected: "private async Task<int> Lambda(int a)", actual: e.Repr());
-    }
-
-    [Fact]
-    public void TestFunctionHierarchical()
-    {
-        var Add5 = (int a) => a + 11;
-        var a = Add;
-        var b = Add2;
-        var c = Add3<short>;
-        var d = Add4;
-        var e = Lambda;
-        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: a.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: Add5.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: b.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: c.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: d.Repr(config: config));
-        Assert.Contains(expectedSubstring: "\"type\":\"Function\"",
-            actualString: e.Repr(config: config));
     }
 
     [Fact]
@@ -670,49 +656,35 @@ public class ReprTest
     }
 
     [Fact]
-    public void TestObjectReprHierarchical()
+    public void TestReprConfig_MaxDepth()
     {
-        var data = new { Name = "Alice", Age = 30 };
-        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-        var actualJsonString = data.Repr(config: config);
-        var actualJsonNode = JsonNode.Parse(json: actualJsonString);
-        var expectedJsonNode = new JsonObject
-        {
-            [propertyName: "type"] = "Anonymous",
-            [propertyName: "Name"] = new JsonObject
-            {
-                [propertyName: "type"] = "string",
-                [propertyName: "value"] = "Alice"
-            },
-            [propertyName: "Age"] = new JsonObject
-            {
-                [propertyName: "type"] = "int",
-                [propertyName: "value"] = "30"
-            }
-        };
-        Assert.True(
-            condition: JsonNode.DeepEquals(node1: actualJsonNode, node2: expectedJsonNode));
+        var nestedList = new List<object> { 1, new List<object> { 2, new List<object> { 3 } } };
+        var config = new ReprConfig(MaxDepth: 1);
+        Assert.Equal(expected: "[int(1), <Max Depth Reached>]", actual: nestedList.Repr(config: config));
+
+        config = new ReprConfig(MaxDepth: 0);
+        Assert.Equal(expected: "<Max Depth Reached>", actual: nestedList.Repr(config: config));
     }
 
     [Fact]
-    public void TestJsonCircularRepr()
+    public void TestReprConfig_MaxElementsPerCollection()
     {
-        List<object> a = new();
-        a.Add(item: a);
-        var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-        var actualJsonString = a.Repr(config: config);
-    
-        // Parse the JSON to verify structure
-        var json = JsonNode.Parse(actualJsonString);
-    
-        // Verify top-level structure
-        Assert.Equal("List", json?["type"]?.ToString());
-        Assert.Equal(1, json?["count"]?.GetValue<int>());
-    
-        // Verify circular reference structure
-        var firstElement = json?["value"]?[0];
-        Assert.Equal("CircularReference", firstElement?["type"]?.ToString());
-        Assert.Equal("List", firstElement?["target"]?["type"]?.ToString());
-        Assert.StartsWith("0x", firstElement?["target"]?["hashCode"]?.ToString());
+        var list = new List<int> { 1, 2, 3, 4, 5 };
+        var config = new ReprConfig(MaxElementsPerCollection: 3);
+        Assert.Equal(expected: "[int(1), int(2), int(3), ... (2 more items)]", actual: list.Repr(config: config));
+
+        config = new ReprConfig(MaxElementsPerCollection: 0);
+        Assert.Equal(expected: "[... (5 more items)]", actual: list.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestReprConfig_MaxStringLength()
+    {
+        var longString = "This is a very long string that should be truncated.";
+        var config = new ReprConfig(MaxStringLength: 10);
+        Assert.Equal(expected: "\"This is a ... (42 more letters)\"", actual: longString.Repr(config: config));
+
+        config = new ReprConfig(MaxStringLength: 0);
+        Assert.Equal(expected: "\"... (52 more letters)\"", actual: longString.Repr(config: config));
     }
 }
