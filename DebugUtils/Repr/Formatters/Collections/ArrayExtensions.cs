@@ -89,9 +89,9 @@ internal static class ArrayExtensions
                 {
                     // If the element is a jagged array, recurse directly to format its content
                     // without adding another "Array(...)" wrapper.
-                    items.Add(item: innerArray.ArrayToHierarchicalReprRecursive(
-                        indices: new int[innerArray.Rank], dimension: 0,
-                        context: context.WithIncrementedDepth()));
+                    items.Add(
+                        item: innerArray.FormatAsJsonNode(
+                            context: context.WithIncrementedDepth()));
                 }
                 else
                 {
