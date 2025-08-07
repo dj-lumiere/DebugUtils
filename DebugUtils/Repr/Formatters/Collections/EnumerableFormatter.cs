@@ -99,6 +99,16 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
             result.Add(propertyName: "count", value: itemCount.ToString());
         }
 
+        if (list.GetType()
+                .GetGenericArguments()
+                .Length != 0)
+        {
+            var elementType = list.GetType()
+                                  .GetGenericArguments()[0]
+                                  .GetReprTypeName();
+            result.Add(propertyName: "elementType", value: elementType);
+        }
+
         var i = 0;
         var hitLimit = false;
 

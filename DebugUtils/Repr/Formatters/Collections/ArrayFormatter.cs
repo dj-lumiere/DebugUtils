@@ -44,6 +44,9 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
         }
 
         var result = new JsonObject();
+        var elementType = array.GetType()
+                               .GetElementType()
+                              ?.GetReprTypeName() ?? "object";
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
@@ -54,6 +57,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
         }
 
         result.Add(propertyName: "dimensions", value: dimensions);
+        result.Add(propertyName: "elementType", value: elementType);
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 

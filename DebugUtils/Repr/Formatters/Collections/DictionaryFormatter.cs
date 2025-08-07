@@ -78,6 +78,14 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "count", value: dict.Count.ToString());
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
+        var keyType = dict.GetType()
+                          .GetGenericArguments()[0]
+                          .GetReprTypeName();
+        var valueType = dict.GetType()
+                            .GetGenericArguments()[1]
+                            .GetReprTypeName();
+        result.Add(propertyName: "keyType", value: keyType);
+        result.Add(propertyName: "valueType", value: valueType);
         var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
