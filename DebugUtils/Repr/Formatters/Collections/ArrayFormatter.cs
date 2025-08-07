@@ -46,8 +46,14 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "length", value: array.Length.ToString());
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
+        var dimensions = new JsonArray();
+        for (var i = 0; i < array.Rank; i++)
+        {
+            dimensions.Add(value: array.GetLength(dimension: i));
+        }
+
+        result.Add(propertyName: "dimensions", value: dimensions);
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 

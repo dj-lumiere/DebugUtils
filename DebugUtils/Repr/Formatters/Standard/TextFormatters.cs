@@ -37,8 +37,8 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: "string");
         result.Add(propertyName: "kind", value: "class");
-        result.Add(propertyName: "length", value: s.Length.ToString());
         result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
+        result.Add(propertyName: "length", value: s.Length);
         result.Add(propertyName: "value", value: s);
         return result;
     }
@@ -69,8 +69,8 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
         var s = sb.ToString();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "length", value: s.Length.ToString());
         result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
+        result.Add(propertyName: "length", value: s.Length);
         result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
         return result;
     }
