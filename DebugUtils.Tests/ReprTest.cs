@@ -709,12 +709,12 @@ public class ReprTest
     [Fact]
     public void TestReprConfig_ShowNonPublicProperties()
     {
-        var classified = new ClassifiedData("writer", "secret");
-        var config = new ReprConfig(ShowNonPublicProperties:false);
+        var classified = new ClassifiedData(writer: "writer", data: "secret");
+        var config = new ReprConfig(ShowNonPublicProperties: false);
         Assert.Equal(expected: "ClassifiedData(Writer: \"writer\")",
             actual: classified.Repr(config: config));
 
-        config = new ReprConfig(ShowNonPublicProperties:true);
+        config = new ReprConfig(ShowNonPublicProperties: true);
         Assert.Equal(expected: "ClassifiedData(Writer: \"writer\", private_Data: \"secret\")",
             actual: classified.Repr(config: config));
     }

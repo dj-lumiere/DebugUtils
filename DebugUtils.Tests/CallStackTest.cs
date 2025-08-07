@@ -6,7 +6,8 @@ public class CallStackTest
     public void TestGetCallerName_Basic()
     {
         var callerName = CallStack.CallStack.GetCallerName();
-        Assert.Equal(expected: "CallStackTest.TestGetCallerName_Basic", actual: callerName);
+        Assert.Equal(expected: "CallStackTest.TestGetCallerName_Basic",
+            actual: callerName);
     }
 
     private class NestedClass
@@ -22,7 +23,8 @@ public class CallStackTest
     {
         var nested = new NestedClass();
         var callerName = nested.GetCallerNameFromNested();
-        Assert.Equal(expected: "NestedClass.GetCallerNameFromNested", actual: callerName);
+        Assert.Equal(expected: "NestedClass.GetCallerNameFromNested",
+            actual: callerName);
     }
 
     [Fact]
@@ -31,7 +33,15 @@ public class CallStackTest
         var lambdaCaller = new Func<string>(CallStack.CallStack.GetCallerName);
         var callerName = lambdaCaller();
         // The exact name for lambda can vary based on compiler, but it should contain the test method name
-        Assert.Contains(expectedSubstring: "TestGetCallerName_FromLambda",
-            actualString: callerName);
+        Assert.Equal(expected: "CallStackTest.TestGetCallerName_FromLambda",
+            actual: callerName);
+    }
+
+    [Fact]
+    public void TestGetCallerInfo_Basic()
+    {
+        var callerInfo = CallStack.CallStack.GetCallerInfo();
+        Assert.Equal(expected: "CallStackTest.TestGetCallerInfo_Basic@CallStackTest.cs:43:9",
+            actual: callerInfo.ToString());
     }
 }

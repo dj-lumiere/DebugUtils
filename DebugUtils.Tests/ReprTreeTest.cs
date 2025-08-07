@@ -820,7 +820,7 @@ public class ReprTreeTest
           ?.ToString());
 
         var innerArray2Values = innerArray2Json[propertyName: "value"]!.AsArray();
-        Assert.Single(innerArray2Values);
+        Assert.Single(collection: innerArray2Values);
         Assert.True(condition: JsonNode.DeepEquals(
             node1: new JsonObject
             {
@@ -1346,7 +1346,7 @@ public class ReprTreeTest
         Assert.NotNull(@object: listNode[propertyName: "hashCode"]);
         Assert.Equal(expected: 1, actual: listNode[propertyName: "count"]!.GetValue<int>());
         var innerValue = listNode[propertyName: "value"]!.AsArray();
-        Assert.Single(innerValue);
+        Assert.Single(collection: innerValue);
         Assert.True(condition: JsonNode.DeepEquals(
             node1: new JsonObject
             {
@@ -1624,13 +1624,25 @@ public class ReprTreeTest
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
 
-    public static int Add(int a, int b) => a + b;
+    public static int Add(int a, int b)
+    {
+        return a + b;
+    }
 
-    internal static long Add2(int a) => a;
+    internal static long Add2(int a)
+    {
+        return a;
+    }
 
-    private T Add3<T>(T a) => a;
+    private T Add3<T>(T a)
+    {
+        return a;
+    }
 
-    private static void Add4(in int a, out int b) => b = a + 1;
+    private static void Add4(in int a, out int b)
+    {
+        b = a + 1;
+    }
 
     private async Task<int> Lambda(int a)
     {
@@ -1674,7 +1686,7 @@ public class ReprTreeTest
             node2: parameters[propertyName: "dimensions"]!));
         Assert.NotNull(@object: parameters[propertyName: "value"]);
         var parameterArray = parameters[propertyName: "value"]!.AsArray();
-        Assert.Single(parameterArray);
+        Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "a", actual: parameterArray[index: 0]![propertyName: "name"]
@@ -1738,7 +1750,7 @@ public class ReprTreeTest
             node2: parameters[propertyName: "dimensions"]!));
         Assert.NotNull(@object: parameters[propertyName: "value"]);
         parameterArray = parameters[propertyName: "value"]!.AsArray();
-        Assert.Single(parameterArray);
+        Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "a", actual: parameterArray[index: 0]![propertyName: "name"]
@@ -1765,7 +1777,7 @@ public class ReprTreeTest
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
             node2: parameters[propertyName: "dimensions"]!));
         parameterArray = parameters[propertyName: "value"]!.AsArray();
-        Assert.Single(parameterArray);
+        Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "short", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "a", actual: parameterArray[index: 0]![propertyName: "name"]
@@ -1827,7 +1839,7 @@ public class ReprTreeTest
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
             node2: parameters[propertyName: "dimensions"]!));
         parameterArray = parameters[propertyName: "value"]!.AsArray();
-        Assert.Single(parameterArray);
+        Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "a", actual: parameterArray[index: 0]![propertyName: "name"]
@@ -1994,10 +2006,10 @@ public class ReprTreeTest
     [Fact]
     public void TestReprConfig_ShowNonPublicProperties_ReprTree()
     {
-        var classified = new ClassifiedData("writer", "secret");
+        var classified = new ClassifiedData(writer: "writer", data: "secret");
         var config = new ReprConfig(ShowNonPublicProperties: false);
         var actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
-        Assert.NotNull(actualJson);
+        Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
@@ -2014,7 +2026,7 @@ public class ReprTreeTest
 
         config = new ReprConfig(ShowNonPublicProperties: true);
         actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
-        Assert.NotNull(actualJson);
+        Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
@@ -2030,7 +2042,7 @@ public class ReprTreeTest
           ?.ToString());
 
         var secretNode = actualJson[propertyName: "private_Data"];
-        Assert.NotNull(secretNode);
+        Assert.NotNull(@object: secretNode);
         Assert.Equal(expected: "string", actual: secretNode[propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: 6, actual: secretNode[propertyName: "length"]!.GetValue<int>());
