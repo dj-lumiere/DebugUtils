@@ -6,11 +6,11 @@ and get meaningful debugging information instantly.**
 ## Core Features
 
 🔍 **`.Repr()`** - See actual content instead of type names  
-🌳 **`.ReprTree()`** - Structured JSON-like output for complex analysis
-🔧 **`.FormatAsJsonNode()`** - Build custom tree formatters
-⚡ **Performance-focused** - Built for competitive programming and production debugging  
-🎯 **Zero dependencies** - Just add to your project and go
-🔌 **Extensible** - Create custom formatters for your types
+🌳 **`.ReprTree()`** - Structured JSON-like output for complex analysis  
+🔧 **`.FormatAsJsonNode()`** - Build custom tree formatters  
+⚡ **Performance-focused** - Built for competitive programming and production debugging    
+🎯 **Zero dependencies** - Just add to your project and go  
+🔌 **Extensible** - Create custom formatters for your types  
 
 ## The Problems We Solve
 
@@ -318,10 +318,10 @@ Console.WriteLine(parent.Repr());
 
 ## Performance
 
-- **Efficient circular reference detection** using RuntimeHelpers.GetHashCode
-- **Minimal allocations** for simple representations
-- **Automatic cleanup** prevents memory leaks
-- **Depth limiting** prevents stack overflow on deep hierarchies
+- **Efficient circular reference detection** using RuntimeHelpers.GetHashCode  
+- **Minimal allocations** for simple representations  
+- **Automatic cleanup** prevents memory leaks  
+- **Depth limiting** prevents stack overflow on deep hierarchies  
 
 ## Contributing
 

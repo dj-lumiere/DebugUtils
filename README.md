@@ -4,11 +4,11 @@ A collection of debugging utilities for C# developers.
 
 ## Core Features
 
-## 🔍 Object Representation ([Repr Documentation](Repr/README.md))
+## 🔍 Object Representation ([`Repr`, `ReprTree` Documentation](DebugUtils/Repr/README.md))
 
 Stop getting useless `ToString()` output. See actual object contents.
 
-## 📍 Call Stack Tracking ([CallStack Documentation](CallStack/README.md))
+## 📍 Call Stack Tracking ([`CallStack` Documentation](DebugUtils/CallStack/README.md))
 
 Know exactly where your code is executing and which methods are calling what.
 
@@ -281,14 +281,14 @@ public void TestComplexAlgorithm()
 
 **Current Features:**
 
-✅ `.Repr()` - Comprehensive object representation
-✅ `.ReprTree()` - Structured JSON tree output
-✅ `.FormatAsJsonNode()` - Custom formatter building blocks
-✅ `GetCallerName()` - Call stack tracking
-✅ Multi-framework support (.NET 6-9)
-✅ Zero dependencies
-✅ Circular reference detection
-✅ Custom formatter system
+✅ `.Repr()` - Comprehensive object representation  
+✅ `.ReprTree()` - Structured JSON tree output  
+✅ `.FormatAsJsonNode()` - Custom formatter building blocks  
+✅ `GetCallerName()` - Call stack tracking  
+✅ Multi-framework support (.NET 6-9)  
+✅ Zero dependencies  
+✅ Circular reference detection  
+✅ Custom formatter system  
 
 **Planned Features:**
 
