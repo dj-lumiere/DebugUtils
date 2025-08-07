@@ -83,33 +83,33 @@ new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
 Get structured, JSON-like output perfect for understanding complex object hierarchies:
 
 ```csharp
-public class Person
+public class Student
 {
     public string Name { get; set; }
     public int Age { get; set; }
     public List<string> Hobbies { get; set; }
 }
 
-var person = new Person { 
+var student = new Student { 
     Name = "Alice", 
     Age = 30, 
     Hobbies = new List<string> {"reading", "coding"} 
 };
 
-Console.WriteLine(person.ReprTree());
+Console.WriteLine(student.ReprTree());
+// hashCode can vary depending on when it got executed.
 // Output: {
-//   "type": "Person",
+//   "type": "Student",
 //   "kind": "class",
-//   "Name": { "type": "string", "kind": "class", "value": "Alice" },
+//   "Name": { "type": "string", "kind": "class", "length": 5, "hashCode" = "0xAAAAAAAA", "value": "Alice" },
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
 //   "Hobbies": {
 //     "type": "List",
 //     "kind": "class",
 //     "count": 2,
-//     "itemsShown": 2,
 //     "value": [
-//       { "type": "string", "kind": "class", "value": "reading" },
-//       { "type": "string", "kind": "class", "value": "coding" }
+//       { "type": "string", "kind": "class", "length": 7, "hashCode" = "0xBBBBBBBB", "value": "reading" },
+//       { "type": "string", "kind": "class", "length": 6, "hashCode" = "0xCCCCCCCC", "value": "coding" }
 //     ]
 //   }
 // }
@@ -192,25 +192,6 @@ var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
 new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([int(1), int(2), int(3)])
 ```
 
-### Hierarchical Display
-
-```csharp
-public class Person
-{
-    public string Name { get; set; }
-    public int Age { get; set; }
-
-    public Person(string name, int age)
-    {
-        Name = name;
-        Age = age;
-    }
-}
-var a = new Person(name: "Lumi", age: 28);
-var config = new ReprConfig(FormattingMode: FormattingMode.Hierarchical);
-a.Repr(config: config); //{"type":"Person","Name":{"type":"string","value":"Lumi"},"Age":{"type":"int","value":"28"}}
-```
-
 ## Real-World Use Cases
 
 ### Competitive Programming
@@ -232,17 +213,6 @@ public int Solve(int[] arr)
     Console.WriteLine($"Result: {result.Repr()}");
     return result;
 }
-```
-
-### Unity Development
-
-```csharp
-// Debug GameObject components
-Debug.Log($"Transform: {transform.position.Repr()}");
-Debug.Log($"Player data: {playerData.Repr()}");
-
-// Structured analysis of complex game state
-Debug.Log($"Game state:\n{gameState.ReprTree()}");
 ```
 
 ### Production Debugging

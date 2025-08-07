@@ -46,7 +46,7 @@ public class OrderProcessor
 {
     public void ProcessOrder(Order order)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Starting order processing...");
         
         try
@@ -66,7 +66,7 @@ public class OrderProcessor
     
     private void SaveToDatabase(Order order)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Saving to database...");
         
         if (connectionString == null)
@@ -100,7 +100,7 @@ public class MyClass
     public void MyMethod()
     {
         // Get the name of the current method
-        var methodName = CallStack.GetCallerName();
+        var methodName = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{methodName}] Method started");
         
         DoSomeWork();
@@ -110,7 +110,7 @@ public class MyClass
     
     private void DoSomeWork()
     {
-        var methodName = CallStack.GetCallerName();
+        var methodName = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{methodName}] Doing work...");
     }
 }
@@ -131,7 +131,7 @@ public class UserService
 {
     public async Task<User> GetUserAsync(int userId)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Fetching user {userId}");
         
         // Implementation...
@@ -170,7 +170,7 @@ public class PaymentProcessor
     
     public async Task<PaymentResult> ProcessPaymentAsync(PaymentRequest request)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         _logger.Info($"[{caller}] Processing payment for ${request.Amount}");
         
         try
@@ -195,7 +195,7 @@ public class PaymentProcessor
     
     private async Task<PaymentResult> ChargeCard(PaymentRequest request)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         _logger.Debug($"[{caller}] Charging card ending in {request.CardNumber.Substring(12)}");
         
         // Payment gateway logic...
@@ -218,7 +218,7 @@ public class GraphAlgorithm
 {
     public List<int> FindShortestPath(int start, int end)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Finding path from {start} to {end}");
         
         var visited = new HashSet<int>();
@@ -236,7 +236,7 @@ public class GraphAlgorithm
     
     private bool DFS(int current, int target, HashSet<int> visited, List<int> path)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         Console.WriteLine($"[{caller}] Visiting node {current}");
         
         visited.Add(current);
@@ -282,7 +282,7 @@ Better test failure messages and debugging information:
 [Test]
 public void TestComplexCalculation()
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     
     // Arrange
     var input = GenerateTestData();
@@ -308,7 +308,7 @@ public void TestComplexCalculation()
 
 private decimal ComplexCalculation(decimal input)
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     Console.WriteLine($"[{caller}] Starting calculation with {input}");
     
     var step1 = ProcessStep1(input);
@@ -339,7 +339,7 @@ public class OrderService
     
     public async Task<Order> CreateOrderAsync(CreateOrderRequest request)
     {
-        var caller = CallStack.GetCallerName();
+        var caller = CallStack.CallStack.GetCallerName();
         using var timer = _metrics.StartTimer($"{caller}.Duration");
         
         _logger.Info($"[{caller}] Creating order for customer {request.CustomerId}");
@@ -405,7 +405,7 @@ logging.
 // ✅ Use for error tracking
 public void ProcessData()
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     try
     {
         // Your logic
@@ -420,7 +420,7 @@ public void ProcessData()
 // ✅ Use for debugging complex flows
 public void ComplexAlgorithm()
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     _logger.Debug($"[{caller}] Starting algorithm");
     // Algorithm steps...
 }
@@ -428,7 +428,7 @@ public void ComplexAlgorithm()
 // ✅ Use for production monitoring
 public async Task<Result> ImportantOperation()
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     using var timer = _metrics.StartTimer($"{caller}.duration");
     // Operation logic...
 }
@@ -440,21 +440,21 @@ public async Task<Result> ImportantOperation()
 // ❌ Don't use in tight loops (performance impact)
 for (int i = 0; i < 1000000; i++)
 {
-    var caller = CallStack.GetCallerName(); // Too expensive!
+    var caller = CallStack.CallStack.GetCallerName(); // Too expensive!
     ProcessItem(i);
 }
 
 // ❌ Don't use for normal program flow
 public int Add(int a, int b)
 {
-    var caller = CallStack.GetCallerName(); // Unnecessary overhead
+    var caller = CallStack.CallStack.GetCallerName(); // Unnecessary overhead
     return a + b;
 }
 
 // ✅ Instead, use conditionally or cache the value
 public void ProcessItems(List<Item> items)
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.CallStack.GetCallerName();
     foreach (var item in items)
     {
         ProcessItem(item, caller); // Pass caller name down
