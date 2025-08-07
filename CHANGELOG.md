@@ -1,11 +1,12 @@
 # Changelog
 
-## [v1.2.1] Released at 2025.08.07
+## [v1.2.2] Released at 2025.08.07
 
 ### ✨ New Features
 - Added `Type` type support
 - Added `GetCallerInfo` for detailed caller info
 
+## [v1.2.1] Released at 2025.08.07
 ### 🐛 Bug Fixes & Improvements
 - Changed string's hashcode to hexadecimal notation
 
