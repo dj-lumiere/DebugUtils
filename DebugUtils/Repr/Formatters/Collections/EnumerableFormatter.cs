@@ -85,7 +85,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
                 [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth.ToString()
+                [propertyName: "depth"] = context.Depth
             };
         }
 
@@ -96,7 +96,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         if (itemCount is not null)
         {
-            result.Add(propertyName: "count", value: itemCount.ToString());
+            result.Add(propertyName: "count", value: itemCount);
         }
 
         if (list.GetType()

@@ -68,7 +68,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
                 [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth.ToString()
+                [propertyName: "depth"] = context.Depth
             };
         }
 
@@ -76,7 +76,6 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         var entries = new JsonArray();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "count", value: dict.Count.ToString());
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         var keyType = dict.GetType()
                           .GetGenericArguments()[0]
@@ -84,6 +83,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         var valueType = dict.GetType()
                             .GetGenericArguments()[1]
                             .GetReprTypeName();
+        result.Add(propertyName: "count", value: dict.Count);
         result.Add(propertyName: "keyType", value: keyType);
         result.Add(propertyName: "valueType", value: valueType);
         var count = 0;

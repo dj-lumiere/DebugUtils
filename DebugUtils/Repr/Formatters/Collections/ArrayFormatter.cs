@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
@@ -39,7 +40,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
                 [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth.ToString()
+                [propertyName: "depth"] = context.Depth
             };
         }
 
