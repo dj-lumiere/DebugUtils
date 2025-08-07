@@ -177,7 +177,7 @@ internal class ParameterDetailsFormatter : IReprFormatter, IReprTreeFormatter
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
                 [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth.ToString()
+                [propertyName: "depth"] = context.Depth
             };
         }
 
