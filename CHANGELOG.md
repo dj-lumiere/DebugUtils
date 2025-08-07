@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.2.1] Released at 2025.08.07
+
+### 🐛 Bug Fixes & Improvements
+- Changed string's hashcode to hexadecimal notation
+
 ## [v1.2.0] Released at 2025.08.07
 
 ### ✨ New Features
