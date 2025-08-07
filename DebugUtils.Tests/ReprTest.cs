@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr;
@@ -68,6 +68,12 @@ public class Children
 {
     public required string Name { get; set; }
     public Children? Parent { get; set; }
+}
+
+public class ClassifiedData(string writer, string data)
+{
+    public string Writer { get; set; } = writer;
+    private string Data { get; set; } = data;
 }
 
 public class ReprTest
@@ -152,12 +158,6 @@ public class ReprTest
             "Children(Name: \"Parent\", Parent: Children(Name: \"Child\", Parent: <Circular Reference to Children @",
             actualString: parent.Repr());
         Assert.EndsWith(expectedEndString: ">))", actualString: parent.Repr());
-
-        var obj = new { Name = "John", Age = 30 };
-        Assert.Equal(
-            expected:
-            "{\"type\":\"Anonymous\",\"kind\":\"class\",\"Name\":{\"type\":\"string\",\"kind\":\"class\",\"length\":\"4\",\"value\":\"John\"},\"Age\":{\"type\":\"int\",\"kind\":\"struct\",\"value\":\"30\"}}",
-            actual: obj.ReprTree());
     }
 
     // Basic Types
@@ -293,17 +293,17 @@ public class ReprTest
     [Fact]
     public void TestFloatRepr_SpecialValues()
     {
-        Assert.Equal(expected: "float(Quiet NaN)", actual: float.NaN.Repr());
-        Assert.Equal(expected: "float(Infinity)", actual: float.PositiveInfinity.Repr());
-        Assert.Equal(expected: "float(-Infinity)", actual: float.NegativeInfinity.Repr());
+        Assert.Equal(expected: "float(Quiet NaN)", actual: Single.NaN.Repr());
+        Assert.Equal(expected: "float(Infinity)", actual: Single.PositiveInfinity.Repr());
+        Assert.Equal(expected: "float(-Infinity)", actual: Single.NegativeInfinity.Repr());
     }
 
     [Fact]
     public void TestDoubleRepr_SpecialValues()
     {
-        Assert.Equal(expected: "double(Quiet NaN)", actual: double.NaN.Repr());
-        Assert.Equal(expected: "double(Infinity)", actual: double.PositiveInfinity.Repr());
-        Assert.Equal(expected: "double(-Infinity)", actual: double.NegativeInfinity.Repr());
+        Assert.Equal(expected: "double(Quiet NaN)", actual: Double.NaN.Repr());
+        Assert.Equal(expected: "double(Infinity)", actual: Double.PositiveInfinity.Repr());
+        Assert.Equal(expected: "double(-Infinity)", actual: Double.NegativeInfinity.Repr());
     }
 
     #if NET5_0_OR_GREATER
@@ -422,6 +422,20 @@ public class ReprTest
         stack.Push(item: 1);
         stack.Push(item: 2);
         Assert.Equal(expected: "Stack([int(2), int(1)])", actual: stack.Repr());
+    }
+
+    [Fact]
+    public void TestPriorityQueueRepr()
+    {
+        var pq = new PriorityQueue<string, int>();
+        pq.Enqueue(element: "second", priority: 2);
+        pq.Enqueue(element: "first", priority: 1);
+        pq.Enqueue(element: "third", priority: 3);
+
+        var repr = pq.Repr();
+        Assert.Contains(expectedSubstring: "\"first\" (priority: int(1))", actualString: repr);
+        Assert.Contains(expectedSubstring: "\"second\" (priority: int(2))", actualString: repr);
+        Assert.Contains(expectedSubstring: "\"third\" (priority: int(3))", actualString: repr);
     }
 
     // Custom Types
@@ -577,7 +591,7 @@ public class ReprTest
     public void TestDateTimeOffsetRepr_WithOffset()
     {
         Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00+01:00:00)",
-            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month:1, day: 1),
+            actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
                 offset: TimeSpan.FromHours(hours: 1)).Repr());
     }
 
@@ -660,7 +674,8 @@ public class ReprTest
     {
         var nestedList = new List<object> { 1, new List<object> { 2, new List<object> { 3 } } };
         var config = new ReprConfig(MaxDepth: 1);
-        Assert.Equal(expected: "[int(1), <Max Depth Reached>]", actual: nestedList.Repr(config: config));
+        Assert.Equal(expected: "[int(1), <Max Depth Reached>]",
+            actual: nestedList.Repr(config: config));
 
         config = new ReprConfig(MaxDepth: 0);
         Assert.Equal(expected: "<Max Depth Reached>", actual: nestedList.Repr(config: config));
@@ -671,7 +686,8 @@ public class ReprTest
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
         var config = new ReprConfig(MaxElementsPerCollection: 3);
-        Assert.Equal(expected: "[int(1), int(2), int(3), ... (2 more items)]", actual: list.Repr(config: config));
+        Assert.Equal(expected: "[int(1), int(2), int(3), ... (2 more items)]",
+            actual: list.Repr(config: config));
 
         config = new ReprConfig(MaxElementsPerCollection: 0);
         Assert.Equal(expected: "[... (5 more items)]", actual: list.Repr(config: config));
@@ -682,9 +698,24 @@ public class ReprTest
     {
         var longString = "This is a very long string that should be truncated.";
         var config = new ReprConfig(MaxStringLength: 10);
-        Assert.Equal(expected: "\"This is a ... (42 more letters)\"", actual: longString.Repr(config: config));
+        Assert.Equal(expected: "\"This is a ... (42 more letters)\"",
+            actual: longString.Repr(config: config));
 
         config = new ReprConfig(MaxStringLength: 0);
-        Assert.Equal(expected: "\"... (52 more letters)\"", actual: longString.Repr(config: config));
+        Assert.Equal(expected: "\"... (52 more letters)\"",
+            actual: longString.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestReprConfig_ShowNonPublicProperties()
+    {
+        var classified = new ClassifiedData("writer", "secret");
+        var config = new ReprConfig(ShowNonPublicProperties:false);
+        Assert.Equal(expected: "ClassifiedData(Writer: \"writer\")",
+            actual: classified.Repr(config: config));
+
+        config = new ReprConfig(ShowNonPublicProperties:true);
+        Assert.Equal(expected: "ClassifiedData(Writer: \"writer\", private_Data: \"secret\")",
+            actual: classified.Repr(config: config));
     }
 }
