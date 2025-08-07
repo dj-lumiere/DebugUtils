@@ -1,30 +1,47 @@
 # Changelog
 
+## [v1.2.0] Released at 2025.08.07
+
+### ✨ New Features
+
+- Added `PriorityQueue<TElement, TPriority>` support with priority-element formatting
+- Added `hashCode` property for reference types in ReprTree output
+- Collections now include underlying element type information when available
+- Arrays now show `dimensions` instead of `length` for better multi-dimensional support
+
+### 🐛 Bug Fixes & Improvements
+
+- Fixed jagged arrays to display inner arrays as proper structured objects
+- Changed numeric properties (count, length, rank, dimensions) to use actual integers instead of strings in JsonNode output
+- Fixed README on main repository to correctly reference 
+- Fixed README not printing line feed properly
+
 ## [v1.1.0] Released at 2025.08.06
 
 ### ✨ New Features
+
 - Added Features
-  - **Tree Representation (`.ReprTree()`)** - Structured JSON output for debugging tools and IDEs
-      - Complete type information for every value
-      - Hierarchical object relationships
-      - Machine-readable format perfect for analysis tools
-      - Pretty printing support with configurable indentation
-  - **Custom Formatter System** - Build your own object representations
-      - `IReprFormatter` interface for custom string formatting
-      - `IReprTreeFormatter` interface for custom JSON tree formatting
-      - `ReprFormatterAttribute` for automatic formatter registration
-      - `.FormatAsJsonNode()` method for building complex tree structures
+    - **Tree Representation (`.ReprTree()`)** - Structured JSON output for debugging tools and IDEs
+        - Complete type information for every value
+        - Hierarchical object relationships
+        - Machine-readable format perfect for analysis tools
+        - Pretty printing support with configurable indentation
+    - **Custom Formatter System** - Build your own object representations
+        - `IReprFormatter` interface for custom string formatting
+        - `IReprTreeFormatter` interface for custom JSON tree formatting
+        - `ReprFormatterAttribute` for automatic formatter registration
+        - `.FormatAsJsonNode()` method for building complex tree structures
 
 - Advanced Configuration & Limits
 
-  - **Comprehensive Limit Controls** - Prevent performance issues with large objects
-      - `MaxDepth` - Control recursion depth (supports unlimited with `-1`)
-      - `MaxElementsPerCollection` - Limit array/list elements shown
-      - `MaxPropertiesPerObject` - Limit object properties displayed
-      - `MaxStringLength` - Truncate long strings with character counts
-  - **Enhanced Type Display Options**
-      - `ShowNonPublicProperties` - Access private fields and properties for deep debugging
-      - `EnablePrettyPrintForReprTree` - Enable pretty printing for tree output
+    - **Comprehensive Limit Controls** - Prevent performance issues with large objects
+        - `MaxDepth` - Control recursion depth (supports unlimited with `-1`)
+        - `MaxElementsPerCollection` - Limit array/list elements shown
+        - `MaxPropertiesPerObject` - Limit object properties displayed
+        - `MaxStringLength` - Truncate long strings with character counts
+    - **Enhanced Type Display Options**
+        - `ShowNonPublicProperties` - Access private fields and properties for deep debugging
+        - `EnablePrettyPrintForReprTree` - Enable pretty printing for tree output
 
 ### 🔧 API Improvements
 
@@ -51,18 +68,19 @@
 - **JSON Tree Output Format** - Tree representation now includes comprehensive metadata
     - Added `type`, `kind` fields for all objects
 
-**Migration Notes:** Existing `.Repr()` calls remain unchanged. New `.ReprTree()` method provides additional 
+**Migration Notes:** Existing `.Repr()` calls remain unchanged. New `.ReprTree()` method provides additional
 JSON tree functionality. Custom formatters can be gradually adopted using the new interface system.
 
 ## [v1.0.3] Released at 2025.08.04
 
 ### 🐛 Bug Fixes
--  Removed indents and line feeds when in hierarchical mode for nullable structs
 
+- Removed indents and line feeds when in hierarchical mode for nullable structs
 
 ## [v1.0.2] Released at 2025.08.04
 
 ### 🐛 Bug Fixes
+
 - Fixed double circular reference checking issues
 - Removed the experimental status of hierarchical mode
 - Removed indents and line feeds when in hierarchical mode
