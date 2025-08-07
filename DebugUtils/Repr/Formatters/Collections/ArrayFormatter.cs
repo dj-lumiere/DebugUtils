@@ -57,6 +57,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
             dimensions.Add(value: array.GetLength(dimension: i));
         }
 
+        result.Add(propertyName: "rank", value: array.Rank);
         result.Add(propertyName: "dimensions", value: dimensions);
         result.Add(propertyName: "elementType", value: elementType);
         // Apply container defaults if configured
