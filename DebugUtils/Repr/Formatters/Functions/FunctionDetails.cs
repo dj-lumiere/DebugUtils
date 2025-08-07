@@ -3,7 +3,7 @@ using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
-internal class FunctionDetails
+internal readonly struct FunctionDetails
 {
     public string Name { get; }
     public ParameterDetails[] Parameters { get; }

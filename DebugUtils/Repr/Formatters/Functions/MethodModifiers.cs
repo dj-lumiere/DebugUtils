@@ -3,12 +3,12 @@ using System.Runtime.CompilerServices;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
-internal class MethodModifiers
+internal readonly struct MethodModifiers
 {
-    public bool IsPublic { get; set; }
-    public bool IsPrivate { get; set; }
-    public bool IsProtected { get; set; }
-    public bool IsInternal { get; set; }
+    public bool IsPublic { get; }
+    public bool IsPrivate { get; }
+    public bool IsProtected { get; }
+    public bool IsInternal { get; }
 
     // Other modifiers
     public bool IsStatic { get; }

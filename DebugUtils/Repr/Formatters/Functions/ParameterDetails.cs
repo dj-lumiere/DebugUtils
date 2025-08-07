@@ -3,20 +3,18 @@ using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters.Functions;
 
-internal class ParameterDetails
+internal readonly struct ParameterDetails
 {
-    public string Name { get; init; }
-    public string TypeReprName { get; init; }
-    public string Modifier { get; init; }
-    public bool HasDefaultValue { get; init; }
-    public object? DefaultValue { get; init; }
+    public string Name { get; }
+    public string TypeReprName { get; }
+    public string Modifier { get; }
+    public object? DefaultValue { get; }
 
     public ParameterDetails(ParameterInfo parameterInfo)
     {
         Name = parameterInfo.Name ?? "unnamed";
         TypeReprName = parameterInfo.ParameterType.GetReprTypeName();
         Modifier = parameterInfo.GetParameterModifier();
-        HasDefaultValue = parameterInfo.HasDefaultValue;
         DefaultValue = parameterInfo.HasDefaultValue
             ? parameterInfo.DefaultValue
             : null;
