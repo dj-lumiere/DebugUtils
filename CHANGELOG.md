@@ -2,6 +2,10 @@
 
 ## [v1.2.1] Released at 2025.08.07
 
+### ✨ New Features
+- Added `Type` type support
+- Added `GetCallerInfo` for detailed caller info
+
 ### 🐛 Bug Fixes & Improvements
 - Changed string's hashcode to hexadecimal notation
 
