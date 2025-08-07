@@ -760,43 +760,75 @@ public class ReprTreeTest
         var jagged2D = new[] { new[] { 1, 2 }, new[] { 3 } };
         var actualJson = JsonNode.Parse(json: jagged2D.ReprTree())!;
 
+        // Check outer jagged array properties
         Assert.Equal(expected: "JaggedArray", actual: actualJson[propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
           ?.ToString());
         Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: 1, actual: actualJson[propertyName: "rank"]!.GetValue<int>());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(2),
             node2: actualJson[propertyName: "dimensions"]!));
+        Assert.Equal(expected: "1DArray", actual: actualJson[propertyName: "elementType"]
+          ?.ToString());
 
+        // Check the nested arrays structure
         var outerArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 2, actual: outerArray.Count);
 
-        var innerArray1 = outerArray[index: 0]!.AsArray();
-        Assert.Equal(expected: 2, actual: innerArray1.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: innerArray1[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: innerArray1[index: 1]));
+        // First inner array: int[] { 1, 2 }
+        var innerArray1Json = outerArray[index: 0]!;
+        Assert.Equal(expected: "1DArray", actual: innerArray1Json[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: innerArray1Json[propertyName: "kind"]
+          ?.ToString());
+        Assert.Equal(expected: 1, actual: innerArray1Json[propertyName: "rank"]!.GetValue<int>());
+        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(2),
+            node2: innerArray1Json[propertyName: "dimensions"]!));
+        Assert.Equal(expected: "int", actual: innerArray1Json[propertyName: "elementType"]
+          ?.ToString());
 
-        var innerArray2 = outerArray[index: 1]!.AsArray();
-        Assert.Single(innerArray2);
+        var innerArray1Values = innerArray1Json[propertyName: "value"]!.AsArray();
+        Assert.Equal(expected: 2, actual: innerArray1Values.Count);
         Assert.True(condition: JsonNode.DeepEquals(
             node1: new JsonObject
             {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
+                [propertyName: "type"] = "int",
+                [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "1" // String value due to repr config
             },
-            node2: innerArray2[index: 0]));
+            node2: innerArray1Values[index: 0]));
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int",
+                [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "2" // String value due to repr config
+            },
+            node2: innerArray1Values[index: 1]));
+
+        // Second inner array: int[] { 3 }
+        var innerArray2Json = outerArray[index: 1]!;
+        Assert.Equal(expected: "1DArray", actual: innerArray2Json[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: innerArray2Json[propertyName: "kind"]
+          ?.ToString());
+        Assert.Equal(expected: 1, actual: innerArray2Json[propertyName: "rank"]!.GetValue<int>());
+        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
+            node2: innerArray2Json[propertyName: "dimensions"]!));
+        Assert.Equal(expected: "int", actual: innerArray2Json[propertyName: "elementType"]
+          ?.ToString());
+
+        var innerArray2Values = innerArray2Json[propertyName: "value"]!.AsArray();
+        Assert.Single(innerArray2Values);
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int",
+                [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "3" // String value due to repr config
+            },
+            node2: innerArray2Values[index: 0]));
     }
 
     [Fact]
@@ -810,6 +842,7 @@ public class ReprTreeTest
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
           ?.ToString());
         Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: 2, actual: actualJson[propertyName: "rank"]!.GetValue<int>());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(2, 2),
             node2: actualJson[propertyName: "dimensions"]!));
 
