@@ -89,7 +89,8 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            entries.Add(value: tuple[index: i].FormatAsJsonNode(context: context.WithIncrementedDepth()));
+            entries.Add(value: tuple[index: i]
+               .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
         if (context.Config.MaxElementsPerCollection >= 0 &&
@@ -99,6 +100,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                                      context.Config.MaxElementsPerCollection;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
+
         result.Add(propertyName: "value", value: entries);
         return result;
     }

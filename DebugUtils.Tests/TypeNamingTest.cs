@@ -32,9 +32,9 @@ public class TypeNamingTest
         var nestedType = typeof(OuterClass.NestedClass);
         Assert.Equal(expected: "NestedClass", actual: nestedType.GetReprTypeName());
 
-        var genericMethodType = typeof(TypeNamingTest).GetMethod(nameof(GenericMethod))
+        var genericMethodType = typeof(TypeNamingTest).GetMethod(name: nameof(GenericMethod))
                                                      ?.GetGenericArguments()[0];
-        Assert.Null(genericMethodType?.GetReprTypeName());
+        Assert.Null(@object: genericMethodType?.GetReprTypeName());
     }
 
     public class OuterClass

@@ -52,6 +52,7 @@ internal class RecordFormatter : IReprFormatter
             {
                 parts.Add(item: $"{prop.Name}: <Error: {ex.Message}>");
             }
+
             propertyCount += 1;
         }
 

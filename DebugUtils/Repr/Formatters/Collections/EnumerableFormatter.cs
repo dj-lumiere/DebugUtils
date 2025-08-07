@@ -27,11 +27,12 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         var items = new List<string>();
         int? itemCount = null;
 
-        if (type.GetProperty("Count")
-               ?.GetValue(obj) is { } value)
+        if (type.GetProperty(name: "Count")
+               ?.GetValue(obj: obj) is { } value)
         {
             itemCount = (int)value;
         }
+
         var i = 0;
         var hitLimit = false;
         foreach (var item in list)
@@ -72,8 +73,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         var type = list.GetType();
         int? itemCount = null;
 
-        if (type.GetProperty("Count")
-               ?.GetValue(obj) is { } value)
+        if (type.GetProperty(name: "Count")
+               ?.GetValue(obj: obj) is { } value)
         {
             itemCount = (int)value;
         }

@@ -184,7 +184,7 @@ internal static class IntegerExtensions
             _ => throw new ArgumentException(message: "Invalid type")
         };
     }
-    public static int GetByteSize<T>(this T obj)
+    private static int GetByteSize<T>(this T obj)
     {
         return obj switch
         {
@@ -198,7 +198,7 @@ internal static class IntegerExtensions
             _ => throw new ArgumentException(message: "Invalid type")
         };
     }
-    public static ulong SignExtendConvertToUlong<T>(this T obj)
+    private static ulong SignExtendConvertToUlong<T>(this T obj)
     {
         if (obj is null)
         {
@@ -232,7 +232,7 @@ internal static class IntegerExtensions
         return result;
     }
 
-    public static string FormatUlongAsBinary(this ulong value)
+    private static string FormatUlongAsBinary(this ulong value)
     {
         if (value == 0)
         {
@@ -251,7 +251,7 @@ internal static class IntegerExtensions
                             : 32, paddingChar: '0'))
            .ToUpper();
     }
-    public static string FormatUlongAsHex(this ulong value)
+    private static string FormatUlongAsHex(this ulong value)
     {
         if (value == 0)
         {
@@ -271,7 +271,7 @@ internal static class IntegerExtensions
            .ToUpper();
     }
 
-    public static string FormatBigIntegerAsBinary(this BigInteger value)
+    private static string FormatBigIntegerAsBinary(this BigInteger value)
     {
         if (value == 0)
         {
@@ -297,7 +297,7 @@ internal static class IntegerExtensions
             ? $"-0b{binaryString}"
             : $"0b{binaryString}";
     }
-    public static string FormatBigIntegerAsHex(this BigInteger value)
+    private static string FormatBigIntegerAsHex(this BigInteger value)
     {
         if (value == 0)
         {
@@ -314,7 +314,7 @@ internal static class IntegerExtensions
     }
 
     #if NET7_0_OR_GREATER
-    public static string FormatUInt128AsBinary(this UInt128 value)
+    private static string FormatUInt128AsBinary(this UInt128 value)
     {
         if (value == 0)
         {
@@ -333,7 +333,7 @@ internal static class IntegerExtensions
                              : 64, paddingChar: '0'))
            .ToUpper();
     }
-    public static string FormatUInt128AsHex(this UInt128 value)
+    private static string FormatUInt128AsHex(this UInt128 value)
     {
         if (value == 0)
         {
@@ -353,7 +353,7 @@ internal static class IntegerExtensions
            .ToUpper();
     }
 
-    public static byte[] GetBytesFromInt128(this Int128 value)
+    private static byte[] GetBytesFromInt128(this Int128 value)
     {
         var ui128 = (UInt128)value;
         var isNegative = value < 0;
@@ -365,7 +365,7 @@ internal static class IntegerExtensions
 
         return ui128.GetBytesFromUInt128();
     }
-    public static byte[] GetBytesFromUInt128(this UInt128 value)
+    private static byte[] GetBytesFromUInt128(this UInt128 value)
     {
         var highBytes = (ulong)(value >> 64);
         var lowBytes = (ulong)value;

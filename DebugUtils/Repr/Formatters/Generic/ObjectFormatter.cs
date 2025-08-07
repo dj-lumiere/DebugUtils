@@ -150,6 +150,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             {
                 parts.Add(item: $"private_{propName}: {ex.Message}");
             }
+
             propertyCount += 1;
         }
 
@@ -220,7 +221,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             {
                 break;
             }
-            
+
             try
             {
                 var value = prop.GetValue(obj: obj);
@@ -231,6 +232,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             {
                 result.Add(propertyName: prop.Name, value: $"Error: {ex.Message}");
             }
+
             propertyCount += 1;
         }
 
@@ -289,6 +291,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             {
                 result.Add(propertyName: $"private_{prop.Name}", value: $"Error: {ex.Message}");
             }
+
             propertyCount += 1;
         }
 

@@ -109,7 +109,8 @@ internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "second", value: ts.Seconds.ToString());
         result.Add(propertyName: "millisecond", value: ts.Milliseconds.ToString());
         result.Add(propertyName: "ticks", value: ts.Ticks.ToString());
-        result.Add(propertyName: "isNegative", value: isNegative.ToString().ToLowerInvariant());
+        result.Add(propertyName: "isNegative", value: isNegative.ToString()
+                                                                .ToLowerInvariant());
         return result;
     }
 }
