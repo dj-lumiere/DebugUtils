@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.Records;
@@ -41,6 +42,7 @@ internal class FunctionFormatter : IReprFormatter, IReprTreeFormatter
         var functionDetails = del.Method.ToFunctionDetails();
         var result = new JsonObject();
         result.Add(propertyName: "type", value: "Function");
+        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         result.Add(propertyName: "properties",
             value: functionDetails.FormatAsJsonNode(context: context));
         return result;

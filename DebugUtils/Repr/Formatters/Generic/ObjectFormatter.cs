@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
@@ -182,6 +183,12 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        if (!type.IsValueType)
+        {
+            result.Add(propertyName: "hashCode",
+                value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
+        }
+
         var propertyCount = 0;
         // Get public fields
         var fields =

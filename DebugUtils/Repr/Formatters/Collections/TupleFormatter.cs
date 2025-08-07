@@ -73,6 +73,12 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "length", value: tuple.Length.ToString());
+        if (!type.IsValueType)
+        {
+            result.Add(propertyName: "hashCode",
+                value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
+        }
+
         var entries = new JsonArray();
         for (var i = 0; i < tuple.Length; i++)
         {

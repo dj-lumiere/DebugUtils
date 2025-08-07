@@ -47,6 +47,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "length", value: array.Length.ToString());
+        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         // Apply container defaults if configured
         context = context.WithContainerConfig();
 

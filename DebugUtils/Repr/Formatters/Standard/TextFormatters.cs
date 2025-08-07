@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
@@ -37,6 +38,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "type", value: "string");
         result.Add(propertyName: "kind", value: "class");
         result.Add(propertyName: "length", value: s.Length.ToString());
+        result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
         result.Add(propertyName: "value", value: s);
         return result;
     }
@@ -68,6 +70,7 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "length", value: s.Length.ToString());
+        result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
         result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
         return result;
     }

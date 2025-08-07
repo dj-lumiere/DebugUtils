@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
@@ -92,6 +93,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         var entries = new JsonArray();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
+        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         if (itemCount is not null)
         {
             result.Add(propertyName: "count", value: itemCount.ToString());
