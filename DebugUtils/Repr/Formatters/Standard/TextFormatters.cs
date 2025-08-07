@@ -37,7 +37,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: "string");
         result.Add(propertyName: "kind", value: "class");
-        result.Add(propertyName: "hashCode", value: $"{RuntimeHelpers.GetHashCode(o: obj):X8}");
+        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         result.Add(propertyName: "length", value: s.Length);
         result.Add(propertyName: "value", value: s);
         return result;
