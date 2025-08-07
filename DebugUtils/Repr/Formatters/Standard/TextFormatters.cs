@@ -109,7 +109,8 @@ internal class CharFormatter : IReprFormatter, IReprTreeFormatter
         var result = new JsonObject();
         result.Add(propertyName: "type", value: "char");
         result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "value", value: c.ToString());
+        // should truncate ' prefix and suffix
+        result.Add(propertyName: "value", value: ToRepr(obj: c, context: context)[1..^1]);
         result.Add(propertyName: "unicodeValue", value: $"0x{(int)c:X4}");
         return result;
     }
