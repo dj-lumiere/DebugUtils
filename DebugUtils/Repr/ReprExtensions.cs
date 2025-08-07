@@ -168,14 +168,16 @@ public static class ReprExtensions
     /// var person = new Person { Name = "John", Age = 30 };
     /// var config = new ReprConfig(EnablePrettyPrintForReprTree: true);
     /// var jsonResult = person.ReprTree(config);
-    /// 
+    ///
     /// // jsonResult contains structured representation:
     /// // {
     /// //   "type": "Person",
-    /// //   "kind": "class", 
-    /// //   "Name": { "type": "string", "kind": "class", "value": "John" },
+    /// //   "kind": "class",
+    /// //   "hashCode": "0xAAAAAAAA",
+    /// //   "Name": { "type": "string", "kind": "class", "length": 4, "hashCode": "0xBBBBBBBB", "value": "John" },
     /// //   "Age": { "type": "int", "kind": "struct", "value": "30" }
     /// // }
+    /// // hashCode can vary depending on when it got executed.
     /// </code>
     /// </example>
     public static string ReprTree<T>(this T obj, ReprConfig? config = null)
