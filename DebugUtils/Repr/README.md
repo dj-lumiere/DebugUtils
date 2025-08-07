@@ -10,7 +10,7 @@ and get meaningful debugging information instantly.**
 🔧 **`.FormatAsJsonNode()`** - Build custom tree formatters  
 ⚡ **Performance-focused** - Built for competitive programming and production debugging    
 🎯 **Zero dependencies** - Just add to your project and go  
-🔌 **Extensible** - Create custom formatters for your types  
+🔌 **Extensible** - Create custom formatters for your types
 
 ## The Problems We Solve
 
@@ -101,6 +101,7 @@ Console.WriteLine(student.ReprTree());
 // Output: {
 //   "type": "Student",
 //   "kind": "class",
+//   "hashCode": "0xABCDABCD"
 //   "Name": { "type": "string", "kind": "class", "length": 5, "hashCode" = "0xAAAAAAAA", "value": "Alice" },
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
 //   "Hobbies": {
@@ -267,8 +268,7 @@ obj.ReprTree()                       // Uses default config
 obj.ReprTree(config)                 // Uses custom config
 
 // JsonNode for custom formatters
-obj.FormatAsJsonNode()               // For building custom tree structures
-obj.FormatAsJsonNode(context)        // With custom context
+obj.FormatAsJsonNode(context)        // For building custom tree structures, should pass context.
 ```
 
 ### Configuration
@@ -318,10 +318,10 @@ Console.WriteLine(parent.Repr());
 
 ## Performance
 
-- **Efficient circular reference detection** using RuntimeHelpers.GetHashCode  
-- **Minimal allocations** for simple representations  
-- **Automatic cleanup** prevents memory leaks  
-- **Depth limiting** prevents stack overflow on deep hierarchies  
+- **Efficient circular reference detection** using RuntimeHelpers.GetHashCode
+- **Minimal allocations** for simple representations
+- **Automatic cleanup** prevents memory leaks
+- **Depth limiting** prevents stack overflow on deep hierarchies
 
 ## Contributing
 

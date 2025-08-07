@@ -32,20 +32,23 @@ Console.WriteLine(data.ReprTree());
 // Output: {
 //   "type": "Anonymous",
 //   "kind": "class",
-//   "Name": { "type": "string", "kind": "class", "value": "Alice" },
+//   "hashCode": "0xAAAAAAAA",
+//   "Name": { "type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 5, "value": "Alice" },
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
 //   "Scores": {
 //     "type": "1DArray",
 //     "kind": "class",
-//     "count": 3,
-//     "itemsShown": 3,
+//     "hashCode": "0xCCCCCCCC",
+//     "rank": 1,
+//     "dimensions": [3],
+//     "elementType": "int",
 //     "value": [
 //       { "type": "int", "kind": "struct", "value": "95" },
 //       { "type": "int", "kind": "struct", "value": "87" },
 //       { "type": "int", "kind": "struct", "value": "92" }
 //     ]
 //   }
-// }
+// } (hashCode may vary.)
 
 // 📍 Caller tracking for debugging
 public class Program
@@ -55,12 +58,12 @@ public class Program
         Console.WriteLine($"[{CallStack.GetCallerName()}] Starting algorithm...");
         
         var result = ComputeResult();
-        Console.WriteLine($"[{CallStack.GetCallerName()}] Result: {result.Repr()}");
+        Console.WriteLine($"[{CallStack.GetCallerInfo()}] Result: {result.Repr()}");
     }
 }
 
 // Output: [Program.MyAlgorithm] Starting algorithm...
-// Output: [Program.MyAlgorithm] Result: [int(1), int(4), int(9), int(16), int(25)]
+// Output: [Program.MyAlgorithm@Program.cs:21:8] Result: [int(1), int(4), int(9), int(16), int(25)]
 ```
 
 ## Features
@@ -108,6 +111,7 @@ new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
 Perfect for logging, error tracking, and debugging call flows:
 
 ```csharp
+// DataProcessor.cs
 public class DataProcessor 
 {
     public void ProcessFile(string filename)
@@ -138,12 +142,36 @@ public class DataProcessor
 // Output: [DataProcessor.ProcessFile] Loaded 150 records
 ```
 
+### ℹ️ Detailed Caller Information (`GetCallerInfo()`)
+
+Get the file, line, and column number for even more precise debugging.
+
+```csharp
+// DataProcessor.cs
+public class DataProcessor 
+{
+    public void ProcessFile(string filename)
+    {
+        var caller = CallStack.GetCallerInfo();
+        Console.WriteLine($"[{caller}] Processing file: {filename}");
+        
+        if (!File.Exists(filename))
+        {
+            Console.WriteLine($"[{caller}] ERROR: File not found");
+            return;
+        }
+    }
+}
+
+// Output: [DataProcessor.ProcessFile@DataProcessor.cs:6:8] Processing file: data.txt
+```
+
 **Use cases:**
 
-- **Error tracking** - Know exactly which method failed
-- **Performance logging** - Track execution flow
-- **Debugging algorithms** - See the call chain in complex recursion
-- **Unit testing** - Better test failure messages
+- **Error tracking** - Know the exact line that failed
+- **Performance logging** - Pinpoint slow sections of code
+- **Debugging algorithms** - Trace execution flow with precision
+- **Unit testing** - Get detailed failure locations
 
 ## Configuration Options
 
@@ -201,7 +229,14 @@ public class Person
     }
 }
 var a = new Person(name: "Lumi", age: 28);
-a.ReprTree(); //{"type":"Person","kind":"class","Name":{"type":"string","kind":"class","value":"Lumi"},"Age":{"type":"int","kind":"struct","value":"28"}}
+a.ReprTree();
+//  Output: {
+//     "type": "Person",
+//     "kind": "class",
+//     "hashCode": "0xAAAAAAAA",
+//     "Name": {"type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length":4, "value":"Lumi"},
+//     "Age": {"type": "int", "kind": "struct", "value": "28"}
+// } (hashCode may vary)
 ```
 
 ## Real-World Use Cases
@@ -214,15 +249,15 @@ Debug algorithms instantly without writing custom debug code:
 // Debug your DP table
 int[,] dp = new int[n, m];
 // ... fill DP table ...
-Console.WriteLine($"[{CallStack.GetCallerName()}] DP: {dp.Repr()}");
+Console.WriteLine($"[{CallStack.GetCallerInfo()}] DP: {dp.Repr()}");
 
 // Track algorithm execution
 public int Solve(int[] arr)
 {
-    Console.WriteLine($"[{CallStack.GetCallerName()}] Input: {arr.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerInfo()}] Input: {arr.Repr()}");
     
     var result = ProcessArray(arr);
-    Console.WriteLine($"[{CallStack.GetCallerName()}] Result: {result}");
+    Console.WriteLine($"[{CallStack.GetCallerInfo()}] Result: {result}");
     return result;
 }
 ```
@@ -232,7 +267,7 @@ public int Solve(int[] arr)
 ```csharp
 public async Task<ApiResponse> ProcessRequest(RequestData request)
 {
-    var caller = CallStack.GetCallerName();
+    var caller = CallStack.GetCallerInfo();
     logger.Info($"[{caller}] Request: {request.Repr()}");
     
     try 
@@ -262,9 +297,9 @@ public void TestComplexAlgorithm()
     var actual = MyAlgorithm(input);
     
     // Amazing error messages when tests fail
-    Console.WriteLine($"[{CallStack.GetCallerName()}] Input: {input.Repr()}");
-    Console.WriteLine($"[{CallStack.GetCallerName()}] Expected: {expected.Repr()}");
-    Console.WriteLine($"[{CallStack.GetCallerName()}] Actual: {actual.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerInfo()}] Input: {input.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerInfo()}] Expected: {expected.Repr()}");
+    Console.WriteLine($"[{CallStack.GetCallerInfo()}] Actual: {actual.Repr()}");
     
     Assert.Equal(expected, actual);
 }
@@ -284,11 +319,12 @@ public void TestComplexAlgorithm()
 ✅ `.Repr()` - Comprehensive object representation  
 ✅ `.ReprTree()` - Structured JSON tree output  
 ✅ `.FormatAsJsonNode()` - Custom formatter building blocks  
-✅ `GetCallerName()` - Call stack tracking  
+✅ `GetCallerName()` - Simple call stack tracking  
+✅ `GetCallerInfo()` - Detailed call stack tracking  
 ✅ Multi-framework support (.NET 6-9)  
 ✅ Zero dependencies  
 ✅ Circular reference detection  
-✅ Custom formatter system  
+✅ Custom formatter system
 
 **Planned Features:**
 
