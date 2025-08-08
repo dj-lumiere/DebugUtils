@@ -1,13 +1,76 @@
 # Changelog
 
+## [v1.2.3] Released at 2025.08.08
+
+### 📋 Breaking Changes
+
+- **BREAKING**: Simplified namespace structure for cleaner API
+    - **CallStack**:
+        - `DebugUtils.CallStack.CallStack` → `DebugUtils.CallStack`
+    - **Repr**:
+        - `DebugUtils.Repr.Repr` → `DebugUtils.Repr`
+        - `DebugUtils.Repr.Repr.Formatters.*` → `DebugUtils.Repr.Formatters`
+        - `DebugUtils.Repr.Repr.Attributes` → `DebugUtils.Repr.Attributes`
+        - `DebugUtils.Repr.Repr.Interfaces` → `DebugUtils.Repr.Interfaces`
+        - All other sub-namespaces simplified similarly
+    - **Moved core types to main namespace**:
+        - `ReprConfig` and `ReprContext` moved from `DebugUtils.Repr.Records` to `DebugUtils.Repr`
+        - These are commonly used types that belong in the main API
+    - **Reason**: Directory structure was leaking into public API, making imports verbose and confusing
+    - **Migration**: Update your using statements:
+  #### Before (v1.2.2):
+    ```csharp
+    using DebugUtils.CallStack;
+    using DebugUtils.Repr;
+    using DebugUtils.Repr.Records;
+    
+    var caller = CallStack.CallStack.GetCallerName();
+    var config = new ReprConfig();
+    var result = myObject.Repr(config);
+    ```
+
+  #### After (v1.2.3):
+
+    ```csharp
+    using DebugUtils.CallStack;
+    using DebugUtils.Repr;
+    
+    var caller = CallStack.GetCallerName();
+    var config = new ReprConfig();
+    var result = myObject.Repr(config);
+    
+    using DebugUtils.Repr;
+    using DebugUtils.Repr.Attributes;
+    using DebugUtils.Repr.Interfaces;
+    
+    [ReprFormatter(typeof(MyType))]
+    public class MyTypeFormatter : IReprFormatter
+    {
+    public string ToRepr(object obj, ReprContext context) // ReprContext in main namespace
+    {
+    // Implementation
+    }
+    }
+    ```
+
+### Technical Notes
+
+- File locations reorganized for a better structure
+- All functionality remains identical—only import statements change
+- Preparation for DebugUtils.Unity 1.0.0 release
+- Follows .NET naming conventions and common library patterns
+
 ## [v1.2.2] Released at 2025.08.07
 
 ### ✨ New Features
+
 - Added `Type` type support
 - Added `GetCallerInfo` for detailed caller info
 
 ## [v1.2.1] Released at 2025.08.07
+
 ### 🐛 Bug Fixes & Improvements
+
 - Changed string's hashcode to hexadecimal notation
 
 ## [v1.2.0] Released at 2025.08.07
@@ -22,8 +85,9 @@
 ### 🐛 Bug Fixes & Improvements
 
 - Fixed jagged arrays to display inner arrays as proper structured objects
-- Changed numeric properties (count, length, rank, dimensions) to use actual integers instead of strings in JsonNode output
-- Fixed README on main repository to correctly reference 
+- Changed numeric properties (count, length, rank, dimensions) to use actual integers instead of strings in JsonNode
+  output
+- Fixed README on main repository to correctly reference
 - Fixed README not printing line feed properly
 
 ## [v1.1.0] Released at 2025.08.06

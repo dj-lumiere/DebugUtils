@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>DebugUtils.CSharp</PackageId>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
     <Authors>Lumi</Authors>
     <Description>Essential debugging utilities for C# - Python-style repr(), caller info, and object inspection tools. Stop struggling with useless ToString() output!</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
