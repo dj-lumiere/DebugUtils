@@ -3,10 +3,9 @@ using System.Numerics;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Numeric;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int),
     typeof(uint), typeof(long), typeof(ulong), typeof(BigInteger)

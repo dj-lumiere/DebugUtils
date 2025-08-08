@@ -1,9 +1,8 @@
 using System.Reflection;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Generic;
+namespace DebugUtils.Repr.Formatters;
 
 /// <summary>
 ///     A generic formatter for any record type.

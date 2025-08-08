@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Numerics;
-using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Numeric;
+namespace DebugUtils.Repr.Formatters;
 
 internal static class FloatExtensions
 {

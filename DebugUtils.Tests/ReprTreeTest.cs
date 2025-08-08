@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr;
-using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Tests;
 

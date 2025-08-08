@@ -7,7 +7,7 @@ namespace DebugUtils.CallStack;
 /// Provides utilities for inspecting the call stack and retrieving caller information.
 /// Useful for debugging, logging, and diagnostic purposes.
 /// </summary>
-public class CallStack
+public static class CallStack
 {
     /// <summary>
     /// Retrieves information about the calling method using stack trace inspection.

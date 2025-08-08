@@ -2,12 +2,10 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
-using DebugUtils.Repr.Formatters.Generic;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Standard;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprOptions(needsPrefix: false)]
 internal class TypeFormatter : IReprFormatter, IReprTreeFormatter

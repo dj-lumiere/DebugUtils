@@ -2,10 +2,9 @@
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Functions;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(Delegate))]
 [ReprOptions(needsPrefix: false)]

@@ -3,10 +3,9 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Generic;
+namespace DebugUtils.Repr.Formatters;
 
 /// <summary>
 ///     The default object pointer that handles any type not specifically registered.

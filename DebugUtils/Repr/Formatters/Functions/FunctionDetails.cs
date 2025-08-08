@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Functions;
+namespace DebugUtils.Repr.Formatters;
 
 internal readonly struct FunctionDetails
 {

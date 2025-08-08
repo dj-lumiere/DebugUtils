@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace DebugUtils.Repr.Formatters.Numeric;
+namespace DebugUtils.Repr.Formatters;
 
 internal static class DecimalExtensions
 {

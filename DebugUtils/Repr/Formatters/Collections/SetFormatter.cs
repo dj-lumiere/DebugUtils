@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Collections;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprOptions(needsPrefix: true)]
 internal class SetFormatter : IReprFormatter

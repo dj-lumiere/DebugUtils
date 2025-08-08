@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Records;
+﻿namespace DebugUtils.Repr;
 
 /// <summary>
 /// Specifies how floating-point numbers should be represented in object representations.

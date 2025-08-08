@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using DebugUtils.Repr.Attributes;
-using DebugUtils.Repr.Records;
 
 namespace DebugUtils.Repr.TypeHelpers;
 

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Nodes;
-using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Collections;
+namespace DebugUtils.Repr.Formatters;
 
 internal static class ArrayExtensions
 {

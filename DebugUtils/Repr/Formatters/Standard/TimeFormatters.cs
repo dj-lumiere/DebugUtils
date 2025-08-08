@@ -1,9 +1,8 @@
 ﻿using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 
-namespace DebugUtils.Repr.Formatters.Standard;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(DateTime))]
 [ReprOptions(needsPrefix: true)]

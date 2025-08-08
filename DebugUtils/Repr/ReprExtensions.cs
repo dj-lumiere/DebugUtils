@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr;

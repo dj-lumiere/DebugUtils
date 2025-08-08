@@ -3,10 +3,9 @@ using System.Text;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
-using DebugUtils.Repr.Records;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters.Standard;
+namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(string))]
 [ReprOptions(needsPrefix: false)]

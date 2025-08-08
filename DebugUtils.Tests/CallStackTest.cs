@@ -1,11 +1,12 @@
 namespace DebugUtils.Tests;
+using CallStack;
 
 public class CallStackTest
 {
     [Fact]
     public void TestGetCallerName_Basic()
     {
-        var callerName = CallStack.CallStack.GetCallerName();
+        var callerName = CallStack.GetCallerName();
         Assert.Equal(expected: "CallStackTest.TestGetCallerName_Basic",
             actual: callerName);
     }
@@ -14,7 +15,7 @@ public class CallStackTest
     {
         public string GetCallerNameFromNested()
         {
-            return CallStack.CallStack.GetCallerName();
+            return CallStack.GetCallerName();
         }
     }
 
@@ -30,7 +31,7 @@ public class CallStackTest
     [Fact]
     public void TestGetCallerName_FromLambda()
     {
-        var lambdaCaller = new Func<string>(CallStack.CallStack.GetCallerName);
+        var lambdaCaller = new Func<string>(CallStack.GetCallerName);
         var callerName = lambdaCaller();
         // The exact name for lambda can vary based on compiler, but it should contain the test method name
         Assert.Equal(expected: "CallStackTest.TestGetCallerName_FromLambda",
@@ -40,7 +41,7 @@ public class CallStackTest
     [Fact]
     public void TestGetCallerInfo_Basic()
     {
-        var callerInfo = CallStack.CallStack.GetCallerInfo();
+        var callerInfo = CallStack.GetCallerInfo();
         Assert.Equal(expected: "CallStackTest.TestGetCallerInfo_Basic@CallStackTest.cs:43:9",
             actual: callerInfo.ToString());
     }

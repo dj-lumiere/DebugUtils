@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Records;
+﻿namespace DebugUtils.Repr;
 
 /// <summary>
 /// Represents the context for managing the representation process within the system.
