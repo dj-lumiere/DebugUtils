@@ -34,7 +34,7 @@ internal class FunctionFormatter : IReprFormatter, IReprTreeFormatter
             {
                 [propertyName: "type"] = "Function",
                 [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = true,
+                [propertyName: "maxDepthReached"] = "true",
                 [propertyName: "depth"] = context.Depth
             };
         }
@@ -86,8 +86,15 @@ internal class FunctionDetailsFormatter : IReprFormatter, IReprTreeFormatter
             value: details.ReturnTypeReprName);
         result.Add(propertyName: "modifiers",
             value: details.Modifiers.FormatAsJsonNode(context: context.WithIncrementedDepth()));
-        result.Add(propertyName: "parameters",
-            value: details.Parameters.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+        var parameters = new JsonArray();
+        foreach (var parameter in details.Parameters)
+        {
+            parameters.Add(
+                value: parameter.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+        }
+
+        result.Add(propertyName: "parameters", value: parameters);
+
         return result;
     }
 }
@@ -117,7 +124,7 @@ internal class MethodModifiersFormatter : IReprFormatter, IReprTreeFormatter
             {
                 [propertyName: "type"] = type.GetReprTypeName(),
                 [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = true,
+                [propertyName: "maxDepthReached"] = "true",
                 [propertyName: "depth"] = context.Depth
             };
         }
