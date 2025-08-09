@@ -2,6 +2,7 @@
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Interfaces;
+using DebugUtils.Repr.Models;
 using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters;

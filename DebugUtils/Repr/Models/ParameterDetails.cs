@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters;
+namespace DebugUtils.Repr.Models;
 
 internal readonly struct ParameterDetails
 {

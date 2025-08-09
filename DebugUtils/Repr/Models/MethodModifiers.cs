@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace DebugUtils.Repr.Formatters;
+namespace DebugUtils.Repr.Models;
 
 internal readonly struct MethodModifiers
 {

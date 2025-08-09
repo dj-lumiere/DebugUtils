@@ -1,4 +1,4 @@
-﻿namespace DebugUtils.Repr.Formatters;
+﻿namespace DebugUtils.Repr.Models;
 
 internal enum FloatTypeKind
 {

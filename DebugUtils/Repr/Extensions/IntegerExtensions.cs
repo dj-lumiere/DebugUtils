@@ -2,7 +2,7 @@
 using System.Text;
 using DebugUtils.Repr.TypeHelpers;
 
-namespace DebugUtils.Repr.Formatters;
+namespace DebugUtils.Repr.Extensions;
 
 internal static class IntegerExtensions
 {

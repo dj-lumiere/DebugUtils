@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace DebugUtils.Repr.Formatters;
+namespace DebugUtils.Repr.Extensions;
 
 internal static class ArrayExtensions
 {
