@@ -1,17 +1,20 @@
 # Changelog
 
+## [v1.2.4] Released at 2025.08.09
+### 📋 Changes
+- ArrayExtensions, DecimalExtensions, FloatExtensions, IntegerExtensions - changed to `DebugUtils.Repr.Extensions` 
+  namespace
+- FloatInfo, FloatSpec, FunctionDetails, MethodModifiers, ParameterDetails - changed to `DebugUtils.Repr.Models` 
+  namespace
+- Fixed Repr documentation to correctly reflect the outcome and added formatting to separate code blocks
+
 ## [v1.2.3] Released at 2025.08.08
 
 ### 📋 Breaking Changes
 
 - **BREAKING**: Simplified namespace structure for cleaner API
-    - **CallStack**:
-        - `DebugUtils.CallStack.CallStack` → `DebugUtils.CallStack`
     - **Repr**:
-        - `DebugUtils.Repr.Repr` → `DebugUtils.Repr`
-        - `DebugUtils.Repr.Repr.Formatters.*` → `DebugUtils.Repr.Formatters`
-        - `DebugUtils.Repr.Repr.Attributes` → `DebugUtils.Repr.Attributes`
-        - `DebugUtils.Repr.Repr.Interfaces` → `DebugUtils.Repr.Interfaces`
+        - `DebugUtils.Repr.Formatters.*` → `DebugUtils.Repr.Formatters`
         - All other sub-namespaces simplified similarly
     - **Moved core types to main namespace**:
         - `ReprConfig` and `ReprContext` moved from `DebugUtils.Repr.Records` to `DebugUtils.Repr`
