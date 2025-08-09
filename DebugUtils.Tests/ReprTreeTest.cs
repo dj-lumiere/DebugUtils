@@ -1678,13 +1678,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("internal"),
             node2: props[propertyName: "modifiers"]));
-        var parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
-            node2: parameters[propertyName: "dimensions"]!));
-        Assert.NotNull(@object: parameters[propertyName: "value"]);
-        var parameterArray = parameters[propertyName: "value"]!.AsArray();
+        var parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -1706,13 +1700,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("public", "static"),
             node2: props[propertyName: "modifiers"]));
-        parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(2),
-            node2: parameters[propertyName: "dimensions"]!));
-        Assert.NotNull(@object: parameters[propertyName: "value"]);
-        parameterArray = parameters[propertyName: "value"]!.AsArray();
+        parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Equal(expected: 2, actual: parameterArray.Count);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -1742,13 +1730,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("internal", "static"),
             node2: props[propertyName: "modifiers"]));
-        parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
-            node2: parameters[propertyName: "dimensions"]!));
-        Assert.NotNull(@object: parameters[propertyName: "value"]);
-        parameterArray = parameters[propertyName: "value"]!.AsArray();
+        parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -1770,12 +1752,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("private", "generic"),
             node2: props[propertyName: "modifiers"]));
-        parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
-            node2: parameters[propertyName: "dimensions"]!));
-        parameterArray = parameters[propertyName: "value"]!.AsArray();
+        parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "short", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -1797,12 +1774,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("private", "static"),
             node2: props[propertyName: "modifiers"]));
-        parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(2),
-            node2: parameters[propertyName: "dimensions"]!));
-        parameterArray = parameters[propertyName: "value"]!.AsArray();
+        parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Equal(expected: 2, actual: parameterArray.Count);
         Assert.Equal(expected: "ref int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -1832,12 +1804,7 @@ public class ReprTreeTest
           ?.ToString());
         Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray("private", "async"),
             node2: props[propertyName: "modifiers"]));
-        parameters = props[propertyName: "parameters"]!.AsObject();
-        Assert.Equal(expected: "1DArray", actual: parameters[propertyName: "type"]
-          ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: new JsonArray(1),
-            node2: parameters[propertyName: "dimensions"]!));
-        parameterArray = parameters[propertyName: "value"]!.AsArray();
+        parameterArray = props[propertyName: "parameters"]!.AsArray();
         Assert.Single(collection: parameterArray);
         Assert.Equal(expected: "int", actual: parameterArray[index: 0]![propertyName: "type"]
           ?.ToString());
@@ -2047,5 +2014,19 @@ public class ReprTreeTest
         Assert.Equal(expected: 6, actual: secretNode[propertyName: "length"]!.GetValue<int>());
         Assert.Equal(expected: "secret", actual: secretNode[propertyName: "value"]
           ?.ToString());
+    }
+
+    [Fact]
+    public void TestReprTree_WithFloats()
+    {
+        var a = new { x = 3.14f, y = 2.71f };
+        var actualJson = JsonNode.Parse(json: a.ReprTree())!;
+        Assert.Equal(expected: "Anonymous", actual: actualJson[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: "3.14", actual: actualJson[propertyName: "x"]?["value"]);
+        Assert.Equal(expected: "2.71", actual: actualJson[propertyName: "y"]?["value"]);
     }
 }

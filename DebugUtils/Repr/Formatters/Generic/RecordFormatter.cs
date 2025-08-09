@@ -13,6 +13,8 @@ internal class RecordFormatter : IReprFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
@@ -20,7 +22,6 @@ internal class RecordFormatter : IReprFormatter
 
         var type = obj.GetType();
         var parts = new List<string>();
-        context = context.WithContainerConfig();
 
         // Get public properties with getters
         var properties = type

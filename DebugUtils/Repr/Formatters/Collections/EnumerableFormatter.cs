@@ -13,6 +13,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
@@ -20,8 +22,6 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 
         var list = (IEnumerable)obj;
         var type = list.GetType();
-        // Apply container defaults if configured
-        context = context.WithContainerConfig();
 
         var items = new List<string>();
         int? itemCount = null;
@@ -68,6 +68,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
         var list = (IEnumerable)obj;
         var type = list.GetType();
         int? itemCount = null;

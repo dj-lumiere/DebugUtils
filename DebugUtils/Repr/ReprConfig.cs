@@ -507,7 +507,7 @@ public record ReprConfig(
     public static ReprConfig GlobalDefaults => new(
         FloatMode: FloatReprMode.Exact,
         FloatPrecision: -1,
-        ContainerReprMode: ContainerReprMode.UseDefaultConfig,
+        ContainerReprMode: ContainerReprMode.UseSimpleFormats,
         IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious,
         ShowNonPublicProperties: false,

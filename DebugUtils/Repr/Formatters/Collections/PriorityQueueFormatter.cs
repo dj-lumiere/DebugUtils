@@ -12,6 +12,8 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
@@ -20,9 +22,6 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         var countProperty = type.GetProperty(name: "Count");
         var count = (int)(countProperty?.GetValue(obj: obj) ?? 0);
-
-        // Apply container defaults if configured
-        context = context.WithContainerConfig();
 
         var unorderedItemsProperty = type.GetProperty(name: "UnorderedItems");
         var unorderedItems = (IEnumerable)unorderedItemsProperty!.GetValue(obj: obj)!;
@@ -70,6 +69,8 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
         var type = obj.GetType();
         var countProperty = type.GetProperty(name: "Count");
         var count = (int)(countProperty?.GetValue(obj: obj) ?? 0);

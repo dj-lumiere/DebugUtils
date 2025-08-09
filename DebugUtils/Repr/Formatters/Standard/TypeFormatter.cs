@@ -35,6 +35,8 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
     {
         var typeObject = (Type)obj;
         var type = typeObject.GetType();
+        // Apply container defaults if configured
+        context = context.WithContainerConfig();
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {

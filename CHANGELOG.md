@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.5] Released at 2025.08.09
+
+### 📋 Breaking Changes
+- Container types use Container type default even in global setting mode (which is `ContainerMode.UseSimpleFormat`)
+- Function parameter type doesn't nest itself and should go straight down to parameter type info itself
+
 ## [v1.2.4] Released at 2025.08.09
 ### 📋 Changes
 - ArrayExtensions, DecimalExtensions, FloatExtensions, IntegerExtensions - changed to `DebugUtils.Repr.Extensions` 
