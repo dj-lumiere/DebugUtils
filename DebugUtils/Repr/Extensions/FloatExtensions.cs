@@ -34,7 +34,9 @@ internal static class FloatExtensions
             IsNegativeInfinity: Half.IsNegativeInfinity(value: value),
             IsQuietNaN: Half.IsNaN(value: value) && (bits & halfSpec.MantissaMsbMask) != 0,
             IsSignalingNaN: Half.IsNaN(value: value) && (bits & halfSpec.MantissaMsbMask) == 0,
-            RealExponent: rawExponent - halfSpec.ExpOffset,
+            RealExponent: rawExponent - halfSpec.ExpOffset + (rawExponent == 0
+                ? 1
+                : 0),
             Mantissa: mantissa,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
@@ -61,7 +63,9 @@ internal static class FloatExtensions
             IsNegativeInfinity: Single.IsNegativeInfinity(f: value),
             IsQuietNaN: Single.IsNaN(f: value) && (bits & floatSpec.MantissaMsbMask) != 0,
             IsSignalingNaN: Single.IsNaN(f: value) && (bits & floatSpec.MantissaMsbMask) == 0,
-            RealExponent: rawExponent - floatSpec.ExpOffset,
+            RealExponent: rawExponent - floatSpec.ExpOffset + (rawExponent == 0
+                ? 1
+                : 0),
             Mantissa: mantissa,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
@@ -87,7 +91,9 @@ internal static class FloatExtensions
             IsNegativeInfinity: Double.IsNegativeInfinity(d: value),
             IsQuietNaN: Double.IsNaN(d: value) && (bits & doubleSpec.MantissaMsbMask) != 0,
             IsSignalingNaN: Double.IsNaN(d: value) && (bits & doubleSpec.MantissaMsbMask) == 0,
-            RealExponent: rawExponent - doubleSpec.ExpOffset,
+            RealExponent: rawExponent - doubleSpec.ExpOffset + (rawExponent == 0
+                ? 1
+                : 0),
             Mantissa: mantissa,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
