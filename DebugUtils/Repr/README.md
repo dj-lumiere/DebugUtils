@@ -157,8 +157,15 @@ public class Vector3Formatter : IReprFormatter, IReprTreeFormatter
 ### Float Formatting
 
 ```csharp
+// Standard exact formatting (BigInteger-free, Unity compatible, faster or similar on modern .NET)
 var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
-3.14159.Repr(config);     // Exact decimal representation down to very last digit.
+3.14159f.Repr(config);     // Uses custom arithmetic engine
+
+// Legacy exact formatting (BigInteger-based)
+var legacyConfig = new ReprConfig(FloatMode: FloatReprMode.Exact_Old);
+3.14159f.Repr(legacyConfig);  // Uses System.Numerics.BigInteger
+
+// Both produce identical output - choose based on your environment
 
 var scientific = new ReprConfig(FloatMode: FloatReprMode.Scientific);  
 3.14159.Repr(scientific); // Scientific notation

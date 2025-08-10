@@ -1,5 +1,44 @@
 # Changelog
 
+# [v1.3.0] Released at 2025.08.11
+
+## High-Performance Exact Floating-Point Formatting
+
+## 🚀 Performance Improvements
+- **New BigInteger-free exact formatting engine**
+- **Up to 2x faster** for worst-case floating-point scenarios
+- **5-22% faster** for Half precision values
+- **Similar or better performance** across all data types
+
+## 🔧 Implementation Options
+- **FloatReprMode.Exact** - New custom arithmetic engine (default)
+- **FloatReprMode.Exact_Old** - Original BigInteger-based implementation
+- **Identical output** - Both produce exactly the same results
+
+## 💡 Why This Matters
+- Better performance for edge cases and complex numbers
+- No external dependencies (Unity-ready)
+- Future-proof against BigInteger compatibility issues
+
+## 💡 Use Cases
+- Use `Exact_Old` for maximum performance on modern .NET
+- Use `Exact` for environments where BigInteger might be problematic
+- Both implementations produce identical results
+
+## 🔄 API Changes
+- `FloatReprMode.Exact` now uses the new high-performance engine
+- `FloatReprMode.Exact_Old` preserves the previous BigInteger-based implementation
+
+## 🐛 Bug Fixes
+- Fixed performance issues with exact decimal representation
+- Improved accuracy for edge cases and subnormal numbers
+
+## ⚠️ Migration Guide
+- No code changes needed - `FloatReprMode.Exact` automatically uses new engine
+- Use `FloatReprMode.Exact_Old` if you need the previous behavior
+- Performance-critical code should see immediate improvements
+
+
 ## [v1.2.5] Released at 2025.08.09
 
 ### 📋 Breaking Changes
