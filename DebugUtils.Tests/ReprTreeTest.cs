@@ -1217,7 +1217,7 @@ public class ReprTreeTest
             node1: new JsonObject
             {
                 [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2.0E2"
+                [propertyName: "value"] = "200"
             },
             node2: tempSetting[propertyName: "value"]));
 
@@ -1230,7 +1230,7 @@ public class ReprTreeTest
             node1: new JsonObject
             {
                 [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3.0E1"
+                [propertyName: "value"] = "30"
             },
             node2: speedSetting[propertyName: "value"]));
     }
@@ -2026,7 +2026,11 @@ public class ReprTreeTest
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
           ?.ToString());
         Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
-        Assert.Equal(expected: "3.14", actual: actualJson[propertyName: "x"]?["value"]);
-        Assert.Equal(expected: "2.71", actual: actualJson[propertyName: "y"]?["value"]);
+        Assert.Equal(expected: "3.14",
+            actual: actualJson[propertyName: "x"]?[propertyName: "value"]
+              ?.ToString());
+        Assert.Equal(expected: "2.71",
+            actual: actualJson[propertyName: "y"]?[propertyName: "value"]
+              ?.ToString());
     }
 }
