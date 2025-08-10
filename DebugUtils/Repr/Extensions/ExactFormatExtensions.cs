@@ -133,7 +133,6 @@ internal static class ExactFormatExtensions
         }
 
         var numeratorStr = sb.ToString();
-        Console.WriteLine(value: numeratorStr);
         var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
         var integerPart = numeratorStr[..1];
         var fractionalPart = numeratorStr[1..]
@@ -208,7 +207,6 @@ internal static class ExactFormatExtensions
         }
 
         var numeratorStr = sb.ToString();
-        Console.WriteLine(value: numeratorStr);
         var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
         var integerPart = numeratorStr[..1];
         var fractionalPart = numeratorStr[1..]
