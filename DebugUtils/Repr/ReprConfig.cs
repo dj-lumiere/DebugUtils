@@ -22,6 +22,20 @@ public enum FloatReprMode
     /// Shows the true decimal value of the floating-point number.
     /// </summary>
     /// <remarks>
+    /// This config is outdated due to BigInteger dependency and performance reasons. Use Exact instead.
+    /// Useful for debugging precision issues and understanding exact floating-point values.
+    /// May produce very long decimal representations for some values.
+    /// </remarks>
+    /// <example>
+    /// 3.14f → "3.1400001049041748046875E0"
+    /// </example>
+    Exact_Old,
+
+    /// <summary>
+    /// Exact decimal representation without rounding or approximation.
+    /// Shows the true decimal value of the floating-point number.
+    /// </summary>
+    /// <remarks>
     /// Useful for debugging precision issues and understanding exact floating-point values.
     /// May produce very long decimal representations for some values.
     /// </remarks>

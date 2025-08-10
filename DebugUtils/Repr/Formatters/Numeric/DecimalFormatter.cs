@@ -44,6 +44,7 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
                 $"{dec.ToString(format: "F" + (config.FloatPrecision > 0 ? config.FloatPrecision : 0))}",
             FloatReprMode.Scientific =>
                 $"{dec.ToString(format: "E" + (config.FloatPrecision > 0 ? config.FloatPrecision - 1 : 0))}",
+            FloatReprMode.Exact_Old => $"{dec.FormatAsExact_Old()}",
             FloatReprMode.Exact => $"{dec.FormatAsExact()}",
             FloatReprMode.General => $"{dec}",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")

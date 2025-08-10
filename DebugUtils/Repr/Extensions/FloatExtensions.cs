@@ -163,7 +163,7 @@ internal static class FloatExtensions
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
-    public static string FormatAsExact(this object obj, FloatInfo info)
+    public static string FormatAsExact_Old(this object obj, FloatInfo info)
     {
         var realExponent = info.RealExponent - info.Spec.MantissaBitSize;
         var significand = info.Significand;
@@ -200,6 +200,22 @@ internal static class FloatExtensions
         var fractionalPart = numeratorStr.Substring(startIndex: 1)
                                          .TrimEnd(trimChar: '0')
                                          .PadLeft(totalWidth: 1, paddingChar: '0');
+
         return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
+    }
+    public static string FormatAsExact(this object obj, FloatInfo info)
+    {
+        return info.TypeName switch
+        {
+            #if NET5_0_OR_GREATER
+            FloatTypeKind.Half =>
+                info.FormatHalfAsExact(),
+            #endif
+            FloatTypeKind.Float =>
+                info.FormatFloatAsExact(),
+            FloatTypeKind.Double =>
+                info.FormatDoubleAsExact(),
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
+        };
     }
 }
