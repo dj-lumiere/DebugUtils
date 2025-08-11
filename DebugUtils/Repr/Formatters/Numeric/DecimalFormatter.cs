@@ -40,13 +40,14 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
                 $"0x{flags:X8}{hi:X8}{mid:X8}{lo:X8}",
             FloatReprMode.BitField =>
                 $"{(isNegative ? 1 : 0)}|{scaleBits}|{hiBits}{midBits}{loBits}",
-            FloatReprMode.Round =>
-                $"{dec.ToString(format: "F" + (config.FloatPrecision > 0 ? config.FloatPrecision : 0))}",
-            FloatReprMode.Scientific =>
-                $"{dec.ToString(format: "E" + (config.FloatPrecision > 0 ? config.FloatPrecision - 1 : 0))}",
             FloatReprMode.Exact_Old => $"{dec.FormatAsExact_Old()}",
             FloatReprMode.Exact => $"{dec.FormatAsExact()}",
             FloatReprMode.General => $"{dec}",
+            _ when config.FloatPrecision is < 0 or >= 100 => $"{dec.FormatAsExact()}",
+            FloatReprMode.Round =>
+                $"{dec.ToString(format: $"F{config.FloatPrecision}")}",
+            FloatReprMode.Scientific =>
+                $"{dec.ToString(format: $"E{config.FloatPrecision}")}",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
         };
     }

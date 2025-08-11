@@ -10,66 +10,66 @@ public class ExactFormatTest
     [Fact]
     public void TestDecimal_Exact_Normal()
     {
-        Assert.Contains(expectedSubstring: "1.0E0",
+        Assert.Contains(expectedSubstring: "1.0E+000",
             actualString: 1.0m.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "-1.0E0",
+        Assert.Contains(expectedSubstring: "-1.0E+000",
             actualString: (-1.0m).Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "3.1415926535897932384626433833E0",
+        Assert.Contains(expectedSubstring: "3.1415926535897932384626433833E+000",
             actualString: 3.1415926535897932384626433833m.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "1.23456789E28",
+        Assert.Contains(expectedSubstring: "1.23456789E+028",
             actualString: 12345678900000000000000000000m.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "1.0E-28",
+        Assert.Contains(expectedSubstring: "1.0E-028",
             actualString: 0.0000000000000000000000000001m.Repr(config: OldExactConfig));
     }
 
     [Fact]
     public void TestDecimal_ExactBeta_Normal()
     {
-        Assert.Contains(expectedSubstring: "1.0E0",
+        Assert.Contains(expectedSubstring: "1.0E+000",
             actualString: 1.0m.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "-1.0E0",
+        Assert.Contains(expectedSubstring: "-1.0E+000",
             actualString: (-1.0m).Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "3.1415926535897932384626433833E0",
+        Assert.Contains(expectedSubstring: "3.1415926535897932384626433833E+000",
             actualString: 3.1415926535897932384626433833m.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "1.23456789E28",
+        Assert.Contains(expectedSubstring: "1.23456789E+028",
             actualString: 12345678900000000000000000000m.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "1.0E-28",
+        Assert.Contains(expectedSubstring: "1.0E-028",
             actualString: 0.0000000000000000000000000001m.Repr(config: NewExactConfig));
     }
 
     [Fact]
     public void TestDecimal_Exact_Zero()
     {
-        Assert.Contains(expectedSubstring: "0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E+000",
             actualString: 0.0m.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E+000",
             actualString: (-0.0m).Repr(config: OldExactConfig));
     }
 
     [Fact]
     public void TestDecimal_ExactBeta_Zero()
     {
-        Assert.Contains(expectedSubstring: "0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E+000",
             actualString: 0.0m.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E+000",
             actualString: (-0.0m).Repr(config: NewExactConfig));
     }
 
     [Fact]
     public void TestDecimal_Exact_MaxMin()
     {
-        Assert.Contains(expectedSubstring: "7.9228162514264337593543950335E28",
+        Assert.Contains(expectedSubstring: "7.9228162514264337593543950335E+028",
             actualString: Decimal.MaxValue.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "-7.9228162514264337593543950335E28",
+        Assert.Contains(expectedSubstring: "-7.9228162514264337593543950335E+028",
             actualString: Decimal.MinValue.Repr(config: OldExactConfig));
     }
 
     [Fact]
     public void TestDecimal_ExactBeta_MaxMin()
     {
-        Assert.Contains(expectedSubstring: "7.9228162514264337593543950335E28",
+        Assert.Contains(expectedSubstring: "7.9228162514264337593543950335E+028",
             actualString: Decimal.MaxValue.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "-7.9228162514264337593543950335E28",
+        Assert.Contains(expectedSubstring: "-7.9228162514264337593543950335E+028",
             actualString: Decimal.MinValue.Repr(config: NewExactConfig));
     }
 

@@ -7,18 +7,66 @@ internal enum FloatTypeKind
     Double
 }
 
-internal record FloatInfo(
+internal readonly record struct FloatInfo(
     FloatSpec Spec,
     long Bits,
-    bool IsNegative,
-    bool IsPositiveInfinity,
-    bool IsNegativeInfinity,
-    bool IsQuietNaN,
-    bool IsSignalingNaN,
     int RealExponent,
-    long Mantissa,
     ulong Significand,
-    string ExpBits,
-    string MantissaBits,
     FloatTypeKind TypeName
-);
+)
+{
+    public bool IsNegative => Bits < 0;
+
+    public long Mantissa => Bits & Spec.MantissaMask;
+
+    public string ExpBits => Convert
+                            .ToString(value: Bits >> Spec.MantissaBitSize & Spec.ExpMask,
+                                 toBase: 2)
+                            .PadLeft(totalWidth: Spec.ExpBitSize, paddingChar: '0');
+
+    public string MantissaBits => Convert.ToString(value: Mantissa, toBase: 2)
+                                         .PadLeft(totalWidth: Spec.MantissaBitSize,
+                                              paddingChar: '0');
+
+    public bool IsPositiveInfinity
+    {
+        get
+        {
+            var rawExponent = Bits >> Spec.MantissaBitSize & Spec.ExpMask;
+            var mantissa = Bits & Spec.MantissaMask;
+            return !IsNegative && rawExponent == Spec.ExpMask && mantissa == 0;
+        }
+    }
+
+    public bool IsNegativeInfinity
+    {
+        get
+        {
+            var rawExponent = Bits >> Spec.MantissaBitSize & Spec.ExpMask;
+            var mantissa = Bits & Spec.MantissaMask;
+            return IsNegative && rawExponent == Spec.ExpMask && mantissa == 0;
+        }
+    }
+
+    public bool IsQuietNaN
+    {
+        get
+        {
+            var rawExponent = Bits >> Spec.MantissaBitSize & Spec.ExpMask;
+            var mantissa = Bits & Spec.MantissaMask;
+            return rawExponent == Spec.ExpMask && mantissa != 0 &&
+                   (Bits & Spec.MantissaMsbMask) != 0;
+        }
+    }
+
+    public bool IsSignalingNaN
+    {
+        get
+        {
+            var rawExponent = Bits >> Spec.MantissaBitSize & Spec.ExpMask;
+            var mantissa = Bits & Spec.MantissaMask;
+            return rawExponent == Spec.ExpMask && mantissa != 0 &&
+                   (Bits & Spec.MantissaMsbMask) == 0;
+        }
+    }
+};
