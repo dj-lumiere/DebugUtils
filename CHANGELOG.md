@@ -1,5 +1,16 @@
 # Changelog
 
+# [v1.3.2] Released at 2025-08-11
+
+## ✨ Enhanced Consistency
+- All exact representations (Half, Float, Double, Decimal) now use consistent `E+/-YYY` notation
+- Format now matches .NET scientific notation conventions (`ToString("E")` style)
+
+## ⚙️ Configuration Changes
+- **FloatPrecision in Scientific mode**: Now represents digits after decimal point (matching C# `ToString("E")` behavior)
+- **Precision values 100+**: Redirect to exact representation (avoids C# formatting limitations)
+- **Precision value negative**: Redirects to exact representation for unlimited precision
+
 # [v1.3.1] Released at 2025.08.11
 ## 🚀 Performance Improvements
 - The current exact float representation engine improved by ~10%
