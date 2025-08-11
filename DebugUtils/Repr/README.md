@@ -70,9 +70,9 @@ new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
 // You can now recognize the real floating point value
 // and find what went wrong when doing arithmetics!
 (0.1 + 0.2).Repr()                            
-// double(3.00000000000000444089209850062616169452667236328125E-1)
+// double(3.00000000000000444089209850062616169452667236328125E-001)
 0.3.Repr()                                    
-// double(2.99999999999999988897769753748434595763683319091796875E-1)
+// double(2.99999999999999988897769753748434595763683319091796875E-001)
 
 (0.1 + 0.2).Repr(new ReprConfig(FloatMode: FloatReprMode.General))
 // double(0.30000000000000004)
