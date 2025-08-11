@@ -203,19 +203,4 @@ internal static class FloatExtensions
 
         return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
     }
-    public static string FormatAsExact(this object obj, FloatInfo info)
-    {
-        return info.TypeName switch
-        {
-            #if NET5_0_OR_GREATER
-            FloatTypeKind.Half =>
-                info.FormatHalfAsExact(),
-            #endif
-            FloatTypeKind.Float =>
-                info.FormatFloatAsExact(),
-            FloatTypeKind.Double =>
-                info.FormatDoubleAsExact(),
-            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
-        };
-    }
 }
