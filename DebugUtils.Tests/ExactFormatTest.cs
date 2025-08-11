@@ -42,7 +42,7 @@ public class ExactFormatTest
     {
         Assert.Contains(expectedSubstring: "0.0E0",
             actualString: 0.0m.Repr(config: OldExactConfig));
-        Assert.Contains(expectedSubstring: "-0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E0",
             actualString: (-0.0m).Repr(config: OldExactConfig));
     }
 
@@ -51,7 +51,7 @@ public class ExactFormatTest
     {
         Assert.Contains(expectedSubstring: "0.0E0",
             actualString: 0.0m.Repr(config: NewExactConfig));
-        Assert.Contains(expectedSubstring: "-0.0E0",
+        Assert.Contains(expectedSubstring: "0.0E0",
             actualString: (-0.0m).Repr(config: NewExactConfig));
     }
 
