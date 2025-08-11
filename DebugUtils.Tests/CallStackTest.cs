@@ -1,4 +1,5 @@
 namespace DebugUtils.Tests;
+
 using CallStack;
 
 public class CallStackTest

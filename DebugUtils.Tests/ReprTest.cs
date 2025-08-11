@@ -112,11 +112,12 @@ public class ReprTest
         Assert.Equal(expected: "int(0b101010)",
             actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Binary)));
 
-        Assert.Equal(expected: "double(3.000000000000000444089209850062616169452667236328125E-1)",
+        Assert.Equal(
+            expected: "double(3.000000000000000444089209850062616169452667236328125E-001)",
             actual: (0.1 + 0.2)
            .Repr());
         Assert.Equal(
-            expected: "double(2.99999999999999988897769753748434595763683319091796875E-1)",
+            expected: "double(2.99999999999999988897769753748434595763683319091796875E-001)",
             actual: 0.3.Repr());
         Assert.Equal(expected: "double(0.30000000000000004)",
             actual: (0.1 + 0.2)
@@ -141,7 +142,7 @@ public class ReprTest
 
         var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
         var f = 3.14f;
-        Assert.Equal(expected: "float(3.1400001049041748046875E0)",
+        Assert.Equal(expected: "float(3.1400001049041748046875E+000)",
             actual: f.Repr(config: config));
 
         int? nullable = 123;
@@ -249,7 +250,7 @@ public class ReprTest
     public void TestFloatRepr_Exact()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
-        Assert.Equal(expected: "float(3.1415927410125732421875E0)", actual: Single
+        Assert.Equal(expected: "float(3.1415927410125732421875E+000)", actual: Single
            .Parse(s: "3.1415926535")
            .Repr(config: config));
     }
@@ -266,8 +267,8 @@ public class ReprTest
     public void TestHalfRepr_Scientific()
     {
         var config = new ReprConfig(FloatMode: FloatReprMode.Scientific, FloatPrecision: 5);
-        Assert.Equal(expected: "Half(3.1406E+000)", actual: Half.Parse(s: "3.14159")
-                                                                .Repr(config: config));
+        Assert.Equal(expected: "Half(3.14062E+000)", actual: Half.Parse(s: "3.14159")
+           .Repr(config: config));
     }
 
     [Fact]

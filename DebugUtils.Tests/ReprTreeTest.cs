@@ -337,7 +337,7 @@ public class ReprTreeTest
         {
             [propertyName: "type"] = "float",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "3.1415927410125732421875E0"
+            [propertyName: "value"] = "3.1415927410125732421875E+000"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
@@ -367,7 +367,7 @@ public class ReprTreeTest
         {
             [propertyName: "type"] = "Half",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "3.1406E+000"
+            [propertyName: "value"] = "3.14062E+000"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
