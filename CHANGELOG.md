@@ -1,5 +1,15 @@
 # Changelog
 
+# [v1.3.1] Released at 2025.08.11
+## 🚀 Performance Improvements
+- The current exact float representation engine improved by ~10%
+
+## 🔧 Fixes & Changes
+- Decimal zero sign handling normalized (both engines now show positive zero)
+
+## ⚠️ Breaking Changes
+- Exact representation of decimal zero now always shows positive sign (was inconsistent)
+
 # [v1.3.0] Released at 2025.08.11
 
 ## High-Performance Exact Floating-Point Formatting
@@ -30,8 +40,7 @@
 - `FloatReprMode.Exact_Old` preserves the previous BigInteger-based implementation
 
 ## 🐛 Bug Fixes
-- Fixed performance issues with exact decimal representation
-- Improved accuracy for edge cases and subnormal numbers
+- Exact representation now correctly handles subnormal numbers
 
 ## ⚠️ Migration Guide
 - No code changes needed - `FloatReprMode.Exact` automatically uses new engine
