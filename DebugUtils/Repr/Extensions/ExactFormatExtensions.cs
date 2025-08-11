@@ -7,7 +7,6 @@ namespace DebugUtils.Repr.Extensions;
 internal static class ExactFormatExtensions
 {
     private const ulong Base = 1000000000;
-    private static readonly uint[] Digits = new uint[90];
 
     private static readonly ulong[] PowersOf5 =
     {
@@ -15,156 +14,36 @@ internal static class ExactFormatExtensions
         1220703125, 6103515625ul, 30517578125ul, 152587890625ul
     };
 
-    public static string FormatHalfAsExact(this FloatInfo info)
+    public static string FormatAsExact(this object obj, FloatInfo info)
     {
         var realExponent = info.RealExponent - info.Spec.MantissaBitSize;
         var significand = info.Significand;
         var isNegative = info.IsNegative;
-        var sign = isNegative
-            ? "-"
-            : "";
-        if (significand == 0)
+        switch (significand)
         {
-            return $"{sign}0.0E0";
+            case 0 when isNegative:
+                return "-0.0E0";
+            case 0:
+                return "0.0E0";
         }
 
         // Convert to exact decimal representation
-        int powerOf10Denominator;
-        var length = 1;
-        Digits[0] = (uint)significand;
-
-        if (realExponent >= 0)
+        var digits = info.TypeName switch
         {
-            powerOf10Denominator = 0;
-            length = Digits.ScalePow2(len: length, k: realExponent);
-        }
-        else
-        {
-            // We want enough decimal places to represent 1/2^(-binaryExponent) exactly
-            // Since 2^n × 5^n = 10^n, we need n = -binaryExponent decimal places
-            powerOf10Denominator = -realExponent;
-            length = Digits.ScalePow5(len: length, k: powerOf10Denominator);
-        }
-
-        // Now we have: numerator / 10^powerOf10Denominator
-        var sb = new StringBuilder();
-        for (var j = length - 1; j >= 0; j -= 1)
-        {
-            switch (sb.Length)
-            {
-                case 0 when Digits[j] == 0:
-                    continue;
-                case 0 when Digits[j] != 0:
-                    sb.Append(value: Digits[j]);
-                    break;
-                default:
-                    sb.Append(value: $"{Digits[j]:D9}");
-                    break;
-            }
-        }
-
-        if (sb.Length == 0)
-        {
-            sb.Append(value: '0');
-        }
-
-        var numeratorStr = sb.ToString();
-        var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
-        var integerPart = numeratorStr[..1];
-        var fractionalPart = numeratorStr[1..]
-                            .TrimEnd(trimChar: '0')
-                            .PadLeft(totalWidth: 1, paddingChar: '0');
-        return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
-    }
-
-    public static string FormatFloatAsExact(this FloatInfo info)
-    {
-        var realExponent = info.RealExponent - info.Spec.MantissaBitSize;
-        var significand = info.Significand;
-        var isNegative = info.IsNegative;
-        var sign = isNegative
-            ? "-"
-            : "";
-        if (significand == 0)
-        {
-            return $"{sign}0.0E0";
-        }
-
-        var length = 1;
-        Digits[0] = (uint)significand;
-
-        // Convert to exact decimal representation
-        int powerOf10Denominator;
-
-        if (realExponent >= 0)
-        {
-            powerOf10Denominator = 0;
-            length = Digits.ScalePow2(len: length, k: realExponent);
-        }
-        else
-        {
-            // We want enough decimal places to represent 1/2^(-binaryExponent) exactly
-            // Since 2^n × 5^n = 10^n, we need n = -binaryExponent decimal places
-            powerOf10Denominator = -realExponent;
-            length = Digits.ScalePow5(len: length, k: powerOf10Denominator);
-        }
-
-        // Now we have: numerator / 10^powerOf10Denominator
-
-        var sb = new StringBuilder();
-        for (var j = length - 1; j >= 0; j -= 1)
-        {
-            switch (sb.Length)
-            {
-                case 0 when Digits[j] == 0:
-                    continue;
-                case 0 when Digits[j] != 0:
-                    sb.Append(value: Digits[j]);
-                    break;
-                default:
-                    sb.Append(value: $"{Digits[j]:D9}");
-                    break;
-            }
-        }
-
-        if (sb.Length == 0)
-        {
-            sb.Append(value: '0');
-        }
-
-        var numeratorStr = sb.ToString();
-        var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
-        var integerPart = numeratorStr[..1];
-        var fractionalPart = numeratorStr[1..]
-                            .TrimEnd(trimChar: '0')
-                            .PadLeft(totalWidth: 1, paddingChar: '0');
-        return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
-    }
-
-    public static string FormatDoubleAsExact(this FloatInfo info)
-    {
-        var realExponent = info.RealExponent - info.Spec.MantissaBitSize;
-        var significand = info.Significand;
-        var isNegative = info.IsNegative;
-        var sign = isNegative
-            ? "-"
-            : "";
-        if (significand == 0)
-        {
-            return $"{sign}0.0E0";
-        }
-
-        // Convert to exact decimal representation
-
+            FloatTypeKind.Half => stackalloc uint[3],
+            FloatTypeKind.Float => stackalloc uint[14],
+            FloatTypeKind.Double => stackalloc uint[86],
+            _ => throw new ArgumentOutOfRangeException(nameof(info.TypeName))
+        };
         var (digit1, digit2) = (significand % Base, significand / Base);
         var length = 1;
         if (digit2 != 0)
         {
             length = 2;
-            Digits[1] = (uint)digit2;
+            digits[1] = (uint)digit2;
         }
 
-        Digits[0] = (uint)digit1;
+        digits[0] = (uint)digit1;
 
         // Convert to exact decimal representation
         int powerOf10Denominator;
@@ -172,51 +51,83 @@ internal static class ExactFormatExtensions
         if (realExponent >= 0)
         {
             powerOf10Denominator = 0;
-            length = Digits.ScalePow2(len: length, k: realExponent);
+            length = digits.ScalePow2(len: length, k: realExponent);
         }
         else
         {
             // We want enough decimal places to represent 1/2^(-binaryExponent) exactly
             // Since 2^n × 5^n = 10^n, we need n = -binaryExponent decimal places
             powerOf10Denominator = -realExponent;
-            length = Digits.ScalePow5(len: length, k: powerOf10Denominator);
+            length = digits.ScalePow5(len: length, k: powerOf10Denominator);
         }
 
 
         // Now we have: numerator / 10^powerOf10Denominator
 
-        var sb = new StringBuilder();
-        for (var j = length - 1; j >= 0; j -= 1)
+        var topDigits = digits[length - 1]
+           .DecimalLength();
+        var totalDigits = (length - 1) * 9 + topDigits;
+
+        var realPowerOf10 = totalDigits - powerOf10Denominator - 1;
+        var sb = new StringBuilder(totalDigits + 16);
+        if (isNegative)
         {
-            switch (sb.Length)
+            sb.Append('-');
+        }
+
+        Span<char> lastBuf = stackalloc char[topDigits];
+        var lastDigit = digits[length - 1];
+        for (var k = topDigits - 1; k >= 0; k -= 1)
+        {
+            lastBuf[k] = (char)('0' + (lastDigit % 10));
+            lastDigit /= 10;
+        }
+
+        sb.Append(lastBuf[0]); // first digit
+        sb.Append('.'); // decimal point
+        if (topDigits > 1)
+        {
+            sb.Append(lastBuf[1..]);
+        } // rest of top limb, if any
+
+        Span<char> buf = stackalloc char[9];
+        for (var i = length - 2; i >= 0; i -= 1)
+        {
+            var digit = digits[i];
+            for (var k = 8; k >= 0; k -= 1)
             {
-                case 0 when Digits[j] == 0:
-                    continue;
-                case 0 when Digits[j] != 0:
-                    sb.Append(value: Digits[j]);
-                    break;
-                default:
-                    sb.Append(value: $"{Digits[j]:D9}");
-                    break;
+                buf[k] = (char)('0' + digit % 10);
+                digit /= 10;
             }
+
+            sb.Append(buf);
         }
 
-        if (sb.Length == 0)
+        // after sign and first digit
+        var dotIndex = isNegative
+            ? 2
+            : 1;
+        var keep = sb.Length;
+        while (keep > dotIndex + 1 && sb[keep - 1] == '0')
         {
-            sb.Append(value: '0');
+            keep -= 1;
         }
 
-        var numeratorStr = sb.ToString();
-        var realPowerOf10 = numeratorStr.Length - powerOf10Denominator - 1;
-        var integerPart = numeratorStr[..1];
-        var fractionalPart = numeratorStr[1..]
-                            .TrimEnd(trimChar: '0')
-                            .PadLeft(totalWidth: 1, paddingChar: '0');
-        return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
+        sb.Length = keep;
+
+        if (sb.Length == dotIndex + 1)
+        {
+            sb.Append('0'); // if we have only one digit after the decimal point, add zero
+        }
+
+        sb.Append('E')
+          .Append(realPowerOf10);
+
+        return sb.ToString();
     }
 
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-    private static int MulBySmall(this uint[] d, int len, ulong factor)
+    private static int MulBySmall(this Span<uint> d, int len, ulong factor)
     {
         ulong carry = 0;
         for (var i = 0; i < len; i++)
@@ -237,7 +148,7 @@ internal static class ExactFormatExtensions
     }
 
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-    private static int ScalePow2(this uint[] a, int len, int k)
+    private static int ScalePow2(this Span<uint> a, int len, int k)
     {
         while (k >= 34)
         {
@@ -254,7 +165,7 @@ internal static class ExactFormatExtensions
     }
 
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-    private static int ScalePow5(this uint[] a, int len, int k)
+    private static int ScalePow5(this Span<uint> a, int len, int k)
     {
         while (k >= 14)
         {
@@ -268,5 +179,22 @@ internal static class ExactFormatExtensions
         }
 
         return len;
+    }
+
+    [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
+    private static int DecimalLength(this uint x)
+    {
+        return x switch
+        {
+            >= 100_000_000 => 9,
+            >= 10_000_000 => 8,
+            >= 1_000_000 => 7,
+            >= 100_000 => 6,
+            >= 10_000 => 5,
+            >= 1_000 => 4,
+            >= 100 => 3,
+            >= 10 => 2,
+            >= 0 => 1
+        };
     }
 }

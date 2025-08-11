@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DebugUtils.Repr.Extensions;
@@ -7,12 +8,13 @@ internal static class DecimalExtensions
 {
     private const uint Base = 1_000_000_000;
 
-    // 2^64/BASE = FIRST_QUOTIENT * 
-    private const ulong FirstQuotient = 18446744073ul;
-    private const ulong SecondQuotient = 4ul;
-    private const ulong FirstRemainder = 709551616ul;
-    private const ulong SecondRemainder = 294967296ul;
-    private static readonly uint[] Digits = new uint[] { 0, 0, 0, 0 };
+    // 2^64 = Q64 * BASE + R64
+    private const ulong Q64 = 18446744073ul;
+    private const ulong R64 = 709551616ul;
+
+    // 2^32 = Q32 * BASE + R32.
+    private const ulong Q32 = 4ul;
+    private const ulong R32 = 294967296ul;
     public static string FormatAsExact_Old(this decimal value)
     {
         // Get the internal bits
@@ -56,6 +58,7 @@ internal static class DecimalExtensions
         var flags = bits[3]; // Scale and sign
         var isNegative = (flags & 0x80000000) != 0;
         var scale = flags >> 16 & 0xFF; // How many digits after decimal
+        Span<uint> digits = stackalloc uint[4];
 
         var lo = (uint)bits[0]; // Low 32 bits of 96-bit integer
         var mid = (uint)bits[1]; // Middle 32 bits  
@@ -86,11 +89,11 @@ internal static class DecimalExtensions
         var d = mid % Base;
         var e = lo / Base;
         var f = lo % Base;
-        var firstRemainder = b * FirstRemainder + d * SecondRemainder + f;
+        var firstRemainder = b * R64 + d * R32 + f;
         var firstQuotientLower64Bit =
-            b * FirstQuotient + ((ulong)c << 32) + d * SecondQuotient + e + firstRemainder / Base;
+            b * Q64 + ((ulong)c << 32) + d * Q32 + e + firstRemainder / Base;
 
-        Digits[0] = (uint)(firstRemainder % Base);
+        digits[0] = (uint)(firstRemainder % Base);
         // The second stage is as follows.
         // (a*2^64+h*10^9+i)/10^9
         // = (a*(18,446,744,073*10^9+709,551,616)+h*10^9+i)/10^9
@@ -106,45 +109,92 @@ internal static class DecimalExtensions
 
         var h = firstQuotientLower64Bit / Base;
         var i = firstQuotientLower64Bit % Base;
-        var secondRemainder = a * FirstRemainder + i;
-        var secondQuotient = a * FirstQuotient + h + secondRemainder / Base;
-        Digits[1] = (uint)(secondRemainder % Base);
-        Digits[2] = (uint)(secondQuotient % Base);
+        var secondRemainder = a * R64 + i;
+        var secondQuotient = a * Q64 + h + secondRemainder / Base;
+        digits[1] = (uint)(secondRemainder % Base);
+        digits[2] = (uint)(secondQuotient % Base);
         secondQuotient /= Base;
-        Digits[3] = (uint)(secondQuotient % Base);
+        digits[3] = (uint)(secondQuotient % Base);
 
-        var sign = isNegative
-            ? "-"
-            : "";
-
-        if (value == 0)
+        int length = 4;
+        while (length > 1 && digits[length - 1] == 0)
         {
-            return $"{sign}0.0E0";
+            length -= 1;
         }
 
-        var sb = new StringBuilder();
-        for (var j = 3; j >= 0; j -= 1)
+        var topDigits = digits[length - 1]
+           .DecimalLength();
+        var totalDigits = (length - 1) * 9 + topDigits;
+
+        var realPowerOf10 = totalDigits - scale - 1;
+        var sb = new StringBuilder(totalDigits + 16);
+        if (isNegative)
         {
-            switch (sb.Length)
+            sb.Append('-');
+        }
+
+        Span<char> lastBuf = stackalloc char[topDigits];
+        var lastDigit = digits[length - 1];
+        for (var k = topDigits - 1; k >= 0; k -= 1)
+        {
+            lastBuf[k] = (char)('0' + (lastDigit % 10));
+            lastDigit /= 10;
+        }
+
+        sb.Append(lastBuf[0]); // first digit
+        sb.Append('.'); // decimal point
+        if (topDigits > 1) sb.Append(lastBuf[1..]); // rest of top limb, if any
+
+        Span<char> buf = stackalloc char[9];
+        for (var j = length - 2; j >= 0; j -= 1)
+        {
+            var digit = digits[j];
+            for (var k = 8; k >= 0; k -= 1)
             {
-                case 0 when Digits[j] == 0:
-                    continue;
-                case 0 when Digits[j] != 0:
-                    sb.Append(value: Digits[j]);
-                    break;
-                default:
-                    sb.Append(value: $"{Digits[j]:D9}");
-                    break;
+                buf[k] = (char)('0' + digit % 10);
+                digit /= 10;
             }
+
+            sb.Append(buf);
         }
 
-        var valueStr = sb.ToString();
+        // after sign and first digit
+        var dotIndex = isNegative
+            ? 2
+            : 1;
+        var keep = sb.Length;
+        while (keep > dotIndex + 1 && sb[keep - 1] == '0')
+        {
+            keep -= 1;
+        }
 
-        var realPowerOf10 = valueStr.Length - (scale + 1);
-        var integerPart = valueStr[..1];
-        var fractionalPart = valueStr[1..]
-                            .TrimEnd(trimChar: '0')
-                            .PadLeft(totalWidth: 1, paddingChar: '0');
-        return $"{sign}{integerPart}.{fractionalPart}E{realPowerOf10}";
+        sb.Length = keep;
+
+        if (sb.Length == dotIndex + 1)
+        {
+            sb.Append('0'); // if we have only one digit after the decimal point, add zero
+        }
+
+        sb.Append('E')
+          .Append(realPowerOf10);
+
+        return sb.ToString();
+    }
+
+    [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
+    private static int DecimalLength(this uint x)
+    {
+        return x switch
+        {
+            >= 100_000_000 => 9,
+            >= 10_000_000 => 8,
+            >= 1_000_000 => 7,
+            >= 100_000 => 6,
+            >= 10_000 => 5,
+            >= 1_000 => 4,
+            >= 100 => 3,
+            >= 10 => 2,
+            >= 0 => 1
+        };
     }
 }
