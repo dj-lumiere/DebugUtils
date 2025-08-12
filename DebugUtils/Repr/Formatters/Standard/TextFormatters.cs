@@ -27,6 +27,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var s = (string)obj;
+        var sLength = s.Length;
         if (s.Length > context.Config.MaxStringLength)
         {
             var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
@@ -37,7 +38,7 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "type", value: "string");
         result.Add(propertyName: "kind", value: "class");
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
-        result.Add(propertyName: "length", value: s.Length);
+        result.Add(propertyName: "length", value: sLength);
         result.Add(propertyName: "value", value: s);
         return result;
     }
@@ -66,11 +67,17 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         var sb = (StringBuilder)obj;
         var s = sb.ToString();
+        var sLength = s.Length;
+        if (s.Length > context.Config.MaxStringLength)
+        {
+            var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
+            s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
+        }
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
-        result.Add(propertyName: "length", value: s.Length);
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
+        result.Add(propertyName: "length", value: sLength);
+        result.Add(propertyName: "value", value: s);
         return result;
     }
 }
