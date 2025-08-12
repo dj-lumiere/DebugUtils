@@ -1,6 +1,16 @@
 # Changelog
 
-# [v1.3.2] Released at 2025-08-11
+# [v1.4.0] Released at 2025.08.12
+
+## ✨ New Features
+
+- Added `Memory<T>`, `ReadOnlyMemory<T>`, `Span<T>`, `ReadOnlySpan<T>`, `Range`, `Index` type support
+
+## 🐛 Bug Fixes
+- string gets proper length even after truncation
+- StringBuilder properly truncates string in `ReprTree`
+
+# [v1.3.2] Released at 2025.08.11
 
 ## ✨ Enhanced Consistency
 - All exact representations (Half, Float, Double, Decimal) now use consistent `E+/-YYY` notation
