@@ -43,7 +43,7 @@ public class CallStackTest
     public void TestGetCallerInfo_Basic()
     {
         var callerInfo = CallStack.GetCallerInfo();
-        Assert.Equal(expected: "CallStackTest.TestGetCallerInfo_Basic@CallStackTest.cs:43:9",
+        Assert.Equal(expected: "CallStackTest.TestGetCallerInfo_Basic@CallStackTest.cs:45:9",
             actual: callerInfo.ToString());
     }
 }
