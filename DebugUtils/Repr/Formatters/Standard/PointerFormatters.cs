@@ -20,12 +20,13 @@ internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "value", ToRepr(obj: obj, context: context) }
+        };
     }
 }
 
@@ -42,11 +43,12 @@ internal class UIntPtrFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "value", ToRepr(obj: obj, context: context) }
+        };
     }
 }

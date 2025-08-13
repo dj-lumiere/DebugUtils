@@ -381,21 +381,21 @@ internal static class IntegerExtensions
 
     public static string FormatAsHexWithPadding(this object obj, string formatString)
     {
-        if (!int.TryParse(s: formatString[1..], result: out var padding))
+        if (!Int32.TryParse(s: formatString[1..], result: out var padding))
         {
             throw new ArgumentException(message: "Invalid format string");
         }
 
-        return $"0x{obj.FormatAsHex()[2..].PadLeft(padding, '0')}";
+        return $"0x{obj.FormatAsHex()[2..].PadLeft(totalWidth: padding, paddingChar: '0')}";
     }
-    
+
     public static string FormatAsBinaryWithPadding(this object obj, string formatString)
     {
-        if (!int.TryParse(s: formatString[1..], result: out var padding))
+        if (!Int32.TryParse(s: formatString[1..], result: out var padding))
         {
             throw new ArgumentException(message: "Invalid format string");
         }
 
-        return $"0b{obj.FormatAsBinary()[2..].PadLeft(padding, '0')}";
+        return $"0b{obj.FormatAsBinary()[2..].PadLeft(totalWidth: padding, paddingChar: '0')}";
     }
 }

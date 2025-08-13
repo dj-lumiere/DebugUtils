@@ -67,7 +67,7 @@ internal static class FloatExactExtensions
 
         // CORE ALGORITHM: Convert IEEE 754 binary representation to exact decimal
         //
-        // IEEE 754 value = significand * 2^realExponent  
+        // IEEE 754 value = significand * 2^realExponent
         //
         // CASE 1: realExponent ≥ 0
         //   significand * 2^realExponent = exact integer (no denominator needed)
@@ -87,7 +87,7 @@ internal static class FloatExactExtensions
         }
         else
         {
-            // Convert binary fraction to exact decimal fraction
+            // Convert a binary fraction to an exact decimal fraction
             // significand * 2^(-k) → (significand * 5^k) / 10^k
             powerOf10Denominator = -realExponent;
             length = digits.ScalePow5(len: length, k: powerOf10Denominator);

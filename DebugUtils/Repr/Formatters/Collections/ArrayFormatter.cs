@@ -37,36 +37,31 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
         var elementType = array.GetType()
                                .GetElementType()
                               ?.GetReprTypeName() ?? "object";
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         var dimensions = new JsonArray();
         for (var i = 0; i < array.Rank; i++)
         {
             dimensions.Add(value: array.GetLength(dimension: i));
         }
 
-        result.Add(propertyName: "rank", value: array.Rank);
-        result.Add(propertyName: "dimensions", value: dimensions);
-        result.Add(propertyName: "elementType", value: elementType);
-
         var rank = array.Rank;
         var content = array.ArrayToHierarchicalReprRecursive(indices: new int[rank], dimension: 0,
             context: context);
-        result.Add(propertyName: "value", value: content);
-        return result;
+
+        return new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "hashCode", $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}" },
+            { "rank", array.Rank },
+            { "dimensions", dimensions },
+            { "elementType", elementType },
+            { "value", content }
+        };
     }
 }

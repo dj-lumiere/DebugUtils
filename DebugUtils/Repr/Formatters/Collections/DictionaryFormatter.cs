@@ -64,29 +64,16 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
         var entries = new JsonArray();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         var keyType = dict.GetType()
                           .GetGenericArguments()[0]
                           .GetReprTypeName();
         var valueType = dict.GetType()
                             .GetGenericArguments()[1]
                             .GetReprTypeName();
-        result.Add(propertyName: "count", value: dict.Count);
-        result.Add(propertyName: "keyType", value: keyType);
-        result.Add(propertyName: "valueType", value: valueType);
         var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
@@ -115,7 +102,15 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 
-        result.Add(propertyName: "value", value: entries);
-        return result;
+        return new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "hashCode", $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}" },
+            { "count", dict.Count },
+            { "keyType", keyType },
+            { "valueType", valueType },
+            { "value", entries }
+        };
     }
 }

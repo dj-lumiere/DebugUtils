@@ -34,13 +34,14 @@ internal class StringFormatter : IReprFormatter, IReprTreeFormatter
             s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "string");
-        result.Add(propertyName: "kind", value: "class");
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
-        result.Add(propertyName: "length", value: sLength);
-        result.Add(propertyName: "value", value: s);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "string",
+            [propertyName: "kind"] = "class",
+            [propertyName: "hashCode"] = $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}",
+            [propertyName: "length"] = sLength,
+            [propertyName: "value"] = s
+        };
     }
 }
 
@@ -63,7 +64,6 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
         var sb = (StringBuilder)obj;
         var s = sb.ToString();
@@ -74,12 +74,14 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
             s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
 
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
-        result.Add(propertyName: "length", value: sLength);
-        result.Add(propertyName: "value", value: s);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "hashCode"] = RuntimeHelpers.GetHashCode(o: obj),
+            [propertyName: "length"] = sLength,
+            [propertyName: "value"] = s
+        };
     }
 }
 
@@ -113,13 +115,14 @@ internal class CharFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var c = (char)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "char");
-        result.Add(propertyName: "kind", value: "struct");
-        // should truncate ' prefix and suffix
-        result.Add(propertyName: "value", value: ToRepr(obj: c, context: context)[1..^1]);
-        result.Add(propertyName: "unicodeValue", value: $"0x{(int)c:X4}");
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "char",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "value"] =
+                ToRepr(obj: c, context: context)[1..^1], // truncate ' prefix and suffix
+            [propertyName: "unicodeValue"] = $"0x{(int)c:X4}"
+        };
     }
 }
 
@@ -135,11 +138,12 @@ internal class RuneFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var rune = (Rune)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "Rune");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "value", value: rune.ToString());
-        result.Add(propertyName: "unicodeValue", value: $"0x{rune.Value:X8}");
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "Rune",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "value"] = rune.ToString(),
+            [propertyName: "unicodeValue"] = $"0x{rune.Value:X8}"
+        };
     }
 }

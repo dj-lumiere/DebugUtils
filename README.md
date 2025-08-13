@@ -25,7 +25,7 @@ using DebugUtils.Repr;
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
 Console.WriteLine(data.Repr());
-// Output: Anonymous(Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))
+// Output: Anonymous(Age: int(30), Name: "Alice", Scores: 1DArray([int(95), int(87), int(92)]))
 
 // 🌳 Structured tree output for complex analysis
 Console.WriteLine(data.ReprTree());
@@ -33,8 +33,8 @@ Console.WriteLine(data.ReprTree());
 //   "type": "Anonymous",
 //   "kind": "class",
 //   "hashCode": "0xAAAAAAAA",
-//   "Name": { "type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 5, "value": "Alice" },
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
+//   "Name": { "type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 5, "value": "Alice" },
 //   "Scores": {
 //     "type": "1DArray",
 //     "kind": "class",
@@ -178,6 +178,36 @@ public class DataProcessor
 - **Debugging algorithms** - Trace execution flow with precision
 - **Unit testing** - Get detailed failure locations
 
+### Member Ordering (v1.6)
+
+For object representation, DebugUtils uses deterministic alphabetical ordering within member categories:
+
+1. **Public fields** (alphabetical by name)
+2. **Public auto-properties** (alphabetical by name)
+3. **Private fields** (alphabetical by name, prefixed with "private_")
+4. **Private auto-properties** (alphabetical by name, prefixed with "private_")
+
+```csharp
+public class ClassifiedData
+{
+    public long Id = 5;                    // Category 1: Public field
+    public int Age = 10;                   // Category 1: Public field
+    public string Writer { get; set; }     // Category 2: Public auto-property
+    public string Name { get; set; }       // Category 2: Public auto-property
+    private DateTime Date = DateTime.Now;  // Category 3: Private field
+    private string Password = "secret";    // Category 3: Private field
+    private string Data { get; set; }      // Category 4: Private auto-property
+    private Guid Key { get; set; }         // Category 4: Private auto-property
+}
+
+// Output with ShowNonPublicProperties: true
+// ClassifiedData(Age: int(10), Id: long(5), Name: "Alice", Writer: "Bob", 
+//                private_Date: DateTime(...), private_Password: "secret",
+//                private_Data: "info", private_Key: Guid(...))
+```
+
+This ordering ensures deterministic output while grouping similar member types together. Auto-properties are accessed via their backing fields to avoid potential side effects from getter calls.
+
 ## Configuration Options
 
 ### Float Formatting (NEW: Format Strings)
@@ -259,8 +289,8 @@ a.ReprTree();
 //     "type": "Person",
 //     "kind": "class",
 //     "hashCode": "0xAAAAAAAA",
-//     "Name": {"type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length":4, "value":"Lumi"},
-//     "Age": {"type": "int", "kind": "struct", "value": "28"}
+//     "Age": {"type": "int", "kind": "struct", "value": "28"},
+//     "Name": {"type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 4, "value": "Lumi"}
 // } (hashCode may vary)
 ```
 

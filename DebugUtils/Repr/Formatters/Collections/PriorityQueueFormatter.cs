@@ -72,25 +72,21 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
         // Apply container defaults if configured
         context = context.WithContainerConfig();
         var type = obj.GetType();
-        var countProperty = type.GetProperty(name: "Count");
-        var count = (int)(countProperty?.GetValue(obj: obj) ?? 0);
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
-        result.Add(propertyName: "count", value: count);
+        var countProperty = type.GetProperty(name: "Count");
+        var count = (int)(countProperty?.GetValue(obj: obj) ?? 0);
+        var result = new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "hashCode", $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}" },
+            { "count", count }
+        };
 
         // Get generic type arguments for element and priority types
         if (type.IsGenericType)
@@ -127,9 +123,11 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
                    .FormatAsJsonNode(context: context.WithIncrementedDepth());
                 var element = tuple[index: 0]
                    .FormatAsJsonNode(context: context.WithIncrementedDepth());
-                var entry = new JsonObject();
-                entry.Add(propertyName: "element", value: element);
-                entry.Add(propertyName: "priority", value: priority);
+                var entry = new JsonObject
+                {
+                    { "element", element },
+                    { "priority", priority }
+                };
                 entries.Add(value: entry);
             }
 
@@ -139,14 +137,7 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
         if (hitLimit)
         {
             var remainingCount = count - context.Config.MaxElementsPerCollection;
-            if (remainingCount > 0)
-            {
-                entries.Add(value: $"... ({remainingCount} more items)");
-            }
-            else
-            {
-                entries.Add(value: "... (more items)");
-            }
+            entries.Add(value: $"... ({remainingCount} more items)");
         }
 
         result.Add(propertyName: "value", value: entries);

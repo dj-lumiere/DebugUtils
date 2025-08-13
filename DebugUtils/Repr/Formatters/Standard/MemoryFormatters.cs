@@ -56,14 +56,9 @@ internal static class SpanFormatter
             };
         }
 
-        var result = new JsonObject();
         var entries = new JsonArray();
         var itemCount = obj.Length;
         var hitLimit = false;
-        result.Add(propertyName: "type", value: "Span");
-        result.Add(propertyName: "kind", value: "ref struct");
-        result.Add(propertyName: "length", value: itemCount);
-        result.Add(propertyName: "elementType", value: typeof(T).GetReprTypeName());
 
         for (var i = 0; i < obj.Length; i += 1)
         {
@@ -87,8 +82,14 @@ internal static class SpanFormatter
             }
         }
 
-        result.Add(propertyName: "value", value: entries);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "Span",
+            [propertyName: "kind"] = "ref struct",
+            [propertyName: "length"] = itemCount,
+            [propertyName: "elementType"] = typeof(T).GetReprTypeName(),
+            [propertyName: "value"] = entries
+        };
     }
 }
 
@@ -143,14 +144,9 @@ internal static class ReadOnlySpanFormatter
             };
         }
 
-        var result = new JsonObject();
         var entries = new JsonArray();
         var itemCount = obj.Length;
         var hitLimit = false;
-        result.Add(propertyName: "type", value: "ReadOnlySpan");
-        result.Add(propertyName: "kind", value: "ref struct");
-        result.Add(propertyName: "length", value: itemCount);
-        result.Add(propertyName: "elementType", value: typeof(T).GetReprTypeName());
 
         for (var i = 0; i < obj.Length; i += 1)
         {
@@ -174,8 +170,14 @@ internal static class ReadOnlySpanFormatter
             }
         }
 
-        result.Add(propertyName: "value", value: entries);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "ReadOnlySpan",
+            [propertyName: "kind"] = "ref struct",
+            [propertyName: "length"] = itemCount,
+            [propertyName: "elementType"] = typeof(T).GetReprTypeName(),
+            [propertyName: "value"] = entries
+        };
     }
 }
 
@@ -185,14 +187,14 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
     public string ToRepr(object obj, ReprContext context)
     {
         var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
         }
 
+        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         var items = new List<string>();
         var itemCount = array.Length;
         var hitLimit = false;
@@ -224,32 +226,21 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
     }
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
+        var type = obj.GetType();
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = "Memory",
-                [propertyName: "kind"] = "struct",
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
+        var toArrayMethod = type.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         var entries = new JsonArray();
         var itemCount = array.Length;
         var hitLimit = false;
         var elementType = array.GetType()
                                .GetElementType()
                               ?.GetReprTypeName() ?? "object";
-        result.Add(propertyName: "type", value: "Memory");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "length", value: itemCount);
-        result.Add(propertyName: "elementType", value: elementType);
 
         for (var i = 0; i < array.Length; i += 1)
         {
@@ -273,8 +264,14 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
             }
         }
 
-        result.Add(propertyName: "value", value: entries);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "Memory",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "length"] = itemCount,
+            [propertyName: "elementType"] = elementType,
+            [propertyName: "value"] = entries
+        };
     }
 }
 
@@ -283,15 +280,15 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
+        var type = obj.GetType();
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
         }
 
+        var toArrayMethod = type.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         var items = new List<string>();
         var itemCount = array.Length;
         var hitLimit = false;
@@ -321,32 +318,21 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
     }
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
+        var type = obj.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = "ReadOnlyMemory",
-                [propertyName: "kind"] = "struct",
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
+        var toArrayMethod = type.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         var entries = new JsonArray();
         var itemCount = array.Length;
         var hitLimit = false;
         var elementType = array.GetType()
                                .GetElementType()
                               ?.GetReprTypeName() ?? "object";
-        result.Add(propertyName: "type", value: "ReadOnlyMemory");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "length", value: itemCount);
-        result.Add(propertyName: "elementType", value: elementType);
 
         for (var i = 0; i < array.Length; i += 1)
         {
@@ -370,8 +356,14 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
             }
         }
 
-        result.Add(propertyName: "value", value: entries);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "ReadOnlyMemory",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "length"] = itemCount,
+            [propertyName: "elementType"] = elementType,
+            [propertyName: "value"] = entries
+        };
     }
 }
 

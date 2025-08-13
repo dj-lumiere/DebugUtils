@@ -1,5 +1,44 @@
 # Changelog
 
+# [v1.6.0] Released at 2025.08.13
+## 📋 Breaking Changes
+- Temporarily deleted unlimited property access from Object
+- Added support for auto property fields
+- **Deterministic member ordering**: Fixed sorting order of fields to ensure consistent output
+- Removed ToString fallback even from FormattingMode.Smart
+
+## 🔧 Member Ordering Improvements
+**New deterministic ordering strategy** for object representation:
+1. **Public fields** (alphabetical by name)
+2. **Public auto-properties** (alphabetical by name) 
+3. **Private fields** (alphabetical by name, prefixed with "private_")
+4. **Private auto-properties** (alphabetical by name, prefixed with "private_")
+
+**Benefits:**
+- **Deterministic output**: Same object always produces identical representation
+- **Alphabetical sorting**: Within each category, members are sorted alphabetically
+- **Safe property access**: Auto-properties accessed via backing fields to avoid side effects
+- **Consistent behavior**: Works identically in both `ToRepr()` and `ToReprTree()` methods
+
+**Example:**
+```csharp
+public class ClassifiedData
+{
+    public long Id = 5;                    // Category 1: Public field
+    public int Age = 10;                   // Category 1: Public field  
+    public string Writer { get; set; }     // Category 2: Public auto-property
+    public string Name { get; set; }       // Category 2: Public auto-property
+    private DateTime Date = DateTime.Now;  // Category 3: Private field
+    private string Password = "secret";    // Category 3: Private field
+    private string Data { get; set; }      // Category 4: Private auto-property
+    private Guid Key { get; set; }         // Category 4: Private auto-property
+}
+
+// Output: ClassifiedData(Age: int(10), Id: long(5), Name: "Alice", Writer: "Bob", 
+//                        private_Date: DateTime(...), private_Password: "secret",
+//                        private_Data: "info", private_Key: Guid(...))
+```
+
 # [v1.5.0] Released at 2025.08.13
 
 ## 🚀 Major Features

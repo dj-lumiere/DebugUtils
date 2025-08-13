@@ -177,7 +177,7 @@ public class StandardFormatterTreeTests
             [propertyName: "millisecond"] = "0",
             [propertyName: "subTicks"] = "0",
             [propertyName: "totalTicks"] = "638712864000000000",
-            [propertyName: "timezone"] = "Utc"
+            [propertyName: "timezone"] = "UTC"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
