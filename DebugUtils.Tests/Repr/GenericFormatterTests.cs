@@ -28,7 +28,7 @@ public class GenericFormatterTests
     public void TestClassRepr_WithToString()
     {
         var person = new Person(name: "Alice", age: 30);
-        Assert.Equal(expected: "Person(Name: \"Alice\", Age: int(30))", actual: person.Repr());
+        Assert.Equal(expected: "Person(Age: int(30), Name: \"Alice\")", actual: person.Repr());
     }
 
     [Fact]
