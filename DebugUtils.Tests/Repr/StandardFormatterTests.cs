@@ -46,18 +46,18 @@ public class StandardFormatterTests
         var dateTime = new DateTime(year: 2025, month: 1, day: 1, hour: 0, minute: 0, second: 0);
         var localDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Local);
         var utcDateTime = DateTime.SpecifyKind(value: dateTime, kind: DateTimeKind.Utc);
-        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Unspecified)", actual:
+        Assert.Equal(expected: "DateTime(2025.01.01 00:00:00.0000000 Unspecified)", actual:
             dateTime.Repr());
-        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 Local)", actual:
+        Assert.Equal(expected: "DateTime(2025.01.01 00:00:00.0000000 Local)", actual:
             localDateTime.Repr());
-        Assert.Equal(expected: "DateTime(2025-01-01 00:00:00 UTC)", actual:
+        Assert.Equal(expected: "DateTime(2025.01.01 00:00:00.0000000 UTC)", actual:
             utcDateTime.Repr());
     }
 
     [Fact]
     public void TestTimeSpanRepr()
     {
-        Assert.Equal(expected: "TimeSpan(1800.000s)", actual: TimeSpan.FromMinutes(minutes: 30)
+        Assert.Equal(expected: "TimeSpan(1D 00:00:00.0000000)", actual: TimeSpan.FromDays(days: 1)
            .Repr());
     }
 
@@ -65,15 +65,24 @@ public class StandardFormatterTests
     public void TestTimeSpanRepr_Negative()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(-1800.000s)", actual: TimeSpan.FromMinutes(minutes: -30)
+        Assert.Equal(expected: "TimeSpan(-00:30:00.0000000)", actual: TimeSpan.FromMinutes(minutes: -30)
            .Repr(config: config));
+    }
+
+    [Fact]
+    public void TestTimeSpanRepr_Negative_WithDays()
+    {
+        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        Assert.Equal(expected: "TimeSpan(-1D-01:00:00.0000000)",
+            actual: new TimeSpan(days: -1, hours: -1, minutes: 0, seconds: 0)
+               .Repr(config: config));
     }
 
     [Fact]
     public void TestTimeSpanRepr_Zero()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(0.000s)",
+        Assert.Equal(expected: "TimeSpan(00:00:00.0000000)",
             actual: TimeSpan.Zero.Repr(config: config));
     }
 
@@ -81,24 +90,25 @@ public class StandardFormatterTests
     public void TestTimeSpanRepr_Positive()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(1800.000s)", actual: TimeSpan.FromMinutes(minutes: 30)
+        Assert.Equal(expected: "TimeSpan(00:30:00.0000000)", actual: TimeSpan.FromMinutes(minutes: 30)
            .Repr(config: config));
     }
 
     [Fact]
     public void TestDateTimeOffsetRepr()
     {
-        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00Z)",
+        Assert.Equal(expected: "DateTimeOffset(2025.01.01 12:34:56.7899870Z)",
             actual: new DateTimeOffset(dateTime: new DateTime(
                 date: new DateOnly(year: 2025, month: 1, day: 1),
-                time: new TimeOnly(hour: 0, minute: 0, second: 0),
+                time: new TimeOnly(hour: 12, minute: 34, second: 56, millisecond: 789,
+                    microsecond: 987),
                 kind: DateTimeKind.Utc)).Repr());
     }
 
     [Fact]
     public void TestDateTimeOffsetRepr_WithOffset()
     {
-        Assert.Equal(expected: "DateTimeOffset(2025-01-01 00:00:00+01:00:00)",
+        Assert.Equal(expected: "DateTimeOffset(2025.01.01 00:00:00.0000000+01:00:00.0000000)",
             actual: new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
                 offset: TimeSpan.FromHours(hours: 1)).Repr());
     }
@@ -106,15 +116,15 @@ public class StandardFormatterTests
     [Fact]
     public void TestDateOnly()
     {
-        Assert.Equal(expected: "DateOnly(2025-01-01)",
+        Assert.Equal(expected: "DateOnly(2025.01.01)",
             actual: new DateOnly(year: 2025, month: 1, day: 1).Repr());
     }
 
     [Fact]
     public void TestTimeOnly()
     {
-        Assert.Equal(expected: "TimeOnly(00:00:00)",
-            actual: new TimeOnly(hour: 0, minute: 0, second: 0).Repr());
+        Assert.Equal(expected: "TimeOnly(01:02:03.0000000)",
+            actual: new TimeOnly(hour: 1, minute: 2, second: 3).Repr());
     }
 
     [Fact]

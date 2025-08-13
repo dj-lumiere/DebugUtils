@@ -226,7 +226,7 @@ public class NumericFormatterTreeTests
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
     #endif
-        #if NET7_0_OR_GREATER
+    #if NET7_0_OR_GREATER
     [Theory]
     [InlineData(IntReprMode.Binary,
         "-0b10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")]
@@ -269,5 +269,4 @@ public class NumericFormatterTreeTests
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
     #endif
-
 }

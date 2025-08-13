@@ -118,5 +118,4 @@ public class GenericFormatterTests
             actualString: repr);
         Assert.EndsWith(expectedEndString: ">]", actualString: repr);
     }
-
 }

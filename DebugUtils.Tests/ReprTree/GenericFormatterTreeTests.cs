@@ -6,121 +6,121 @@ namespace DebugUtils.Tests;
 
 public class GenericFormatterTreeTests
 {
-  [Fact]
-  public void TestCustomStructRepr_NoToString()
-  {
-    var point = new Point { X = 10, Y = 20 };
-    var actualJson = JsonNode.Parse(json: point.ReprTree());
-    var expectedJson = new JsonObject
+    [Fact]
+    public void TestCustomStructRepr_NoToString()
     {
-      [propertyName: "type"] = "Point",
-      [propertyName: "kind"] = "struct",
-      [propertyName: "X"] = new JsonObject
-      {
-        [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-        [propertyName: "value"] = "10"
-      },
-      [propertyName: "Y"] = new JsonObject
-      {
-        [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-        [propertyName: "value"] = "20"
-      }
-    };
-    Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
-  }
+        var point = new Point { X = 10, Y = 20 };
+        var actualJson = JsonNode.Parse(json: point.ReprTree());
+        var expectedJson = new JsonObject
+        {
+            [propertyName: "type"] = "Point",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "X"] = new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "10"
+            },
+            [propertyName: "Y"] = new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "20"
+            }
+        };
+        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
+    }
 
-  [Fact]
-  public void TestCustomStructRepr_WithToString()
-  {
-    var custom = new CustomStruct { Name = "test", Value = 42 };
-    var actualJson = JsonNode.Parse(json: custom.ReprTree())!;
+    [Fact]
+    public void TestCustomStructRepr_WithToString()
+    {
+        var custom = new CustomStruct { Name = "test", Value = 42 };
+        var actualJson = JsonNode.Parse(json: custom.ReprTree())!;
 
-    Assert.Equal(expected: "CustomStruct", actual: actualJson[propertyName: "type"]
-    ?.ToString());
-    Assert.Equal(expected: "struct", actual: actualJson[propertyName: "kind"]
-    ?.ToString());
-    Assert.Null(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: "CustomStruct", actual: actualJson[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "struct", actual: actualJson[propertyName: "kind"]
+          ?.ToString());
+        Assert.Null(@object: actualJson[propertyName: "hashCode"]);
 
-    var nameNode = actualJson[propertyName: "Name"]!.AsObject();
-    Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
-    ?.ToString());
-    Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
-    ?.ToString());
-    Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
-    Assert.Equal(expected: 4, actual: nameNode[propertyName: "length"]!.GetValue<int>());
-    Assert.Equal(expected: "test", actual: nameNode[propertyName: "value"]
-    ?.ToString());
+        var nameNode = actualJson[propertyName: "Name"]!.AsObject();
+        Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
+        Assert.Equal(expected: 4, actual: nameNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "test", actual: nameNode[propertyName: "value"]
+          ?.ToString());
 
-    var valueNode = actualJson[propertyName: "Value"]!.AsObject();
-    Assert.True(condition: JsonNode.DeepEquals(
-      node1: new JsonObject
-      {
-        [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-        [propertyName: "value"] = "42"
-      }, node2: valueNode));
-  }
+        var valueNode = actualJson[propertyName: "Value"]!.AsObject();
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "42"
+            }, node2: valueNode));
+    }
 
     [Fact]
     public void TestClassRepr_WithToString()
     {
-      var person = new Person(name: "Alice", age: 30);
-      var actualJson = JsonNode.Parse(json: person.ReprTree())!;
+        var person = new Person(name: "Alice", age: 30);
+        var actualJson = JsonNode.Parse(json: person.ReprTree())!;
 
-      Assert.Equal(expected: "Person", actual: actualJson[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: "Person", actual: actualJson[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
 
-      var nameNode = actualJson[propertyName: "Name"]!.AsObject();
-      Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
-      Assert.Equal(expected: 5, actual: nameNode[propertyName: "length"]!.GetValue<int>());
-      Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
-      ?.ToString());
+        var nameNode = actualJson[propertyName: "Name"]!.AsObject();
+        Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
+        Assert.Equal(expected: 5, actual: nameNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
+          ?.ToString());
 
-      var ageNode = actualJson[propertyName: "Age"]!.AsObject();
-      Assert.True(condition: JsonNode.DeepEquals(
-        node1: new JsonObject
-        {
-          [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-          [propertyName: "value"] = "30"
-        }, node2: ageNode));
+        var ageNode = actualJson[propertyName: "Age"]!.AsObject();
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "30"
+            }, node2: ageNode));
     }
 
     [Fact]
     public void TestClassRepr_NoToString()
     {
-      var noToString = new NoToStringClass(data: "data", number: 123);
-      var actualJson = JsonNode.Parse(json: noToString.ReprTree())!;
+        var noToString = new NoToStringClass(data: "data", number: 123);
+        var actualJson = JsonNode.Parse(json: noToString.ReprTree())!;
 
-      Assert.Equal(expected: "NoToStringClass", actual: actualJson[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: "NoToStringClass", actual: actualJson[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
 
-      var dataNode = actualJson[propertyName: "Data"]!.AsObject();
-      Assert.Equal(expected: "string", actual: dataNode[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: dataNode[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: dataNode[propertyName: "hashCode"]);
-      Assert.Equal(expected: 4, actual: dataNode[propertyName: "length"]!.GetValue<int>());
-      Assert.Equal(expected: "data", actual: dataNode[propertyName: "value"]
-      ?.ToString());
+        var dataNode = actualJson[propertyName: "Data"]!.AsObject();
+        Assert.Equal(expected: "string", actual: dataNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: dataNode[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: dataNode[propertyName: "hashCode"]);
+        Assert.Equal(expected: 4, actual: dataNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "data", actual: dataNode[propertyName: "value"]
+          ?.ToString());
 
-      var numberNode = actualJson[propertyName: "Number"]!.AsObject();
-      Assert.True(condition: JsonNode.DeepEquals(
-        node1: new JsonObject
-        {
-          [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-          [propertyName: "value"] = "123"
-        },
-        node2: numberNode));
+        var numberNode = actualJson[propertyName: "Number"]!.AsObject();
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "123"
+            },
+            node2: numberNode));
     }
 
     [Fact]
@@ -190,51 +190,51 @@ public class GenericFormatterTreeTests
     [Fact]
     public void TestEnumRepr()
     {
-      var actualJson = JsonNode.Parse(json: Colors.GREEN.ReprTree());
-      var expectedJson = new JsonObject
-      {
-        [propertyName: "type"] = "Colors",
-        [propertyName: "kind"] = "enum",
-        [propertyName: "name"] = "GREEN",
-        [propertyName: "value"] = new JsonObject
+        var actualJson = JsonNode.Parse(json: Colors.GREEN.ReprTree());
+        var expectedJson = new JsonObject
         {
-          [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-          [propertyName: "value"] = "1"
-        }
-      };
-      Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
+            [propertyName: "type"] = "Colors",
+            [propertyName: "kind"] = "enum",
+            [propertyName: "name"] = "GREEN",
+            [propertyName: "value"] = new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "1"
+            }
+        };
+        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
 
 
     [Fact]
     public void TestObjectReprTree()
     {
-      var data = new { Name = "Alice", Age = 30 };
-      var actualJsonNode = JsonNode.Parse(json: data.ReprTree())!;
+        var data = new { Name = "Alice", Age = 30 };
+        var actualJsonNode = JsonNode.Parse(json: data.ReprTree())!;
 
-      Assert.Equal(expected: "Anonymous", actual: actualJsonNode[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: actualJsonNode[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: actualJsonNode[propertyName: "hashCode"]);
+        Assert.Equal(expected: "Anonymous", actual: actualJsonNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: actualJsonNode[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: actualJsonNode[propertyName: "hashCode"]);
 
-      var nameNode = actualJsonNode[propertyName: "Name"]!.AsObject();
-      Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
-      Assert.Equal(expected: 5, actual: nameNode[propertyName: "length"]!.GetValue<int>());
-      Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
-      ?.ToString());
+        var nameNode = actualJsonNode[propertyName: "Name"]!.AsObject();
+        Assert.Equal(expected: "string", actual: nameNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: nameNode[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: nameNode[propertyName: "hashCode"]);
+        Assert.Equal(expected: 5, actual: nameNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
+          ?.ToString());
 
-      var ageNode = actualJsonNode[propertyName: "Age"]!.AsObject();
-      Assert.True(condition: JsonNode.DeepEquals(
-        node1: new JsonObject
-        {
-          [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-          [propertyName: "value"] = "30"
-        }, node2: ageNode));
+        var ageNode = actualJsonNode[propertyName: "Age"]!.AsObject();
+        Assert.True(condition: JsonNode.DeepEquals(
+            node1: new JsonObject
+            {
+                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
+                [propertyName: "value"] = "30"
+            }, node2: ageNode));
     }
 
     [Fact]
