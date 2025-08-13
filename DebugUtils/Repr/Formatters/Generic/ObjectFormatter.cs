@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
+using DebugUtils.Repr.Extensions;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.TypeHelpers;
 
@@ -16,6 +17,7 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
+        context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
             return "<Max Depth Reached>";
@@ -23,84 +25,161 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
 
         var type = obj.GetType();
         var parts = new List<string>();
-        var accessedFieldNames = new HashSet<string>();
-        var propertyCount = 0;
-        var isTruncated = false;
-        var content = "";
-        context = context.WithContainerConfig();
-        // Get public fields
-        var fields = type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance);
-        foreach (var field in fields)
+        var shown = 0;
+        var truncated = false;
+
+        // Optionally include public instance fields declared on this type
+        foreach (var f in type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                              .OrderBy(keySelector: f => f.Name))
         {
             if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
+                shown >= context.Config.MaxPropertiesPerObject)
             {
-                isTruncated = true;
+                truncated = true;
                 break;
             }
 
-            var value = field.GetValue(obj: obj);
             parts.Add(
-                item: $"{field.Name}: {value.Repr(context: context.WithIncrementedDepth())}");
-            accessedFieldNames.Add(item: field.Name);
-            propertyCount += 1;
+                item:
+                $"{f.Name}: {f.GetValue(obj: obj).Repr(context: context.WithIncrementedDepth())}");
+            shown += 1;
         }
 
-        var nonPublicFields =
-            type.GetFields(bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance |
-                                        BindingFlags.Static)
-                .Where(predicate: p => !p.Name.IsCompilerGeneratedName());
-        foreach (var field in nonPublicFields)
+        // Public, non-indexer properties (by name)
+        var props = type
+                   .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                   .Where(predicate: p => p.CanRead && p.GetIndexParameters()
+                                                        .Length == 0 &&
+                                          !p.Name.IsCompilerGeneratedName())
+                   .ToDictionary(keySelector: p => p.Name, elementSelector: p => p);
+
+        // Non-public instance fields for backing-field detection
+        var nonPubInstFields = type
+           .GetFields(bindingAttr: BindingFlags.NonPublic |
+                                   BindingFlags.Instance);
+
+        // Collect (prop, backingField) pairs
+        var pairs = new List<(PropertyInfo prop, FieldInfo backing)>();
+        foreach (var f in nonPubInstFields)
+        {
+            string propName;
+            // Try auto-property backing fields only
+            if (!f.TryGetAutoPropInfo(propName: out propName) &&
+                !f.TryGetAnonymousInfo(propName: out propName))
+            {
+                continue;
+            }
+
+            if (!props.TryGetValue(key: propName, value: out var p))
+            {
+                continue;
+            }
+
+            pairs.Add(item: (p, f));
+        }
+
+        // Emit properties by reading their backing fields (NO getter calls)
+        foreach (var (prop, backing) in pairs.OrderBy(keySelector: p => p.prop.Name))
         {
             if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
+                shown >= context.Config.MaxPropertiesPerObject)
             {
-                isTruncated = true;
+                truncated = true;
                 break;
             }
 
-            var value = field.GetValue(obj: obj);
-            var addingValue = value.Repr(context: context.WithIncrementedDepth());
-            var fieldName = field.Name;
-
-            if (accessedFieldNames.Contains(item: fieldName))
-            {
-                continue; // Skip but don't count
-            }
-
-            parts.Add(item: $"private_{fieldName}: {addingValue}");
-            propertyCount += 1;
+            var val = backing.GetValue(obj: obj);
+            parts.Add(item: $"{prop.Name}: {val.Repr(context: context.WithIncrementedDepth())}");
+            shown += 1;
         }
 
-        if (isTruncated)
+        // Non-public fields (only if requested), excluding backing fields and compiler-generated noise
+        if (context.Config.ShowNonPublicProperties && (context.Config.MaxPropertiesPerObject < 0 ||
+                                                       shown < context.Config
+                                                          .MaxPropertiesPerObject))
+        {
+            var usedBackers =
+                new HashSet<FieldInfo>(collection: pairs.Select(selector: p => p.backing));
+            var privateProps = type
+                              .GetProperties(bindingAttr: BindingFlags.NonPublic |
+                                                          BindingFlags.Instance)
+                              .Where(predicate: p => p.CanRead && p.GetIndexParameters()
+                                                        .Length == 0 &&
+                                                     !p.Name.IsCompilerGeneratedName())
+                              .ToDictionary(keySelector: p => p.Name, elementSelector: p => p);
+            var privatePair = new List<(PropertyInfo prop, FieldInfo backing)>();
+            foreach (var f in nonPubInstFields.OrderBy(keySelector: f => f.Name))
+            {
+                if (usedBackers.Contains(item: f))
+                {
+                    continue;
+                }
+
+                var propName = "";
+
+                if ((f.TryGetAutoPropInfo(propName: out propName) ||
+                     f.TryGetAnonymousInfo(propName: out propName))
+                    && privateProps.TryGetValue(key: propName, value: out var privateProp))
+                {
+                    privatePair.Add(item: (privateProp, f));
+                    continue;
+                }
+
+                if (f.Name.IsCompilerGeneratedName() || f.Name == "EqualityContract")
+                {
+                    continue;
+                }
+
+                if (context.Config.MaxPropertiesPerObject >= 0 &&
+                    shown >= context.Config.MaxPropertiesPerObject)
+                {
+                    truncated = true;
+                    break;
+                }
+
+                parts.Add(
+                    item:
+                    $"private_{f.Name}: {f.GetValue(obj: obj).Repr(context: context.WithIncrementedDepth())}");
+                shown += 1;
+            }
+
+            foreach (var (prop, backing) in privatePair.OrderBy(keySelector: p => p.prop.Name))
+            {
+                if (context.Config.MaxPropertiesPerObject >= 0 &&
+                    shown >= context.Config.MaxPropertiesPerObject)
+                {
+                    truncated = true;
+                    break;
+                }
+
+                var val = backing.GetValue(obj: obj);
+                parts.Add(
+                    item:
+                    $"private_{prop.Name}: {val.Repr(context: context.WithIncrementedDepth())}");
+                shown += 1;
+            }
+        }
+
+        if (truncated)
         {
             parts.Add(item: "...");
         }
 
-        content = parts.Count > 0
-            ? String.Join(separator: ", ", values: parts)
-            : "";
-        return $"{content}";
+        return String.Join(separator: ", ", values: parts);
     }
-
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var type = obj.GetType();
         context = context.WithContainerConfig();
-
+        var type = obj.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
         var result = new JsonObject();
+        var shown = 0;
+        var truncated = false;
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         if (!type.IsValueType)
@@ -109,125 +188,134 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
                 value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
         }
 
-        var propertyCount = 0;
-        // Get public fields
-        var fields =
-            type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance |
-                                        BindingFlags.Static);
-        foreach (var field in fields)
+        // Optionally include public instance fields declared on this type
+        foreach (var f in type.GetFields(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                              .OrderBy(keySelector: f => f.Name))
         {
             if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
+                shown >= context.Config.MaxPropertiesPerObject)
             {
                 break;
             }
 
-            var value = field.GetValue(obj: obj);
-            var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
-            result.Add(propertyName: field.Name, value: addingValue);
-            propertyCount += 1;
+            var val = f.GetValue(obj: obj);
+            result.Add(propertyName: f.Name,
+                value: val.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+            shown += 1;
         }
 
-        // Get public properties with getters
-        var properties = type
-                        .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance |
-                                                    BindingFlags.Static)
-                        .Where(predicate: p => p is { CanRead: true, GetMethod.IsPublic: true });
-        foreach (var prop in properties)
+        // Public, non-indexer properties (by name)
+        var props = type
+                   .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
+                   .Where(predicate: p => p.CanRead && p.GetIndexParameters()
+                                                        .Length == 0 &&
+                                          !p.Name.IsCompilerGeneratedName())
+                   .ToDictionary(keySelector: p => p.Name, elementSelector: p => p);
+
+        // Non-public instance fields for backing-field detection
+        var nonPubInstFields = type
+           .GetFields(bindingAttr: BindingFlags.NonPublic |
+                                   BindingFlags.Instance);
+
+        // Collect (prop, backingField) pairs
+        var pairs = new List<(PropertyInfo prop, FieldInfo backing)>();
+        foreach (var f in nonPubInstFields)
         {
-            if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
-            {
-                break;
-            }
-
-            try
-            {
-                var value = prop.GetValue(obj: obj);
-                var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
-                result.Add(propertyName: prop.Name, value: addingValue);
-            }
-            catch (Exception ex)
-            {
-                result.Add(propertyName: prop.Name, value: $"Error: {ex.Message}");
-            }
-
-            propertyCount += 1;
-        }
-
-        if (!context.Config.ShowNonPublicProperties)
-        {
-            return result;
-        }
-
-        var nonPublicFields =
-            type.GetFields(bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance |
-                                        BindingFlags.Static)
-                .Where(predicate: p => !p.Name.IsCompilerGeneratedName());
-        foreach (var field in nonPublicFields)
-        {
-            if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
-            {
-                break;
-            }
-
-            // The compiler-generated "EqualityContract" property is not useful for representation.
-            if (field.Name == "EqualityContract")
+            string propName;
+            // Try auto-property backing fields only
+            if (!f.TryGetAutoPropInfo(propName: out propName) &&
+                !f.TryGetAnonymousInfo(propName: out propName))
             {
                 continue;
             }
 
-            var value = field.GetValue(obj: obj);
-            var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
-            var fieldName = field.Name;
-            result.Add(propertyName: $"private_{fieldName}", value: addingValue);
-            propertyCount += 1;
+            if (!props.TryGetValue(key: propName, value: out var p))
+            {
+                continue;
+            }
+
+            pairs.Add(item: (p, f));
         }
 
-        // Get public properties with getters
-        var nonPublicProperties = type
-                                 .GetProperties(
-                                      bindingAttr: BindingFlags.NonPublic |
-                                                   BindingFlags.Instance | BindingFlags.Static)
-                                 .Where(predicate: p =>
-                                      p.CanRead && !p.Name.IsCompilerGeneratedName());
-        foreach (var prop in nonPublicProperties)
+        // Emit properties by reading their backing fields (NO getter calls)
+        foreach (var (prop, backing) in pairs.OrderBy(keySelector: p => p.prop.Name))
         {
             if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
+                shown >= context.Config.MaxPropertiesPerObject)
             {
                 break;
             }
 
-            try
+            var val = backing.GetValue(obj: obj);
+            result.Add(propertyName: prop.Name,
+                value: val.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+            shown += 1;
+        }
+
+        // Non-public fields (only if requested), excluding backing fields and compiler-generated noise
+        if (context.Config.ShowNonPublicProperties && (context.Config.MaxPropertiesPerObject < 0 ||
+                                                       shown < context.Config
+                                                          .MaxPropertiesPerObject))
+        {
+            var usedBackers =
+                new HashSet<FieldInfo>(collection: pairs.Select(selector: p => p.backing));
+            var privateProps = type
+                              .GetProperties(bindingAttr: BindingFlags.NonPublic |
+                                                          BindingFlags.Instance)
+                              .Where(predicate: p => p.CanRead && p.GetIndexParameters()
+                                                        .Length == 0 &&
+                                                     !p.Name.IsCompilerGeneratedName())
+                              .ToDictionary(keySelector: p => p.Name, elementSelector: p => p);
+            var privatePair = new List<(PropertyInfo prop, FieldInfo backing)>();
+            foreach (var f in nonPubInstFields.OrderBy(keySelector: f => f.Name))
             {
-                var value = prop.GetValue(obj: obj);
-                var addingValue = value.FormatAsJsonNode(context: context.WithIncrementedDepth());
-                result.Add(propertyName: $"private_{prop.Name}", value: addingValue);
-            }
-            catch (Exception ex)
-            {
-                result.Add(propertyName: $"private_{prop.Name}", value: $"Error: {ex.Message}");
+                if (usedBackers.Contains(item: f))
+                {
+                    continue;
+                }
+
+                var propName = "";
+
+                if ((f.TryGetAutoPropInfo(propName: out propName) ||
+                     f.TryGetAnonymousInfo(propName: out propName))
+                    && privateProps.TryGetValue(key: propName, value: out var privateProp))
+                {
+                    privatePair.Add(item: (privateProp, f));
+                    continue;
+                }
+
+                if (f.Name.IsCompilerGeneratedName() || f.Name == "EqualityContract")
+                {
+                    continue;
+                }
+
+                if (context.Config.MaxPropertiesPerObject >= 0 &&
+                    shown >= context.Config.MaxPropertiesPerObject)
+                {
+                    break;
+                }
+
+                var val = f.GetValue(obj: obj);
+                result.Add(propertyName: $"private_{f.Name}",
+                    value: val.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+                shown += 1;
             }
 
-            propertyCount += 1;
+            foreach (var (prop, backing) in privatePair.OrderBy(keySelector: p => p.prop.Name))
+            {
+                if (context.Config.MaxPropertiesPerObject >= 0 &&
+                    shown >= context.Config.MaxPropertiesPerObject)
+                {
+                    break;
+                }
+
+                var val = backing.GetValue(obj: obj);
+                result.Add(propertyName: $"private_{prop.Name}",
+                    value: val.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+                shown += 1;
+            }
         }
 
         return result;
-    }
-}
-
-internal static class ObjectExtensions
-{
-    public static bool IsCompilerGeneratedName(this string fieldName)
-    {
-        return fieldName.Contains(value: "k__BackingField") || // Auto-property backing fields
-               fieldName.StartsWith(value: "<") || // Most compiler-generated fields
-               fieldName.Contains(value: "__") || // Various compiler patterns
-               fieldName.Contains(value: "DisplayClass") || // Closure fields
-               fieldName.EndsWith(value: "__0") || // State machine fields
-               fieldName.Contains(value: "c__Iterator") || // Iterator fields
-               fieldName == "EqualityContract"; // Record EqualityContract
     }
 }
