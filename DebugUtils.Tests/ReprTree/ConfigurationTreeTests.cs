@@ -171,7 +171,8 @@ public class ConfigurationTreeTests
     [Fact]
     public void TestReprConfig_ShowNonPublicProperties_ReprTree()
     {
-        var classified = new ClassifiedData(writer: "writer", data: "secret");
+        var classified =
+            new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
         var config = new ReprConfig(ShowNonPublicProperties: false);
         var actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
         Assert.NotNull(@object: actualJson);
@@ -206,12 +207,21 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: "writer", actual: writerNode[propertyName: "value"]
           ?.ToString());
 
-        var secretNode = actualJson[propertyName: "private_Data"];
-        Assert.NotNull(@object: secretNode);
-        Assert.Equal(expected: "string", actual: secretNode[propertyName: "type"]
+        var secretDataNode = actualJson[propertyName: "private_Data"];
+        Assert.NotNull(@object: secretDataNode);
+        Assert.Equal(expected: "string", actual: secretDataNode[propertyName: "type"]
           ?.ToString());
-        Assert.Equal(expected: 6, actual: secretNode[propertyName: "length"]!.GetValue<int>());
-        Assert.Equal(expected: "secret", actual: secretNode[propertyName: "value"]
+        Assert.Equal(expected: 6, actual: secretDataNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "secret", actual: secretDataNode[propertyName: "value"]
+          ?.ToString());
+
+        var secretPasswordNode = actualJson[propertyName: "private_Password"];
+        Assert.NotNull(@object: secretPasswordNode);
+        Assert.Equal(expected: "string", actual: secretPasswordNode[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: 8,
+            actual: secretPasswordNode[propertyName: "length"]!.GetValue<int>());
+        Assert.Equal(expected: "REDACTED", actual: secretPasswordNode[propertyName: "value"]
           ?.ToString());
     }
 

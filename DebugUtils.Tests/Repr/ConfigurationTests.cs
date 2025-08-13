@@ -45,13 +45,18 @@ public class ConfigurationTests
     [Fact]
     public void TestReprConfig_ShowNonPublicProperties()
     {
-        var classified = new ClassifiedData(writer: "writer", data: "secret");
+        var classified =
+            new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
         var config = new ReprConfig(ShowNonPublicProperties: false);
-        Assert.Equal(expected: "ClassifiedData(Writer: \"writer\")",
+        Assert.Equal(
+            expected:
+            "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\")",
             actual: classified.Repr(config: config));
 
         config = new ReprConfig(ShowNonPublicProperties: true);
-        Assert.Equal(expected: "ClassifiedData(Writer: \"writer\", private_Data: \"secret\")",
+        Assert.Equal(
+            expected:
+            "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
             actual: classified.Repr(config: config));
     }
 
@@ -69,7 +74,7 @@ public class ConfigurationTests
         var data = new { Name = "Alice", Age = 30, Scores = new[] { 95, 87, 92 } };
         Assert.Equal(
             expected:
-            "Anonymous(Name: \"Alice\", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))",
+            "Anonymous(Age: int(30), Name: \"Alice\", Scores: 1DArray([int(95), int(87), int(92)]))",
             actual: data.Repr());
 
         Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
