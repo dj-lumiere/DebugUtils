@@ -13,7 +13,7 @@ internal static class ReprEngine
         // Handle ALL edge cases in the main entry point
         if (obj.IsNullableStruct())
         {
-            return obj.FormatNullableValueType(context: context.WithNullableMode());
+            return obj.FormatNullableValueType(context: context.WithTypeHide());
         }
 
         if (obj is null)
@@ -73,7 +73,7 @@ internal static class ReprEngine
 
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
         return
-            $"{reprName}({value.Repr(context: context.WithNullableMode())})";
+            $"{reprName}({value.Repr(context: context.WithTypeHide())})";
     }
 
     public static JsonNode ToReprTree<T>(this T obj, ReprContext? context = null)

@@ -162,7 +162,7 @@ public record ReprContext
     }
 
 
-    internal ReprContext WithNullableMode()
+    internal ReprContext WithTypeHide()
     {
         return new ReprContext(
             config: Config with

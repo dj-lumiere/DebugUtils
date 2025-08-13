@@ -23,21 +23,27 @@ internal class DateTimeFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var datetime = (DateTime)obj;
+        var dt = (DateTime)obj;
+        var kindSuffix = dt.Kind switch
+        {
+            DateTimeKind.Utc => "UTC",
+            DateTimeKind.Local => "Local",
+            _ => "Unspecified"
+        };
         return new JsonObject
         {
             { "type", "DateTime" },
             { "kind", "struct" },
-            { "year", datetime.Year.ToString() },
-            { "month", datetime.Month.ToString() },
-            { "day", datetime.Day.ToString() },
-            { "hour", datetime.Hour.ToString() },
-            { "minute", datetime.Minute.ToString() },
-            { "second", datetime.Second.ToString() },
-            { "millisecond", datetime.Millisecond.ToString() },
-            { "subTicks", (datetime.Ticks % 10000).ToString() },
-            { "totalTicks", datetime.Ticks.ToString() },
-            { "timezone", datetime.Kind.ToString() }
+            { "year", dt.Year.ToString() },
+            { "month", dt.Month.ToString() },
+            { "day", dt.Day.ToString() },
+            { "hour", dt.Hour.ToString() },
+            { "minute", dt.Minute.ToString() },
+            { "second", dt.Second.ToString() },
+            { "millisecond", dt.Millisecond.ToString() },
+            { "subTicks", (dt.Ticks % 10000).ToString() },
+            { "totalTicks", dt.Ticks.ToString() },
+            { "timezone", kindSuffix }
         };
     }
 }
