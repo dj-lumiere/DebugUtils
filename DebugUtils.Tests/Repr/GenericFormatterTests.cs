@@ -20,7 +20,8 @@ public class GenericFormatterTests
     public void TestCustomStructRepr_WithToString()
     {
         var custom = new CustomStruct { Name = "test", Value = 42 };
-        Assert.Equal(expected: "CustomStruct(Name: \"test\", Value: int(42))", actual: custom.Repr());
+        Assert.Equal(expected: "CustomStruct(Name: \"test\", Value: int(42))",
+            actual: custom.Repr());
     }
 
     [Fact]

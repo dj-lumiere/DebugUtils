@@ -65,7 +65,8 @@ public class StandardFormatterTests
     public void TestTimeSpanRepr_Negative()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(-00:30:00.0000000)", actual: TimeSpan.FromMinutes(minutes: -30)
+        Assert.Equal(expected: "TimeSpan(-00:30:00.0000000)", actual: TimeSpan
+           .FromMinutes(minutes: -30)
            .Repr(config: config));
     }
 
@@ -90,7 +91,8 @@ public class StandardFormatterTests
     public void TestTimeSpanRepr_Positive()
     {
         var config = new ReprConfig(IntMode: IntReprMode.Decimal);
-        Assert.Equal(expected: "TimeSpan(00:30:00.0000000)", actual: TimeSpan.FromMinutes(minutes: 30)
+        Assert.Equal(expected: "TimeSpan(00:30:00.0000000)", actual: TimeSpan
+           .FromMinutes(minutes: 30)
            .Repr(config: config));
     }
 
