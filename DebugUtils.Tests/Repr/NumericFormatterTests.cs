@@ -215,8 +215,8 @@ public class NumericFormatterTests
     public void TestFloatFormatString_ExactMode()
     {
         var config = new ReprConfig(FloatFormatString: "EX");
-        var result = 3.1415926535897931f.Repr(config);
-        Assert.StartsWith("float(3.1415927410125732421875E+000)", result);
+        var result = 3.14159f.Repr(config);
+        Assert.Equal("float(3.141590118408203125E+000)", result);
     }
 
     [Fact]
@@ -232,27 +232,20 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(FloatFormatString: "BF");
         var result = 3.14159f.Repr(config);
-        Assert.Contains("|", result); // Should contain bit field separators
-        Assert.StartsWith("float(0|", result); // Positive number starts with 0
+        Assert.Equal("float(0|10000000|10010010000111111010000)",
+            result); // Positive number starts with 0
     }
 
     [Theory]
     [InlineData("F2", "double(3.14)")]
     [InlineData("E5", "double(3.14159E+000)")]
-    [InlineData("EX", true)] // EX should produce exact representation
-    public void TestFloatFormatString_DoubleValues(string format, object expectedOrExact)
+    [InlineData("EX",
+        "double(3.14158999999999988261834005243144929409027099609375E+000)")] // EX should produce exact representation
+    public void TestFloatFormatString_DoubleValues(string format, object exact)
     {
         var config = new ReprConfig(FloatFormatString: format);
-        var result = 3.1415926535897931.Repr(config);
-
-        if (expectedOrExact is bool)
-        {
-            Assert.StartsWith("double(3.1415926535897931", result);
-        }
-        else
-        {
-            Assert.Equal((string)expectedOrExact, result);
-        }
+        var result = 3.14159.Repr(config);
+        Assert.Equal(exact, result);
     }
 
     [Fact]
@@ -277,23 +270,13 @@ public class NumericFormatterTests
     #if NET5_0_OR_GREATER
     [Theory]
     [InlineData("F2", "Half(3.14)")]
-    [InlineData("HB", true)] // HB should produce hex representation
-    [InlineData("BF", true)] // BF should produce bit field
-    public void TestFloatFormatString_HalfValues(string format, object expectedOrSpecial)
+    [InlineData("HB", "Half(0x4248)")] // HB should produce hex representation
+    [InlineData("BF", "Half(0|10000|1001001000)")] // BF should produce bit field
+    public void TestFloatFormatString_HalfValues(string format, string expectedOrSpecial)
     {
         var config = new ReprConfig(FloatFormatString: format);
         var result = ((Half)3.14159f).Repr(config);
-
-        if (expectedOrSpecial is bool)
-        {
-            Assert.StartsWith("Half(", result);
-            if (format == "HB") Assert.Contains("0x", result);
-            if (format == "BF") Assert.Contains("|", result);
-        }
-        else
-        {
-            Assert.Equal((string)expectedOrSpecial, result);
-        }
+        Assert.Equal(expectedOrSpecial, result);
     }
     #endif
 
@@ -342,20 +325,19 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(IntFormatString: "B8");
         var result = 42.Repr(config);
-        Assert.Equal("int(0b00101010)", result); // Should still use custom binary formatter
+        Assert.Equal("int(0b00101010)", result); // Should use C# binary formatter with prefix.
     }
 
     [Theory]
-    [InlineData("X2")]
-    [InlineData("x4")]
-    [InlineData("B4")]
-    [InlineData("b8")]
-    public void TestIntFormatString_StartsWithHandling(string format)
+    [InlineData("X2", "int(0x2A)")]
+    [InlineData("x4", "int(0x002a)")]
+    [InlineData("B4", "int(0b101010)")]
+    [InlineData("b8", "int(0b00101010)")]
+    public void TestIntFormatString_StartsWithHandling(string format, string expected)
     {
         var config = new ReprConfig(IntFormatString: format);
         var result = 42.Repr(config);
-        Assert.NotNull(result);
-        Assert.StartsWith("int(", result);
+        Assert.Equal(expected, result); // Should use C# binary formatter with prefix.
     }
 
     #endregion
