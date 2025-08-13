@@ -30,6 +30,38 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
             _ => throw new ArgumentException(message: "Invalid type")
         };
 
+        if (!String.IsNullOrEmpty(value: context.Config.FloatFormatString))
+        {
+            return context.Config.FloatFormatString switch
+            {
+                "HB" => info.TypeName switch
+                {
+                    FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
+                        $"0x{info.Bits.ToString(format: $"X{info.Spec.TotalSize / 4}")}",
+                    _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
+                },
+                "BF" => info.TypeName switch
+                {
+                    FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
+                        $"{(info.IsNegative ? 1 : 0)}|{info.ExpBits}|{info.MantissaBits}",
+                    _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
+                },
+                _ when info.IsPositiveInfinity => "Infinity",
+                _ when info.IsNegativeInfinity => "-Infinity",
+                _ when info.IsQuietNaN => "Quiet NaN",
+                _ when info.IsSignalingNaN =>
+                    $"Signaling NaN, Payload: 0x{info.Mantissa.ToString(format: $"X{(info.Spec.MantissaBitSize + 3) / 4}")}",
+                "EX" => obj.FormatAsExact(info: info),
+                _ => obj switch
+                {
+                    Half h => h.ToString(format: context.Config.FloatFormatString),
+                    float f => f.ToString(format: context.Config.FloatFormatString),
+                    double d => d.ToString(format: context.Config.FloatFormatString),
+                    _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
+                }
+            };
+        }
+
         var config = context.Config;
         // those two repr modes prioritize bit perfect representation, so they are processed first.
         switch (config.FloatMode)
@@ -38,7 +70,7 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
                 return info.TypeName switch
                 {
                     FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                        $"0x{info.Bits.ToString(format: $"X{(info.Spec.TotalSize + 3) / 4}")}",
+                        $"0x{info.Bits.ToString(format: $"X{info.Spec.TotalSize / 4}")}",
                     _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
                 };
             case FloatReprMode.BitField:
