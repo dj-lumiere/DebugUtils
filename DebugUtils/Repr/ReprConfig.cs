@@ -352,15 +352,53 @@ public enum FormattingMode
 /// <param name="FloatMode">
 /// Specifies how floating-point numbers (float, double, decimal) should be formatted.
 /// Controls precision, notation, and level of detail for numeric output.
+/// <remarks>
+/// This property is obsolete. Use FloatFormatString instead for more flexibility. Migration guide:
+/// FloatMode.Exact → "EX"
+/// FloatMode.Scientific → "E" + FloatPrecision
+/// FloatMode.Round → "F" + FloatPrecision
+/// FloatMode.General → "G"
+/// FloatMode.HexBytes → "HB"
+/// FloatMode.BitField → "BF"
+/// </remarks>
 /// </param>
 /// <param name="FloatPrecision">
 /// Number of decimal places for floating-point formatting when applicable.
 /// Used by Round and Scientific modes.
 /// Set to a negative integer (e.g., -1) for automatic precision.
+/// <remarks>
+/// This property is obsolete. Use FloatFormatString instead.
+/// Migration guide: Combine with FloatMode like "F2" for Round mode with 2 decimal places.
+/// </remarks>
 /// </param>
 /// <param name="IntMode">
 /// Specifies how integers should be formatted.
 /// Controls the base (decimal, hex, binary) and representation style.
+/// <remarks>
+/// This property is obsolete. Use IntFormatString instead for more flexibility.
+/// Migration guide: IntMode.Decimal → "D", IntMode.Hex → "X", 
+/// IntMode.Binary → "B", IntMode.HexBytes → "HB"
+/// </remarks>
+/// </param>
+/// <param name="FloatFormatString">
+/// Format string for floating-point numbers (float, double, decimal, Half).
+/// Supports standard .NET numeric format strings plus special modes:
+/// <list type="bullet">
+/// <item>Standard formats: "F2" (fixed 2 decimals), "E" (scientific), "G" (general), "P" (percent), etc.</item>
+/// <item>Special modes: "EX" (exact decimal), "HB" (hex bytes), "BF" (bit field for analysis)</item>
+/// <item>When empty, falls back to FloatMode enum behavior for backward compatibility.</item>
+/// </list>
+/// See: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
+/// </param>
+/// <param name="IntFormatString">
+/// Format string for integer numbers (byte, int, long, BigInteger, etc.).
+/// Supports standard .NET numeric format strings plus special modes:
+/// <list type="bullet">
+/// <item>Standard formats: "D" (decimal), "X" (hex uppercase), "x" (hex lowercase), "N" (number with separators), etc..</item>
+/// <item>Special modes: "HB" (hex bytes), "B"/"b" (binary for older .NET versions)</item>
+/// <item>When empty, falls back to IntMode enum behavior for backward compatibility.</item>
+/// </list>
+/// See: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
 /// </param>
 /// <param name="ContainerReprMode">
 /// Specifies how elements within containers, structs, classes, and records should be formatted.
@@ -430,33 +468,57 @@ public enum FormattingMode
 /// </remarks>
 /// <example>
 /// <code>
-/// // Debugging configuration - maximum detail
+/// // NEW FORMAT STRING APPROACH (recommended):
+/// 
+/// // Debugging configuration - maximum detail with format strings
 /// var debugConfig = new ReprConfig(
-///     FloatMode: FloatReprMode.Exact,
-///     IntMode: IntReprMode.Hex,
+///     FloatFormatString: "EX",    // Exact floating-point representation
+///     IntFormatString: "X",       // Hexadecimal integers
 ///     TypeMode: TypeReprMode.AlwaysShow,
 ///     FormattingMode: FormattingMode.Reflection
 /// );
 /// 
-/// // Clean logging configuration
+/// // Clean logging configuration with format strings
 /// var logConfig = new ReprConfig(
-///     FloatMode: FloatReprMode.Round,
-///     FloatPrecision: 2,
-///     IntMode: IntReprMode.Decimal,
+///     FloatFormatString: "F2",    // Fixed 2 decimal places
+///     IntFormatString: "D",       // Decimal integers
 ///     TypeMode: TypeReprMode.HideObvious,
 ///     ContainerReprMode: ContainerReprMode.UseSimpleFormats
+/// );
+/// 
+/// // Special debugging modes
+/// var lowLevelConfig = new ReprConfig(
+///     FloatFormatString: "HB",    // Hex bytes for floats
+///     IntFormatString: "HB",      // Hex bytes for integers
+///     TypeMode: TypeReprMode.AlwaysShow
+/// );
+/// 
+/// // IEEE 754 analysis
+/// var ieeeConfig = new ReprConfig(
+///     FloatFormatString: "BF",    // Bit field representation
+///     IntFormatString: "B"        // Binary representation
+/// );
+/// 
+/// // LEGACY ENUM APPROACH (deprecated but still supported):
+/// 
+/// // Old debugging configuration (will show deprecation warnings)
+/// var oldDebugConfig = new ReprConfig(
+///     FloatMode: FloatReprMode.Exact,     // Use FloatFormatString: "EX" instead
+///     IntMode: IntReprMode.Hex,           // Use IntFormatString: "X" instead
+///     TypeMode: TypeReprMode.AlwaysShow,
+///     FormattingMode: FormattingMode.Reflection
 /// );
 /// 
 /// // For structured tree analysis, use ReprTree() method:
 /// // var treeOutput = obj.ReprTree(new ReprContext(new ReprConfig(EnablePrettyPrintForReprTree: true)));
 /// 
-/// // Custom container formatting
+/// // Custom container formatting with new approach
 /// var customConfig = new ReprConfig(
-///     FloatMode: FloatReprMode.Exact,  // Exact floats at top level
+///     FloatFormatString: "EX",    // Exact floats at top level
 ///     ContainerReprMode: ContainerReprMode.UseCustomConfig,
 ///     CustomContainerConfig: new ReprConfig(
-///         FloatMode: FloatReprMode.Round,  // Rounded floats in containers
-///         FloatPrecision: 1
+///         FloatFormatString: "F1",    // 1 decimal place in containers
+///         IntFormatString: "D"        // Decimal integers in containers
 ///     )
 /// );
 /// </code>
@@ -465,6 +527,8 @@ public record ReprConfig(
     FloatReprMode FloatMode = FloatReprMode.Exact,
     int FloatPrecision = -1,
     IntReprMode IntMode = IntReprMode.Decimal,
+    string FloatFormatString = "",
+    string IntFormatString = "",
     ContainerReprMode ContainerReprMode = ContainerReprMode.UseSimpleFormats,
     TypeReprMode TypeMode = TypeReprMode.HideObvious,
     FormattingMode FormattingMode = FormattingMode.Smart,
@@ -478,12 +542,58 @@ public record ReprConfig(
 )
 {
     /// <summary>
+    /// Specifies how floating-point numbers (float, double, decimal) should be formatted.
+    /// Controls precision, notation, and level of detail for numeric output.
+    /// </summary>
+    /// <remarks>
+    /// This property is obsolete. Use FloatFormatString instead for more flexibility.
+    /// Migration guide: FloatMode.Exact → "EX", FloatMode.Scientific → "E", 
+    /// FloatMode.Round → "F" + FloatPrecision, FloatMode.General → "G" (ignores FloatPrecision), 
+    /// FloatMode.HexBytes → "HB", FloatMode.BitField → "BF"
+    /// </remarks>
+    [Obsolete(
+        message:
+        "Use FloatFormatString instead. FloatMode.Exact becomes \"EX\", FloatMode.Scientific becomes \"E\", FloatMode.Round becomes \"F\" + FloatPrecision, FloatMode.General becomes \"G\" (ignores FloatPrecision), FloatMode.HexBytes becomes \"HB\", FloatMode.BitField becomes \"BF\"",
+        error: false)]
+    public FloatReprMode FloatMode { get; } = FloatMode;
+
+    /// <summary>
+    /// Number of decimal places for floating-point formatting when applicable.
+    /// Used by Round and Scientific modes.
+    /// Set to a negative integer (e.g., -1) for automatic precision.
+    /// </summary>
+    /// <remarks>
+    /// This property is obsolete. Use FloatFormatString instead.
+    /// Migration guide: Combine with FloatMode like "F2" for Round mode with 2 decimal places.
+    /// </remarks>
+    [Obsolete(
+        message:
+        "Use FloatFormatString instead. Combine with FloatMode like \"F2\" for Round mode with 2 decimal places",
+        error: false)]
+    public int FloatPrecision { get; } = FloatPrecision;
+
+    /// <summary>
+    /// Specifies how integers should be formatted.
+    /// Controls the base (decimal, hex, binary) and representation style.
+    /// </summary>
+    /// <remarks>
+    /// This property is obsolete. Use IntFormatString instead for more flexibility.
+    /// Migration guide: IntMode.Decimal → "D", IntMode.Hex → "X", 
+    /// IntMode.Binary → "B", IntMode.HexBytes → "HB"
+    /// </remarks>
+    [Obsolete(
+        message:
+        "Use IntFormatString instead. IntMode.Decimal becomes \"D\", IntMode.Hex becomes \"X\", IntMode.Binary becomes \"B\", IntMode.HexBytes becomes \"HB\"",
+        error: false)]
+    public IntReprMode IntMode { get; } = IntMode;
+
+    /// <summary>
     /// Gets the default configuration optimized for formatting container contents.
     /// Provides clean, readable formatting suitable for elements within collections,
     /// arrays, and object properties.
     /// </summary>
     /// <value>
-    /// A configuration with General float mode, 2-decimal precision, Decimal integers,
+    /// A configuration with General float mode, Decimal integers,
     /// simple container formatting, and obvious type hiding for clean container display.
     /// </value>
     /// <remarks>
@@ -492,10 +602,9 @@ public record ReprConfig(
     /// over detailed numeric representation within containers.
     /// </remarks>
     public static ReprConfig ContainerDefaults => new(
-        FloatMode: FloatReprMode.General,
-        FloatPrecision: 2,
+        FloatFormatString: "G",
+        IntFormatString: "D",
         ContainerReprMode: ContainerReprMode.UseSimpleFormats,
-        IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious,
         ShowNonPublicProperties: false,
         MaxDepth: 5,
@@ -519,10 +628,9 @@ public record ReprConfig(
     /// display clean and familiar.
     /// </remarks>
     public static ReprConfig GlobalDefaults => new(
-        FloatMode: FloatReprMode.Exact,
-        FloatPrecision: -1,
+        FloatFormatString: "EX",
+        IntFormatString: "D",
         ContainerReprMode: ContainerReprMode.UseSimpleFormats,
-        IntMode: IntReprMode.Decimal,
         TypeMode: TypeReprMode.HideObvious,
         ShowNonPublicProperties: false,
         MaxDepth: 5,

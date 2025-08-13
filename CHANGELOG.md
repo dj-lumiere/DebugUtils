@@ -1,5 +1,55 @@
 # Changelog
 
+# [v1.5.0] Released at 2025.08.13
+
+## 🚀 Major Features
+
+### Format String-Based Numeric Formatting
+- **NEW**: `FloatFormatString` and `IntFormatString` properties in `ReprConfig`
+- **Full .NET format string support**: Use standard .NET format strings like `"F2"`, `"E5"`, `"X"`, `"D"`
+- **Special debugging modes**:
+  - `"EX"` - Exact decimal representation for floating-point precision debugging
+  - `"HB"` - Raw hex bytes representation for low-level memory analysis
+  - `"BF"` - IEEE 754 bit field analysis (sign|exponent|mantissa)
+  - `"B"` - Binary representation for versions less than .NET 8
+- **Backward compatibility**: Existing enum-based configuration still works with deprecation warnings
+
+### Enhanced Time Formatting with Tick-Level Precision
+- **Improved DateTime/DateTimeOffset formatting**: Now includes milliseconds and sub-millisecond ticks
+  - Format: `yyyy.MM.dd HH:mm:ss.fff####` where `fff` = milliseconds, `####` = sub-millisecond ticks
+- **Enhanced TimeSpan formatting**: 
+  - Compact day notation: `5D 14:30:15.1234567` (5 days format)
+  - Negative handling: `-2D-14:30:15.1234567` for negative durations
+  - Tick-level precision throughout
+- **TimeOnly formatting**: Full precision with `HH:mm:ss.fff####` format
+- **Comprehensive tick representation**: Both `totalTicks` and `subTicks` (ticks % 10000) in ReprTree
+
+## 📋 Breaking Changes
+- **Deprecated enum-based formatting**: `FloatMode`, `FloatPrecision`, and `IntMode` properties are now obsolete
+- **Migration path**: Clear guidance provided in deprecation warnings and documentation
+- **No immediate breaking changes**: All existing code continues to work with warnings
+
+## 🔧 API Improvements
+- **New properties**: `FloatFormatString` and `IntFormatString` in `ReprConfig`
+- **Enhanced default configurations**: `GlobalDefaults` and `ContainerDefaults` now use format strings
+- **Comprehensive XML documentation**: Detailed migration guides and format string examples
+
+## 📚 Documentation Updates
+- **Updated README files**: Both main and Repr-specific documentation show new format string approach
+- **Migration examples**: Side-by-side comparison of old and new approaches
+- **Format string reference**: Complete guide to standard and special format modes
+
+## 💡 Use Cases & Examples
+```csharp
+// NEW: Format string approach (recommended)
+42.Repr(new ReprConfig(IntFormatString: "X"))          // int(0x2A)
+3.14f.Repr(new ReprConfig(FloatFormatString: "BF"))    // IEEE 754 bit field
+DateTime.Now.Repr()                                    // 2025.08.13 15:30:45.1234567 Local
+
+// OLD: Enum approach (deprecated but supported)
+42.Repr(new ReprConfig(IntMode: IntReprMode.Hex))      // Still works with warnings
+```
+
 # [v1.4.0] Released at 2025.08.12
 
 ## ✨ New Features

@@ -218,18 +218,18 @@ public class ConfigurationTreeTests
     [Fact]
     public void TestReprTree_WithFloats()
     {
-      var a = new { x = 3.14f, y = 2.71f };
-      var actualJson = JsonNode.Parse(json: a.ReprTree())!;
-      Assert.Equal(expected: "Anonymous", actual: actualJson[propertyName: "type"]
-      ?.ToString());
-      Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
-      ?.ToString());
-      Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
-      Assert.Equal(expected: "3.14",
-        actual: actualJson[propertyName: "x"]?[propertyName: "value"]
-        ?.ToString());
-      Assert.Equal(expected: "2.71",
-        actual: actualJson[propertyName: "y"]?[propertyName: "value"]
-        ?.ToString());
+        var a = new { x = 3.14f, y = 2.71f };
+        var actualJson = JsonNode.Parse(json: a.ReprTree())!;
+        Assert.Equal(expected: "Anonymous", actual: actualJson[propertyName: "type"]
+          ?.ToString());
+        Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
+          ?.ToString());
+        Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
+        Assert.Equal(expected: "3.14",
+            actual: actualJson[propertyName: "x"]?[propertyName: "value"]
+              ?.ToString());
+        Assert.Equal(expected: "2.71",
+            actual: actualJson[propertyName: "y"]?[propertyName: "value"]
+              ?.ToString());
     }
 }

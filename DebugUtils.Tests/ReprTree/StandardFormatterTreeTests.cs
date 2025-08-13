@@ -139,7 +139,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "timezone"] = "Unspecified"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -156,7 +157,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "timezone"] = "Local"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -173,7 +175,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "timezone"] = "Utc"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -193,7 +196,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "30",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "18000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "18000000000",
             [propertyName: "isNegative"] = "false"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -228,7 +232,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "30",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "18000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "18000000000",
             [propertyName: "isNegative"] = "true"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -249,7 +254,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "0",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "0",
             [propertyName: "isNegative"] = "false"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -270,7 +276,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "30",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "18000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "18000000000",
             [propertyName: "isNegative"] = "false"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
@@ -294,7 +301,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "offset"] = new JsonObject
             {
                 [propertyName: "type"] = "TimeSpan",
@@ -304,7 +312,8 @@ public class StandardFormatterTreeTests
                 [propertyName: "minute"] = "0",
                 [propertyName: "second"] = "0",
                 [propertyName: "millisecond"] = "0",
-                [propertyName: "ticks"] = "0",
+                [propertyName: "subTicks"] = "0",
+                [propertyName: "totalTicks"] = "0",
                 [propertyName: "isNegative"] = "false"
             }
         };
@@ -329,7 +338,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "offset"] = new JsonObject
             {
                 [propertyName: "type"] = "TimeSpan",
@@ -339,7 +349,8 @@ public class StandardFormatterTreeTests
                 [propertyName: "minute"] = "0",
                 [propertyName: "second"] = "0",
                 [propertyName: "millisecond"] = "0",
-                [propertyName: "ticks"] = "36000000000",
+                [propertyName: "subTicks"] = "0",
+                [propertyName: "totalTicks"] = "36000000000",
                 [propertyName: "isNegative"] = "false"
             }
         };
@@ -364,7 +375,8 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "638712864000000000",
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "638712864000000000",
             [propertyName: "offset"] = new JsonObject
             {
                 [propertyName: "type"] = "TimeSpan",
@@ -374,7 +386,8 @@ public class StandardFormatterTreeTests
                 [propertyName: "minute"] = "0",
                 [propertyName: "second"] = "0",
                 [propertyName: "millisecond"] = "0",
-                [propertyName: "ticks"] = "36000000000",
+                [propertyName: "subTicks"] = "0",
+                [propertyName: "totalTicks"] = "36000000000",
                 [propertyName: "isNegative"] = "true"
             }
         };
@@ -410,11 +423,12 @@ public class StandardFormatterTreeTests
             [propertyName: "minute"] = "0",
             [propertyName: "second"] = "0",
             [propertyName: "millisecond"] = "0",
-            [propertyName: "ticks"] = "0"
+            [propertyName: "subTicks"] = "0",
+            [propertyName: "totalTicks"] = "0"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
-    
+
     [Fact]
     public void TestNullableStructRepr()
     {

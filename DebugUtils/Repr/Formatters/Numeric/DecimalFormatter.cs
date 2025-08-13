@@ -34,6 +34,17 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
         var loBits = Convert.ToString(value: lo, toBase: 2)
                             .PadLeft(totalWidth: 32, paddingChar: '0');
 
+        if (!String.IsNullOrEmpty(value: context.Config.FloatFormatString))
+        {
+            return context.Config.FloatFormatString switch
+            {
+                "HB" => $"0x{flags:X8}{hi:X8}{mid:X8}{lo:X8}",
+                "BF" => $"{(isNegative ? 1 : 0)}|{scaleBits}|{hiBits}{midBits}{loBits}",
+                "EX" => dec.FormatAsExact(),
+                _ => dec.ToString(format: context.Config.FloatFormatString)
+            };
+        }
+
         return config.FloatMode switch
         {
             FloatReprMode.HexBytes =>

@@ -30,7 +30,7 @@ public class FunctionFormatterTreeTests
         await Task.Delay(millisecondsDelay: 1);
         return a;
     }
-    
+
     [Fact]
     public void TestFunctionHierarchical()
     {

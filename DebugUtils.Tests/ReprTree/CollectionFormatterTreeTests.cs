@@ -561,5 +561,4 @@ public class CollectionFormatterTreeTests
             "third" &&
             item[propertyName: "priority"]![propertyName: "value"]!.GetValue<string>() == "3");
     }
-
 }

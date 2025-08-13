@@ -10,31 +10,35 @@ internal class DateTimeFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        var datetime = (DateTime)obj;
-        var kindSuffix = datetime.Kind switch
+        var dt = (DateTime)obj;
+        var kindSuffix = dt.Kind switch
         {
-            DateTimeKind.Utc => " UTC",
-            DateTimeKind.Local => " Local",
-            _ => " Unspecified"
+            DateTimeKind.Utc => "UTC",
+            DateTimeKind.Local => "Local",
+            _ => "Unspecified"
         };
-        return datetime.ToString(format: "yyyy-MM-dd HH:mm:ss") + kindSuffix;
+        return
+            $"{dt.Year:D4}.{dt.Month:D2}.{dt.Day:D2} {dt.Hour:D2}:{dt.Minute:D2}:{dt.Second:D2}.{dt.Millisecond:D3}{dt.Ticks % 10000:D4} {kindSuffix}";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var datetime = (DateTime)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "DateTime");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "year", value: datetime.Year.ToString());
-        result.Add(propertyName: "month", value: datetime.Month.ToString());
-        result.Add(propertyName: "day", value: datetime.Day.ToString());
-        result.Add(propertyName: "hour", value: datetime.Hour.ToString());
-        result.Add(propertyName: "minute", value: datetime.Minute.ToString());
-        result.Add(propertyName: "second", value: datetime.Second.ToString());
-        result.Add(propertyName: "millisecond", value: datetime.Millisecond.ToString());
-        result.Add(propertyName: "ticks", value: datetime.Ticks.ToString());
-        result.Add(propertyName: "timezone", value: datetime.Kind.ToString());
+        var result = new JsonObject
+        {
+            { "type", "DateTime" },
+            { "kind", "struct" },
+            { "year", datetime.Year.ToString() },
+            { "month", datetime.Month.ToString() },
+            { "day", datetime.Day.ToString() },
+            { "hour", datetime.Hour.ToString() },
+            { "minute", datetime.Minute.ToString() },
+            { "second", datetime.Second.ToString() },
+            { "millisecond", datetime.Millisecond.ToString() },
+            { "subTicks", (datetime.Ticks % 10000).ToString() },
+            { "totalTicks", datetime.Ticks.ToString() },
+            { "timezone", datetime.Kind.ToString() }
+        };
         return result;
     }
 }
@@ -46,37 +50,52 @@ internal class DateTimeOffsetFormatter : IReprFormatter, IReprTreeFormatter
     public string ToRepr(object obj, ReprContext context)
     {
         var dto = (DateTimeOffset)obj;
+        var dtoTime =
+            $"{dto.Year:D4}.{dto.Month:D2}.{dto.Day:D2} {dto.Hour:D2}:{dto.Minute:D2}:{dto.Second:D2}.{dto.Millisecond:D3}{dto.Ticks % 10000:D4}";
         if (dto.Offset == TimeSpan.Zero)
         {
-            return dto.ToString(format: "yyyy-MM-dd HH:mm:ss") + "Z";
+            return dtoTime + "Z";
         }
 
-        var offset = dto.Offset.ToString(format: "c");
-        if (!offset.StartsWith(value: "+"))
+        var ts = dto.Offset;
+        var isNegative = ts.Ticks < 0;
+        if (isNegative)
         {
-            offset = "+" + offset;
+            ts = ts.Negate();
         }
 
-        return dto.ToString(format: "yyyy-MM-dd HH:mm:ss") + offset;
+        var subDayPart =
+            $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}.{ts.Milliseconds:D3}{ts.Ticks % 10000:D4}";
+        var tsString = (isNegative, ts.Days) switch
+        {
+            (true, 0) => $"-{subDayPart}",
+            (true, _) => $"-{ts.Days}D-{subDayPart}",
+            (false, 0) => $"+{subDayPart}",
+            (false, _) => $"+{ts.Days}D+{subDayPart}"
+        };
+        return
+            $"{dtoTime}{tsString}";
     }
 
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var dto = (DateTimeOffset)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "DateTimeOffset");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "year", value: dto.Year.ToString());
-        result.Add(propertyName: "month", value: dto.Month.ToString());
-        result.Add(propertyName: "day", value: dto.Day.ToString());
-        result.Add(propertyName: "hour", value: dto.Hour.ToString());
-        result.Add(propertyName: "minute", value: dto.Minute.ToString());
-        result.Add(propertyName: "second", value: dto.Second.ToString());
-        result.Add(propertyName: "millisecond", value: dto.Millisecond.ToString());
-        result.Add(propertyName: "ticks", value: dto.Ticks.ToString());
-        result.Add(propertyName: "offset",
-            value: dto.Offset.FormatAsJsonNode(context: context.WithIncrementedDepth()));
+        var result = new JsonObject
+        {
+            { "type", "DateTimeOffset" },
+            { "kind", "struct" },
+            { "year", dto.Year.ToString() },
+            { "month", dto.Month.ToString() },
+            { "day", dto.Day.ToString() },
+            { "hour", dto.Hour.ToString() },
+            { "minute", dto.Minute.ToString() },
+            { "second", dto.Second.ToString() },
+            { "millisecond", dto.Millisecond.ToString() },
+            { "subTicks", (dto.Ticks % 10000).ToString() },
+            { "totalTicks", dto.Ticks.ToString() },
+            { "offset", dto.Offset.FormatAsJsonNode(context: context.WithIncrementedDepth()) }
+        };
         return result;
     }
 }
@@ -87,7 +106,22 @@ internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        return $"{((TimeSpan)obj).TotalSeconds:0.000}s";
+        var ts = (TimeSpan)obj;
+        var isNegative = ts.Ticks < 0;
+        if (isNegative)
+        {
+            ts = ts.Negate();
+        }
+
+        var subDayPart =
+            $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}.{ts.Milliseconds:D3}{ts.Ticks % 10000:D4}";
+        return (isNegative, ts.Days) switch
+        {
+            (true, 0) => $"-{subDayPart}",
+            (true, _) => $"-{ts.Days}D-{subDayPart}",
+            (false, 0) => subDayPart,
+            (false, _) => $"{ts.Days}D {subDayPart}"
+        };
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
@@ -99,17 +133,22 @@ internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
             ts = ts.Negate();
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "TimeSpan");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "day", value: ts.Days.ToString());
-        result.Add(propertyName: "hour", value: ts.Hours.ToString());
-        result.Add(propertyName: "minute", value: ts.Minutes.ToString());
-        result.Add(propertyName: "second", value: ts.Seconds.ToString());
-        result.Add(propertyName: "millisecond", value: ts.Milliseconds.ToString());
-        result.Add(propertyName: "ticks", value: ts.Ticks.ToString());
-        result.Add(propertyName: "isNegative", value: isNegative.ToString()
-                                                                .ToLowerInvariant());
+        var result = new JsonObject
+        {
+            { "type", "TimeSpan" },
+            { "kind", "struct" },
+            { "day", ts.Days.ToString() },
+            { "hour", ts.Hours.ToString() },
+            { "minute", ts.Minutes.ToString() },
+            { "second", ts.Seconds.ToString() },
+            { "millisecond", ts.Milliseconds.ToString() },
+            { "subTicks", (ts.Ticks % 10000).ToString() },
+            { "totalTicks", ts.Ticks.ToString() },
+            {
+                "isNegative", isNegative.ToString()
+                                        .ToLowerInvariant()
+            }
+        };
         return result;
     }
 }
@@ -121,18 +160,21 @@ internal class DateOnlyFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        return ((DateOnly)obj).ToString(format: "yyyy-MM-dd");
+        var dateOnly = (DateOnly)obj;
+        return $"{dateOnly.Year:D4}.{dateOnly.Month:D2}.{dateOnly.Day:D2}";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var dateOnly = (DateOnly)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "DateOnly");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "year", value: dateOnly.Year.ToString());
-        result.Add(propertyName: "month", value: dateOnly.Month.ToString());
-        result.Add(propertyName: "day", value: dateOnly.Day.ToString());
+        var result = new JsonObject
+        {
+            { "type", "DateOnly" },
+            { "kind", "struct" },
+            { "year", dateOnly.Year.ToString() },
+            { "month", dateOnly.Month.ToString() },
+            { "day", dateOnly.Day.ToString() }
+        };
         return result;
     }
 }
@@ -143,20 +185,25 @@ internal class TimeOnlyFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        return ((TimeOnly)obj).ToString(format: "HH:mm:ss");
+        var to = (TimeOnly)obj;
+        return
+            $"{to.Hour:D2}:{to.Minute:D2}:{to.Second:D2}.{to.Millisecond:D3}{to.Ticks % 10000:D4}";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var to = (TimeOnly)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "TimeOnly");
-        result.Add(propertyName: "kind", value: "struct");
-        result.Add(propertyName: "hour", value: to.Hour.ToString());
-        result.Add(propertyName: "minute", value: to.Minute.ToString());
-        result.Add(propertyName: "second", value: to.Second.ToString());
-        result.Add(propertyName: "millisecond", value: to.Millisecond.ToString());
-        result.Add(propertyName: "ticks", value: to.Ticks.ToString());
+        var result = new JsonObject
+        {
+            { "type", "TimeOnly" },
+            { "kind", "struct" },
+            { "hour", to.Hour.ToString() },
+            { "minute", to.Minute.ToString() },
+            { "second", to.Second.ToString() },
+            { "millisecond", to.Millisecond.ToString() },
+            { "subTicks", (to.Ticks % 10000).ToString() },
+            { "totalTicks", to.Ticks.ToString() }
+        };
         return result;
     }
 }

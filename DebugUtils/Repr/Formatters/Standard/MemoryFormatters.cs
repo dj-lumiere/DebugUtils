@@ -27,7 +27,7 @@ internal static class SpanFormatter
                 break;
             }
 
-            items.Add(item: obj[i]
+            items.Add(item: obj[index: i]
                .Repr(context: context.WithIncrementedDepth()));
         }
 
@@ -36,11 +36,11 @@ internal static class SpanFormatter
             var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
             if (remainingCount > 0)
             {
-                items.Add($"... ({remainingCount} more items)");
+                items.Add(item: $"... ({remainingCount} more items)");
             }
         }
 
-        return "[" + String.Join(", ", items) + "]";
+        return "[" + String.Join(separator: ", ", values: items) + "]";
     }
     public static JsonNode ToReprTree<T>(Span<T> obj, ReprContext context)
     {
@@ -74,7 +74,7 @@ internal static class SpanFormatter
                 break;
             }
 
-            entries.Add(item: obj[i]
+            entries.Add(item: obj[index: i]
                .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
@@ -114,7 +114,7 @@ internal static class ReadOnlySpanFormatter
                 break;
             }
 
-            items.Add(item: obj[i]
+            items.Add(item: obj[index: i]
                .Repr(context: context.WithIncrementedDepth()));
         }
 
@@ -123,11 +123,11 @@ internal static class ReadOnlySpanFormatter
             var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
             if (remainingCount > 0)
             {
-                items.Add($"... ({remainingCount} more items)");
+                items.Add(item: $"... ({remainingCount} more items)");
             }
         }
 
-        return "[" + String.Join(", ", items) + "]";
+        return "[" + String.Join(separator: ", ", values: items) + "]";
     }
     public static JsonNode ToReprTree<T>(ReadOnlySpan<T> obj, ReprContext context)
     {
@@ -161,7 +161,7 @@ internal static class ReadOnlySpanFormatter
                 break;
             }
 
-            entries.Add(item: obj[i]
+            entries.Add(item: obj[index: i]
                .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
@@ -179,14 +179,14 @@ internal static class ReadOnlySpanFormatter
     }
 }
 
-[ReprOptions(true)]
+[ReprOptions(needsPrefix: true)]
 internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
         var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod("ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj, null)!;
+        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
@@ -205,7 +205,7 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            items.Add(item: array.GetValue(i)
+            items.Add(item: array.GetValue(index: i)
                                  .Repr(context: context.WithIncrementedDepth()));
         }
 
@@ -225,8 +225,8 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod("ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj, null)!;
+        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
@@ -260,7 +260,7 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            entries.Add(item: array.GetValue(i)
+            entries.Add(item: array.GetValue(index: i)
                                    .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
@@ -278,14 +278,14 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
     }
 }
 
-[ReprOptions(true)]
+[ReprOptions(needsPrefix: true)]
 internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
         var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod("ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj, null)!;
+        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
@@ -304,7 +304,7 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            items.Add(item: array.GetValue(i)
+            items.Add(item: array.GetValue(index: i)
                                  .Repr(context: context.WithIncrementedDepth()));
         }
 
@@ -313,17 +313,17 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
             var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
             if (remainingCount > 0)
             {
-                items.Add($"... ({remainingCount} more items)");
+                items.Add(item: $"... ({remainingCount} more items)");
             }
         }
 
-        return "[" + String.Join(", ", items) + "]";
+        return "[" + String.Join(separator: ", ", values: items) + "]";
     }
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var memoryType = obj.GetType();
-        var toArrayMethod = memoryType.GetMethod("ToArray");
-        var array = (Array)toArrayMethod!.Invoke(obj, null)!;
+        var toArrayMethod = memoryType.GetMethod(name: "ToArray");
+        var array = (Array)toArrayMethod!.Invoke(obj: obj, parameters: null)!;
         context = context.WithContainerConfig();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
@@ -357,7 +357,7 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
                 break;
             }
 
-            entries.Add(item: array.GetValue(i)
+            entries.Add(item: array.GetValue(index: i)
                                    .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
@@ -376,7 +376,7 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 }
 
 [ReprFormatter(typeof(Index))]
-[ReprOptions(true)]
+[ReprOptions(needsPrefix: true)]
 internal class IndexFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -399,7 +399,7 @@ internal class IndexFormatter : IReprFormatter, IReprTreeFormatter
 }
 
 [ReprFormatter(typeof(Range))]
-[ReprOptions(true)]
+[ReprOptions(needsPrefix: true)]
 internal class RangeFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -414,8 +414,8 @@ internal class RangeFormatter : IReprFormatter, IReprTreeFormatter
         {
             { "type", "Range" },
             { "kind", "struct" },
-            { "start", range.Start.FormatAsJsonNode(context) },
-            { "end", range.End.FormatAsJsonNode(context) }
+            { "start", range.Start.FormatAsJsonNode(context: context) },
+            { "end", range.End.FormatAsJsonNode(context: context) }
         };
         return result;
     }
