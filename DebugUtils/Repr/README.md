@@ -107,8 +107,7 @@ Console.WriteLine(student.ReprTree());
 // Output: {
 //   "type": "Student",
 //   "kind": "class",
-//   "hashCode": "0xABCDABCD"
-//   "Name": { "type": "string", "kind": "class", "length": 5, "hashCode" = "0xAAAAAAAA", "value": "Alice" },
+//   "hashCode": "0xABCDABCD",
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
 //   "Hobbies": {
 //     "type": "List",
@@ -118,7 +117,8 @@ Console.WriteLine(student.ReprTree());
 //       { "type": "string", "kind": "class", "length": 7, "hashCode" = "0xBBBBBBBB", "value": "reading" },
 //       { "type": "string", "kind": "class", "length": 6, "hashCode" = "0xCCCCCCCC", "value": "coding" }
 //     ]
-//   }
+//   },
+//   "Name": { "type": "string", "kind": "class", "length": 5, "hashCode" = "0xAAAAAAAA", "value": "Alice" },
 // }
 ```
 
@@ -344,7 +344,8 @@ var child = new Node { Name = "Child", Parent = parent };
 parent.Child = child;
 
 Console.WriteLine(parent.Repr());
-// Output: Node(Name: "Parent", Child: Node(Name: "Child", Parent: <Circular Reference to Node @0x12345678>))
+// Output: Node(Child: Node(Child: null, Name: "Child", Parent: <Circular Reference to Node @0x01F550A4>), Name: "Parent", Parent: null)
+// (hashCode may vary)
 ```
 
 ## Target Frameworks

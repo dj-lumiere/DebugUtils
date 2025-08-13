@@ -25,7 +25,7 @@ using DebugUtils.Repr;
 // 🔍 Better object representation
 var data = new { Name = "Alice", Age = 30, Scores = new[] {95, 87, 92} };
 Console.WriteLine(data.Repr());
-// Output: Anonymous(Name: "Alice", Age: int(30), Scores: 1DArray([int(95), int(87), int(92)]))
+// Output: Anonymous(Age: int(30), Name: "Alice", Scores: 1DArray([int(95), int(87), int(92)]))
 
 // 🌳 Structured tree output for complex analysis
 Console.WriteLine(data.ReprTree());
@@ -33,8 +33,8 @@ Console.WriteLine(data.ReprTree());
 //   "type": "Anonymous",
 //   "kind": "class",
 //   "hashCode": "0xAAAAAAAA",
-//   "Name": { "type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 5, "value": "Alice" },
 //   "Age": { "type": "int", "kind": "struct", "value": "30" },
+//   "Name": { "type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 5, "value": "Alice" },
 //   "Scores": {
 //     "type": "1DArray",
 //     "kind": "class",
@@ -259,8 +259,8 @@ a.ReprTree();
 //     "type": "Person",
 //     "kind": "class",
 //     "hashCode": "0xAAAAAAAA",
-//     "Name": {"type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length":4, "value":"Lumi"},
-//     "Age": {"type": "int", "kind": "struct", "value": "28"}
+//     "Age": {"type": "int", "kind": "struct", "value": "28"},
+//     "Name": {"type": "string", "kind": "class", "hashCode": "0xBBBBBBBB", "length": 4, "value": "Lumi"}
 // } (hashCode may vary)
 ```
 
