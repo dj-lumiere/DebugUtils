@@ -46,47 +46,6 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             propertyCount += 1;
         }
 
-        // Get public properties with getters
-        var properties = type
-                        .GetProperties(bindingAttr: BindingFlags.Public | BindingFlags.Instance)
-                        .Where(predicate: p => p is { CanRead: true, GetMethod.IsPublic: true });
-        foreach (var prop in properties)
-        {
-            if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
-            {
-                isTruncated = true;
-                break;
-            }
-
-            try
-            {
-                var value = prop.GetValue(obj: obj);
-                parts.Add(
-                    item: $"{prop.Name}: {value.Repr(context: context.WithIncrementedDepth())}");
-            }
-            catch (Exception ex)
-            {
-                parts.Add(item: $"{prop.Name}: <error {ex.Message}>");
-            }
-
-            accessedFieldNames.Add(item: prop.Name);
-            propertyCount += 1;
-        }
-
-        if (!context.Config.ShowNonPublicProperties)
-        {
-            if (isTruncated)
-            {
-                parts.Add(item: "...");
-            }
-
-            content = parts.Count > 0
-                ? String.Join(separator: ", ", values: parts)
-                : "";
-            return $"{content}";
-        }
-
         var nonPublicFields =
             type.GetFields(bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance |
                                         BindingFlags.Static)
@@ -110,46 +69,6 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
             }
 
             parts.Add(item: $"private_{fieldName}: {addingValue}");
-            propertyCount += 1;
-        }
-
-        // Get public properties with getters
-        var nonPublicProperties = type
-                                 .GetProperties(
-                                      bindingAttr: BindingFlags.NonPublic |
-                                                   BindingFlags.Instance)
-                                 .Where(predicate: p => p is
-                                                        {
-                                                            CanRead: true,
-                                                            GetMethod.IsPublic: false
-                                                        } &&
-                                                        !p.Name.IsCompilerGeneratedName());
-        foreach (var prop in nonPublicProperties)
-        {
-            if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
-            {
-                break;
-            }
-
-            var propName = prop.Name;
-
-            if (accessedFieldNames.Contains(item: propName))
-            {
-                continue; // Skip but don't count
-            }
-
-            try
-            {
-                var value = prop.GetValue(obj: obj);
-                var addingValue = value.Repr(context: context.WithIncrementedDepth());
-                parts.Add(item: $"private_{propName}: {addingValue}");
-            }
-            catch (Exception ex)
-            {
-                parts.Add(item: $"private_{propName}: {ex.Message}");
-            }
-
             propertyCount += 1;
         }
 
