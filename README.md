@@ -178,6 +178,36 @@ public class DataProcessor
 - **Debugging algorithms** - Trace execution flow with precision
 - **Unit testing** - Get detailed failure locations
 
+### Member Ordering (v1.6)
+
+For object representation, DebugUtils uses deterministic alphabetical ordering within member categories:
+
+1. **Public fields** (alphabetical by name)
+2. **Public auto-properties** (alphabetical by name)
+3. **Private fields** (alphabetical by name, prefixed with "private_")
+4. **Private auto-properties** (alphabetical by name, prefixed with "private_")
+
+```csharp
+public class ClassifiedData
+{
+    public long Id = 5;                    // Category 1: Public field
+    public int Age = 10;                   // Category 1: Public field
+    public string Writer { get; set; }     // Category 2: Public auto-property
+    public string Name { get; set; }       // Category 2: Public auto-property
+    private DateTime Date = DateTime.Now;  // Category 3: Private field
+    private string Password = "secret";    // Category 3: Private field
+    private string Data { get; set; }      // Category 4: Private auto-property
+    private Guid Key { get; set; }         // Category 4: Private auto-property
+}
+
+// Output with ShowNonPublicProperties: true
+// ClassifiedData(Age: int(10), Id: long(5), Name: "Alice", Writer: "Bob", 
+//                private_Date: DateTime(...), private_Password: "secret",
+//                private_Data: "info", private_Key: Guid(...))
+```
+
+This ordering ensures deterministic output while grouping similar member types together. Auto-properties are accessed via their backing fields to avoid potential side effects from getter calls.
+
 ## Configuration Options
 
 ### Float Formatting (NEW: Format Strings)
