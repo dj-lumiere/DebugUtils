@@ -73,6 +73,7 @@ internal class StringBuilderFormatter : IReprFormatter, IReprTreeFormatter
             var truncatedLetterCount = s.Length - context.Config.MaxStringLength;
             s = s[..context.Config.MaxStringLength] + $"... ({truncatedLetterCount} more letters)";
         }
+
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "hashCode", value: RuntimeHelpers.GetHashCode(o: obj));
