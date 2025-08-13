@@ -30,22 +30,16 @@ internal class FunctionFormatter : IReprFormatter, IReprTreeFormatter
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = "Function",
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
         var functionDetails = del.Method.ToFunctionDetails();
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "Function");
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
-        result.Add(propertyName: "properties",
-            value: functionDetails.FormatAsJsonNode(context: context));
-        return result;
+        return new JsonObject
+        {
+            { "type", "Function" },
+            { "hashCode", $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}" },
+            { "properties", functionDetails.FormatAsJsonNode(context: context) }
+        };
     }
 }
 
@@ -70,22 +64,9 @@ internal class FunctionDetailsFormatter : IReprFormatter, IReprTreeFormatter
         var type = details.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "name",
-            value: details.Name);
-        result.Add(propertyName: "returnType",
-            value: details.ReturnTypeReprName);
-        result.Add(propertyName: "modifiers",
-            value: details.Modifiers.FormatAsJsonNode(context: context.WithIncrementedDepth()));
         var parameters = new JsonArray();
         foreach (var parameter in details.Parameters)
         {
@@ -93,9 +74,16 @@ internal class FunctionDetailsFormatter : IReprFormatter, IReprTreeFormatter
                 value: parameter.FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
-        result.Add(propertyName: "parameters", value: parameters);
-
-        return result;
+        return new JsonObject
+        {
+            { "name", details.Name },
+            { "returnType", details.ReturnTypeReprName },
+            {
+                "modifiers",
+                details.Modifiers.FormatAsJsonNode(context: context.WithIncrementedDepth())
+            },
+            { "parameters", parameters }
+        };
     }
 }
 
@@ -120,13 +108,7 @@ internal class MethodModifiersFormatter : IReprFormatter, IReprTreeFormatter
         var type = methodModifiers.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
         var modifiers = new JsonArray();
@@ -179,25 +161,18 @@ internal class ParameterDetailsFormatter : IReprFormatter, IReprTreeFormatter
         var type = details.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "name",
-            value: details.Name);
-        result.Add(propertyName: "type",
-            value: details.TypeReprName);
-        result.Add(propertyName: "modifier",
-            value: details.Modifier);
-        result.Add(propertyName: "defaultValue",
-            value: details.DefaultValue.FormatAsJsonNode(
-                context: context.WithIncrementedDepth()));
-        return result;
+        return new JsonObject
+        {
+            { "name", details.Name },
+            { "type", details.TypeReprName },
+            { "modifier", details.Modifier },
+            {
+                "defaultValue", details.DefaultValue.FormatAsJsonNode(
+                    context: context.WithIncrementedDepth())
+            }
+        };
     }
 }

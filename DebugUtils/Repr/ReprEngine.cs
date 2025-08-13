@@ -141,6 +141,17 @@ internal static class ReprEngine
         };
     }
 
+    public static JsonObject CreateMaxDepthReachedJson(this Type type, int depth)
+    {
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "maxDepthReached"] = "true",
+            [propertyName: "depth"] = depth
+        };
+    }
+
     private static JsonNode FormatNullableAsHierarchical<T>(this T nullable, ReprContext context)
     {
         var type = typeof(T);

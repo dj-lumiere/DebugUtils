@@ -72,6 +72,11 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         context = context.WithContainerConfig();
         var list = (IEnumerable)obj;
         var type = list.GetType();
+        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
+        {
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
+        }
+
         int? itemCount = null;
 
         if (type.GetProperty(name: "Count")
@@ -80,19 +85,9 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
             itemCount = (int)value;
         }
 
-        if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
-        {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
-        }
 
-        var result = new JsonObject();
         var entries = new JsonArray();
+        var result = new JsonObject();
         result.Add(propertyName: "type", value: type.GetReprTypeName());
         result.Add(propertyName: "kind", value: type.GetTypeKind());
         result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");

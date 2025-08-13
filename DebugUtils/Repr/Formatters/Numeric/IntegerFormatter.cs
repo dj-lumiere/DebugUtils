@@ -21,42 +21,56 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
     {
         if (!String.IsNullOrEmpty(value: context.Config.IntFormatString))
         {
-            return context.Config.IntFormatString switch
-            {
-                "HB" => obj.FormatAsHexBytes(),
-                "B" or "b" => obj.FormatAsBinary(),
-                "X" => obj.FormatAsHex(),
-                "x" => obj.FormatAsHex()
-                          .ToLowerInvariant(),
-                _ when (context.Config.IntFormatString.StartsWith("B")) ||
-                       (context.Config.IntFormatString.StartsWith("b")) => obj
-                   .FormatAsBinaryWithPadding(context.Config.IntFormatString),
-                _ when (context.Config.IntFormatString.StartsWith("X")) => obj
-                   .FormatAsHexWithPadding(context.Config.IntFormatString),
-                _ when (context.Config.IntFormatString.StartsWith("x")) => obj
-                   .FormatAsHexWithPadding(context.Config.IntFormatString)
-                   .ToLowerInvariant(),
-                _ => obj switch
-                {
-                    byte b => b.ToString(format: context.Config.IntFormatString),
-                    sbyte sb => sb.ToString(format: context.Config.IntFormatString),
-                    short s => s.ToString(format: context.Config.IntFormatString),
-                    ushort us => us.ToString(format: context.Config.IntFormatString),
-                    int i => i.ToString(format: context.Config.IntFormatString),
-                    uint ui => ui.ToString(format: context.Config.IntFormatString),
-                    long l => l.ToString(format: context.Config.IntFormatString),
-                    ulong ul => ul.ToString(format: context.Config.IntFormatString),
-                    BigInteger bi => bi.ToString(format: context.Config.IntFormatString),
-                    #if NET7_0_OR_GREATER
-                    Int128 i128 => i128.ToString(format: context.Config.IntFormatString),
-                    UInt128 u128 => u128.ToString(format: context.Config.IntFormatString),
-                    #endif
-                    _ => throw new InvalidEnumArgumentException(message: "Invalid Repr Config")
-                }
-            };
+            return FormatWithCustomString(obj: obj, formatString: context.Config.IntFormatString);
         }
 
-        return context.Config.IntMode switch
+        return FormatWithMode(obj: obj, mode: context.Config.IntMode);
+    }
+
+    private static string FormatWithCustomString(object obj, string formatString)
+    {
+        return formatString switch
+        {
+            "HB" => obj.FormatAsHexBytes(),
+            "B" or "b" => obj.FormatAsBinary(),
+            "X" => obj.FormatAsHex(),
+            "x" => obj.FormatAsHex()
+                      .ToLowerInvariant(),
+            _ when formatString.StartsWith(value: "B") || formatString.StartsWith(value: "b") =>
+                obj.FormatAsBinaryWithPadding(formatString: formatString),
+            _ when formatString.StartsWith(value: "X") =>
+                obj.FormatAsHexWithPadding(formatString: formatString),
+            _ when formatString.StartsWith(value: "x") =>
+                obj.FormatAsHexWithPadding(formatString: formatString)
+                   .ToLowerInvariant(),
+            _ => FormatWithBuiltInToString(obj: obj, formatString: formatString)
+        };
+    }
+
+    private static string FormatWithBuiltInToString(object obj, string formatString)
+    {
+        return obj switch
+        {
+            byte b => b.ToString(format: formatString),
+            sbyte sb => sb.ToString(format: formatString),
+            short s => s.ToString(format: formatString),
+            ushort us => us.ToString(format: formatString),
+            int i => i.ToString(format: formatString),
+            uint ui => ui.ToString(format: formatString),
+            long l => l.ToString(format: formatString),
+            ulong ul => ul.ToString(format: formatString),
+            BigInteger bi => bi.ToString(format: formatString),
+            #if NET7_0_OR_GREATER
+            Int128 i128 => i128.ToString(format: formatString),
+            UInt128 u128 => u128.ToString(format: formatString),
+            #endif
+            _ => throw new InvalidEnumArgumentException(message: "Invalid Repr Config")
+        };
+    }
+
+    private static string FormatWithMode(object obj, IntReprMode mode)
+    {
+        return mode switch
         {
             IntReprMode.Binary => obj.FormatAsBinary(),
             IntReprMode.Decimal => obj.ToString()!,
@@ -68,11 +82,12 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "value"] = ToRepr(obj: obj, context: context)
+        };
     }
 }

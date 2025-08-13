@@ -61,18 +61,14 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         var type = tuple.GetType();
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
+        var result = new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() }
+        };
         if (!type.IsValueType)
         {
             result.Add(propertyName: "hashCode",

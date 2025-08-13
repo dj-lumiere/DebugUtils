@@ -18,12 +18,13 @@ internal class BoolFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "value"] = ToRepr(obj: obj, context: context)
+        };
     }
 }
 
@@ -43,14 +44,15 @@ internal class EnumFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var e = (Enum)obj;
-        var json = new JsonObject();
         var underlyingType = Enum.GetUnderlyingType(enumType: e.GetType());
         var numericValue = Convert.ChangeType(value: e, conversionType: underlyingType);
 
-        json.Add(propertyName: "type", value: e.GetReprTypeName());
-        json.Add(propertyName: "kind", value: "enum");
-        json.Add(propertyName: "name", value: e.ToString());
-        json.Add(propertyName: "value", value: numericValue.FormatAsJsonNode(context: context));
-        return json;
+        return new JsonObject
+        {
+            [propertyName: "type"] = e.GetReprTypeName(),
+            [propertyName: "kind"] = "enum",
+            [propertyName: "name"] = e.ToString(),
+            [propertyName: "value"] = numericValue.FormatAsJsonNode(context: context)
+        };
     }
 }

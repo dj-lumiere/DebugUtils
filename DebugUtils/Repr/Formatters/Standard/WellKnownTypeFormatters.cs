@@ -16,12 +16,13 @@ internal class GuidFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "value"] = ToRepr(obj: obj, context: context)
+        };
     }
 }
 
@@ -36,12 +37,13 @@ internal class UriFormatter : IReprFormatter, IReprTreeFormatter
 
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
-        var result = new JsonObject();
         var type = obj.GetType();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "value", value: ToRepr(obj: obj, context: context));
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = type.GetReprTypeName(),
+            [propertyName: "kind"] = type.GetTypeKind(),
+            [propertyName: "value"] = ToRepr(obj: obj, context: context)
+        };
     }
 }
 
@@ -57,13 +59,14 @@ internal class VersionFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var v = (Version)obj;
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: "Version");
-        result.Add(propertyName: "kind", value: "class");
-        result.Add(propertyName: "major", value: v.Major);
-        result.Add(propertyName: "minor", value: v.Minor);
-        result.Add(propertyName: "build", value: v.Build);
-        result.Add(propertyName: "revision", value: v.Revision);
-        return result;
+        return new JsonObject
+        {
+            [propertyName: "type"] = "Version",
+            [propertyName: "kind"] = "class",
+            [propertyName: "major"] = v.Major,
+            [propertyName: "minor"] = v.Minor,
+            [propertyName: "build"] = v.Build,
+            [propertyName: "revision"] = v.Revision
+        };
     }
 }

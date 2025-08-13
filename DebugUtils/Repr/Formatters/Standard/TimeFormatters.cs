@@ -24,7 +24,7 @@ internal class DateTimeFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var datetime = (DateTime)obj;
-        var result = new JsonObject
+        return new JsonObject
         {
             { "type", "DateTime" },
             { "kind", "struct" },
@@ -39,7 +39,6 @@ internal class DateTimeFormatter : IReprFormatter, IReprTreeFormatter
             { "totalTicks", datetime.Ticks.ToString() },
             { "timezone", datetime.Kind.ToString() }
         };
-        return result;
     }
 }
 
@@ -81,7 +80,7 @@ internal class DateTimeOffsetFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var dto = (DateTimeOffset)obj;
-        var result = new JsonObject
+        return new JsonObject
         {
             { "type", "DateTimeOffset" },
             { "kind", "struct" },
@@ -96,7 +95,6 @@ internal class DateTimeOffsetFormatter : IReprFormatter, IReprTreeFormatter
             { "totalTicks", dto.Ticks.ToString() },
             { "offset", dto.Offset.FormatAsJsonNode(context: context.WithIncrementedDepth()) }
         };
-        return result;
     }
 }
 
@@ -133,7 +131,7 @@ internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
             ts = ts.Negate();
         }
 
-        var result = new JsonObject
+        return new JsonObject
         {
             { "type", "TimeSpan" },
             { "kind", "struct" },
@@ -149,7 +147,6 @@ internal class TimeSpanFormatter : IReprFormatter, IReprTreeFormatter
                                         .ToLowerInvariant()
             }
         };
-        return result;
     }
 }
 
@@ -167,7 +164,7 @@ internal class DateOnlyFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var dateOnly = (DateOnly)obj;
-        var result = new JsonObject
+        return new JsonObject
         {
             { "type", "DateOnly" },
             { "kind", "struct" },
@@ -175,7 +172,6 @@ internal class DateOnlyFormatter : IReprFormatter, IReprTreeFormatter
             { "month", dateOnly.Month.ToString() },
             { "day", dateOnly.Day.ToString() }
         };
-        return result;
     }
 }
 
@@ -193,7 +189,7 @@ internal class TimeOnlyFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var to = (TimeOnly)obj;
-        var result = new JsonObject
+        return new JsonObject
         {
             { "type", "TimeOnly" },
             { "kind", "struct" },
@@ -204,7 +200,6 @@ internal class TimeOnlyFormatter : IReprFormatter, IReprTreeFormatter
             { "subTicks", (to.Ticks % 10000).ToString() },
             { "totalTicks", to.Ticks.ToString() }
         };
-        return result;
     }
 }
 

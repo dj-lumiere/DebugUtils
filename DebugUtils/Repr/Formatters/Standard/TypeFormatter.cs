@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
+using DebugUtils.Repr.Extensions;
 using DebugUtils.Repr.Interfaces;
 using DebugUtils.Repr.TypeHelpers;
 
@@ -19,17 +20,14 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
 
         var typeObject = (Type)obj;
 
-        if (typeObject.IsGenericTypeDefinition)
+        return typeObject switch
         {
-            return $"Type<{typeObject.FullName}> (generic definition)";
-        }
-
-        if (typeObject.IsConstructedGenericType)
-        {
-            return $"Type<{typeObject.GetReprTypeName()}> (constructed)";
-        }
-
-        return $"Type<{typeObject.FullName}>";
+            _ when typeObject.IsGenericTypeDefinition =>
+                $"Type<{typeObject.FullName}> (generic definition)",
+            _ when typeObject.IsConstructedGenericType =>
+                $"Type<{typeObject.GetReprTypeName()}> (constructed)",
+            _ => $"Type<{typeObject.FullName}>"
+        };
     }
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
@@ -40,40 +38,34 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
 
         if (context.Config.MaxDepth >= 0 && context.Depth >= context.Config.MaxDepth)
         {
-            return new JsonObject
-            {
-                [propertyName: "type"] = type.GetReprTypeName(),
-                [propertyName: "kind"] = type.GetTypeKind(),
-                [propertyName: "maxDepthReached"] = "true",
-                [propertyName: "depth"] = context.Depth
-            };
+            return type.CreateMaxDepthReachedJson(depth: context.Depth);
         }
 
-        var result = new JsonObject();
-        result.Add(propertyName: "type", value: type.GetReprTypeName());
-        result.Add(propertyName: "kind", value: type.GetTypeKind());
-        result.Add(propertyName: "hashCode", value: $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}");
-        result.Add(propertyName: "namespace", value: typeObject.Namespace);
-        result.Add(propertyName: "name", value: typeObject.Name);
-        result.Add(propertyName: "fullName", value: typeObject.FullName);
-        var assemblyInfo = new JsonObject();
-        assemblyInfo.Add(propertyName: "name", value: typeObject.Assembly.GetName()
-                                                                .Name);
-        assemblyInfo.Add(propertyName: "version", value: typeObject.Assembly
-           .GetName()
-           .Version
-          ?.ToString());
-        assemblyInfo.Add(propertyName: "publicKeyToken", value: typeObject.Assembly
-           .GetName()
-           .GetPublicKeyToken()
-          ?.ToHexString() ?? "null");
-        assemblyInfo.Add(propertyName: "culture", value: typeObject.Assembly.GetName()
-           .CultureName ?? "neutral");
-        result.Add(propertyName: "assembly", value: assemblyInfo);
-        result.Add(propertyName: "guid", value: typeObject.GUID.ToString());
-        result.Add(propertyName: "typeHandle",
-            value: typeObject.TypeHandle.Value.ToRepr(context: context));
-        result.Add(propertyName: "baseType", value: typeObject.BaseType?.GetReprTypeName());
+
+        var assemblyInfo = new JsonObject
+        {
+            {
+                "name", typeObject.Assembly.GetName()
+                                  .Name
+            },
+            {
+                "version", typeObject.Assembly
+                                     .GetName()
+                                     .Version
+                                    ?.ToString()
+            },
+            {
+                "publicKeyToken", typeObject.Assembly
+                                            .GetName()
+                                            .GetPublicKeyToken()
+                                           ?.ToHexString() ?? "null"
+            },
+            {
+                "culture", typeObject.Assembly.GetName()
+                                     .CultureName ?? "neutral"
+            }
+        };
+
         var propertiesStartsWithIs = type
                                     .GetProperties(bindingAttr: BindingFlags.Public |
                                                                 BindingFlags.Instance)
@@ -119,10 +111,21 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
             propertyCount += 1;
         }
 
-        result.Add(propertyName: "properties", value: properties);
-        result.Add(propertyName: "availableProperties", value: availableProperties);
-
-        return result;
+        return new JsonObject
+        {
+            { "type", type.GetReprTypeName() },
+            { "kind", type.GetTypeKind() },
+            { "hashCode", $"0x{RuntimeHelpers.GetHashCode(o: obj):X8}" },
+            { "namespace", typeObject.Namespace },
+            { "name", typeObject.Name },
+            { "fullName", typeObject.FullName },
+            { "assembly", assemblyInfo },
+            { "guid", typeObject.GUID.ToString() },
+            { "typeHandle", typeObject.TypeHandle.Value.ToRepr(context: context) },
+            { "baseType", typeObject.BaseType?.GetReprTypeName() },
+            { "properties", properties },
+            { "availableProperties", availableProperties }
+        };
     }
 }
 
