@@ -20,14 +20,14 @@ public class GenericFormatterTests
     public void TestCustomStructRepr_WithToString()
     {
         var custom = new CustomStruct { Name = "test", Value = 42 };
-        Assert.Equal(expected: "Custom(test, 42)", actual: custom.Repr());
+        Assert.Equal(expected: "CustomStruct(Name: \"test\", Value: int(42))", actual: custom.Repr());
     }
 
     [Fact]
     public void TestClassRepr_WithToString()
     {
         var person = new Person(name: "Alice", age: 30);
-        Assert.Equal(expected: "Alice(30)", actual: person.Repr());
+        Assert.Equal(expected: "Person(Name: \"Alice\", Age: int(30))", actual: person.Repr());
     }
 
     [Fact]
