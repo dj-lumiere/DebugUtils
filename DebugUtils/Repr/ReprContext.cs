@@ -11,7 +11,7 @@ public record ReprContext
     /// <remarks>
     /// Config provides initialization options for the ReprContext enabling custom behaviors or functionalities.
     /// </remarks>
-    public ReprConfig Config { get; } = ReprConfig.GlobalDefaults;
+    public ReprConfig Config { get; } = new();
 
     /// <summary>
     /// Tracks the set of visited object identifiers during the representation process.
@@ -26,8 +26,8 @@ public record ReprContext
     /// Tracks the depth of recursive calls during the representation process.
     /// </summary>
     /// <remarks>
-    /// The <c>Depth</c> property is used to prevent infinite loops while processing object relationships by
-    /// maintaining depth 
+    /// The <c>Depth</c> property is used to prevent stack overflow and infinite loops while processing object relationships
+    /// by maintaining the current nesting level. When depth exceeds MaxDepth, traversal is halted.
     /// </remarks>
     public int Depth { get; }
 
@@ -51,7 +51,7 @@ public record ReprContext
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="config"/> is null.</exception>
     /// <example>
     /// <code>
-    /// var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
+    /// var config = new ReprConfig(FloatFormatString: "EX");
     /// var context = new ReprContext(config);
     /// var result = obj.Repr(context);
     /// </code>
@@ -106,7 +106,7 @@ public record ReprContext
     /// </example>
     public ReprContext(ReprConfig? config = null, HashSet<int>? visited = null, int depth = 0)
     {
-        Config = config ?? ReprConfig.GlobalDefaults;
+        Config = config ?? new ReprConfig();
         Visited = visited ?? new HashSet<int>();
         Depth = depth;
     }
@@ -174,28 +174,53 @@ public record ReprContext
         );
     }
 
+    /// <summary>
+    /// Creates a new context with container-specific formatting applied.
+    /// Uses simplified formatting when UseSimpleFormatsInContainers is enabled,
+    /// or applies child type hiding when HideChildTypes is enabled.
+    /// </summary>
+    /// <returns>
+    /// A new ReprContext with container-appropriate configuration, sharing the same
+    /// visited set and depth as the current context.
+    /// </returns>
+    /// <remarks>
+    /// This method applies the container formatting rules:
+    /// <list type="bullet">
+    /// <item>When UseSimpleFormatsInContainers is true: uses "G" for floats, "D" for integers</item>
+    /// <item>When HideChildTypes is true: hides obvious type prefixes in container contents</item>
+    /// <item>Preserves all other configuration settings from the parent context</item>
+    /// </list>
+    /// </remarks>
     internal ReprContext WithContainerConfig()
     {
         return new ReprContext(
-            config: GetContainerConfig(), visited: Visited, depth: Depth);
+            config: GetContainerConfig(), 
+            visited: Visited, 
+            depth: Depth
+        );
     }
 
     private ReprConfig GetContainerConfig()
     {
-        return Config.ContainerReprMode switch
+        var newConfig = Config;
+        
+        if (Config.UseSimpleFormatsInContainers)
         {
-            ContainerReprMode.UseParentConfig => Config,
-            ContainerReprMode.UseSimpleFormats => ReprConfig.ContainerDefaults with
+            newConfig = newConfig with
             {
-                MaxDepth = Config.MaxDepth,
-                MaxPropertiesPerObject = Config.MaxPropertiesPerObject,
-                MaxElementsPerCollection = Config.MaxElementsPerCollection,
-                ShowNonPublicProperties = Config.ShowNonPublicProperties,
-                EnablePrettyPrintForReprTree = Config.EnablePrettyPrintForReprTree
-            },
-            ContainerReprMode.UseCustomConfig => Config.CustomContainerConfig ??
-                                                 ReprConfig.ContainerDefaults,
-            _ => ReprConfig.GlobalDefaults
-        };
+                FloatFormatString = "G",
+                IntFormatString = "D"
+            };
+        }
+        
+        if (Config.HideChildTypes)
+        {
+            newConfig = newConfig with
+            {
+                TypeMode = TypeReprMode.AlwaysHide
+            };
+        }
+        
+        return newConfig;
     }
 }

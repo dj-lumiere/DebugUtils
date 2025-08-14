@@ -24,10 +24,10 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
 
         var sb = new StringBuilder();
         sb.Append(value: '(');
-        for (var i = 0; i < tuple.Length; i++)
+        for (var i = 0; i < tuple.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 break;
             }
@@ -41,11 +41,11 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                .Repr(context: context.WithIncrementedDepth()));
         }
 
-        if (context.Config.MaxElementsPerCollection >= 0 &&
-            tuple.Length > context.Config.MaxElementsPerCollection)
+        if (context.Config.MaxItemsPerContainer >= 0 &&
+            tuple.Length > context.Config.MaxItemsPerContainer)
         {
             var truncatedItemCount = tuple.Length -
-                                     context.Config.MaxElementsPerCollection;
+                                     context.Config.MaxItemsPerContainer;
             sb.Append(value: $"... {truncatedItemCount} more items");
         }
 
@@ -78,10 +78,10 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         result.Add(propertyName: "length", value: tuple.Length);
 
         var entries = new JsonArray();
-        for (var i = 0; i < tuple.Length; i++)
+        for (var i = 0; i < tuple.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 break;
             }
@@ -90,11 +90,11 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
                .FormatAsJsonNode(context: context.WithIncrementedDepth()));
         }
 
-        if (context.Config.MaxElementsPerCollection >= 0 &&
-            tuple.Length > context.Config.MaxElementsPerCollection)
+        if (context.Config.MaxItemsPerContainer >= 0 &&
+            tuple.Length > context.Config.MaxItemsPerContainer)
         {
             var truncatedItemCount = tuple.Length -
-                                     context.Config.MaxElementsPerCollection;
+                                     context.Config.MaxItemsPerContainer;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 

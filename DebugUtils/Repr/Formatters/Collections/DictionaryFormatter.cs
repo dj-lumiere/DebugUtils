@@ -31,8 +31,8 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                count >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                count >= context.Config.MaxItemsPerContainer)
             {
                 break;
             }
@@ -44,11 +44,11 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         }
 
 
-        if (context.Config.MaxElementsPerCollection >= 0 &&
-            dict.Count > context.Config.MaxElementsPerCollection)
+        if (context.Config.MaxItemsPerContainer >= 0 &&
+            dict.Count > context.Config.MaxItemsPerContainer)
         {
             var truncatedItemCount = dict.Count -
-                                     context.Config.MaxElementsPerCollection;
+                                     context.Config.MaxItemsPerContainer;
             items.Add(item: $"... {truncatedItemCount} more items");
         }
 
@@ -77,8 +77,8 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         var count = 0;
         foreach (DictionaryEntry entry in dict)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                count >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                count >= context.Config.MaxItemsPerContainer)
             {
                 break;
             }
@@ -94,11 +94,11 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
             count += 1;
         }
 
-        if (context.Config.MaxElementsPerCollection >= 0 &&
-            dict.Count > context.Config.MaxElementsPerCollection)
+        if (context.Config.MaxItemsPerContainer >= 0 &&
+            dict.Count > context.Config.MaxItemsPerContainer)
         {
             var truncatedItemCount = dict.Count -
-                                     context.Config.MaxElementsPerCollection;
+                                     context.Config.MaxItemsPerContainer;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 

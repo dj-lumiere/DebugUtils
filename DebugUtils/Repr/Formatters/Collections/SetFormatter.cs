@@ -32,8 +32,8 @@ internal class SetFormatter : IReprFormatter
         var hitLimit = false;
         foreach (var item in list)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -47,7 +47,7 @@ internal class SetFormatter : IReprFormatter
         {
             if (itemCount is not null)
             {
-                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
                 if (remainingCount > 0)
                 {
                     items.Add(item: $"... ({remainingCount} more items)");

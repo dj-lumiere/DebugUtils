@@ -64,7 +64,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Negative()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         Assert.Equal(expected: "TimeSpan(-00:30:00.0000000)", actual: TimeSpan
            .FromMinutes(minutes: -30)
            .Repr(config: config));
@@ -73,7 +73,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Negative_WithDays()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         Assert.Equal(expected: "TimeSpan(-1D-01:00:00.0000000)",
             actual: new TimeSpan(days: -1, hours: -1, minutes: 0, seconds: 0)
                .Repr(config: config));
@@ -82,7 +82,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Zero()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         Assert.Equal(expected: "TimeSpan(00:00:00.0000000)",
             actual: TimeSpan.Zero.Repr(config: config));
     }
@@ -90,7 +90,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Positive()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         Assert.Equal(expected: "TimeSpan(00:30:00.0000000)", actual: TimeSpan
            .FromMinutes(minutes: 30)
            .Repr(config: config));
@@ -140,7 +140,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestMemoryRepr()
     {
-        var array = new int[] { 1, 2, 3, 4, 5 };
+        var array = new[] { 1, 2, 3, 4, 5 };
         var memory = new Memory<int>(array: array, start: 1, length: 3);
         Assert.Equal(expected: "Memory([int(2), int(3), int(4)])", actual: memory.Repr());
 
@@ -151,7 +151,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestReadOnlyMemoryRepr()
     {
-        var array = new int[] { 1, 2, 3, 4, 5 };
+        var array = new[] { 1, 2, 3, 4, 5 };
         var readOnlyMemory = new ReadOnlyMemory<int>(array: array, start: 1, length: 3);
         Assert.Equal(expected: "ReadOnlyMemory([int(2), int(3), int(4)])",
             actual: readOnlyMemory.Repr());
@@ -163,7 +163,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestSpanRepr()
     {
-        var array = new int[] { 1, 2, 3, 4, 5 };
+        var array = new[] { 1, 2, 3, 4, 5 };
         var span = new Span<int>(array: array, start: 1, length: 3);
         Assert.Equal(expected: "Span([int(2), int(3), int(4)])", actual: span.Repr());
 
@@ -174,7 +174,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestReadOnlySpanRepr()
     {
-        var array = new int[] { 1, 2, 3, 4, 5 };
+        var array = new[] { 1, 2, 3, 4, 5 };
         var readOnlySpan = new ReadOnlySpan<int>(array: array, start: 1, length: 3);
         Assert.Equal(expected: "ReadOnlySpan([int(2), int(3), int(4)])",
             actual: readOnlySpan.Repr());

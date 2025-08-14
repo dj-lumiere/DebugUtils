@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using DebugUtils.Repr;
 
@@ -7,31 +8,29 @@ public class NumericFormatterTests
 {
     // Integer Types
     [Theory]
-    [InlineData(IntReprMode.Binary, "byte(0b101010)")]
-    [InlineData(IntReprMode.Decimal, "byte(42)")]
-    [InlineData(IntReprMode.Hex, "byte(0x2A)")]
-    [InlineData(IntReprMode.HexBytes, "byte(0x2A)")]
-    public void TestByteRepr(IntReprMode mode, string expected)
+    [InlineData("B", "byte(0b101010)")]
+    [InlineData("D", "byte(42)")]
+    [InlineData("X", "byte(0x2A)")]
+    public void TestByteRepr(string format, string expected)
     {
-        var config = new ReprConfig(IntMode: mode);
+        var config = new ReprConfig(IntFormatString: format);
         Assert.Equal(expected: expected, actual: ((byte)42).Repr(config: config));
     }
 
     [Theory]
-    [InlineData(IntReprMode.Binary, "int(-0b101010)")]
-    [InlineData(IntReprMode.Decimal, "int(-42)")]
-    [InlineData(IntReprMode.Hex, "int(-0x2A)")]
-    [InlineData(IntReprMode.HexBytes, "int(0xFFFFFFD6)")]
-    public void TestIntRepr(IntReprMode mode, string expected)
+    [InlineData("B", "int(-0b101010)")]
+    [InlineData("D", "int(-42)")]
+    [InlineData("X", "int(-0x2A)")]
+    public void TestIntRepr(string format, string expected)
     {
-        var config = new ReprConfig(IntMode: mode);
+        var config = new ReprConfig(IntFormatString: format);
         Assert.Equal(expected: expected, actual: (-42).Repr(config: config));
     }
 
     [Fact]
     public void TestBigIntRepr()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         Assert.Equal(expected: "BigInteger(-42)",
             actual: new BigInteger(value: -42).Repr(config: config));
     }
@@ -40,7 +39,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatRepr_Exact()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
+        var config = new ReprConfig(FloatFormatString: "EX");
         Assert.Equal(expected: "float(3.1415927410125732421875E+000)", actual: Single
            .Parse(s: "3.1415926535")
            .Repr(config: config));
@@ -49,7 +48,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestDoubleRepr_Round()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 5);
+        var config = new ReprConfig(FloatFormatString: "F5");
         Assert.Equal(expected: "double(3.14159)", actual: Double.Parse(s: "3.1415926535")
                                                                 .Repr(config: config));
     }
@@ -57,25 +56,25 @@ public class NumericFormatterTests
     [Fact]
     public void TestHalfRepr_Scientific()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.Scientific, FloatPrecision: 5);
+        var config = new ReprConfig(FloatFormatString: "E5");
         Assert.Equal(expected: "Half(3.14062E+000)", actual: Half.Parse(s: "3.14159")
            .Repr(config: config));
     }
 
     [Fact]
-    public void TestDecimalRepr_RawHex()
+    public void TestDecimalRepr_HexPower()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.HexBytes);
-        Assert.Equal(expected: "decimal(0x001C00006582A5360B14388541B65F29)",
+        var config = new ReprConfig(FloatFormatString: "HP");
+        Assert.Equal(expected: "decimal(0x6582A5360B14388541B65F29P-028)",
             actual: 3.1415926535897932384626433832795m.Repr(
                 config: config));
     }
 
     [Fact]
-    public void TestHalfRepr_BitField()
+    public void TestHalfRepr_HexPower()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.BitField);
-        Assert.Equal(expected: "Half(0|10000|1001001000)", actual: Half.Parse(s: "3.14159")
+        var config = new ReprConfig(FloatFormatString: "HP");
+        Assert.Equal(expected: "Half(0x1.920P+001)", actual: Half.Parse(s: "3.14159")
            .Repr(config: config));
     }
 
@@ -107,29 +106,27 @@ public class NumericFormatterTests
 
     #if NET7_0_OR_GREATER
     [Theory]
-    [InlineData(IntReprMode.Binary,
+    [InlineData("B",
         "Int128(-0b10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)")]
-    [InlineData(IntReprMode.Decimal, "Int128(-170141183460469231731687303715884105728)")]
-    [InlineData(IntReprMode.Hex, "Int128(-0x80000000000000000000000000000000)")]
-    [InlineData(IntReprMode.HexBytes, "Int128(0x80000000000000000000000000000000)")]
-    public void TestInt128Repr(IntReprMode mode, string expected)
+    [InlineData("D", "Int128(-170141183460469231731687303715884105728)")]
+    [InlineData("X", "Int128(-0x80000000000000000000000000000000)")]
+    public void TestInt128Repr(string format, string expected)
     {
         var i128 = Int128.MinValue;
-        var config = new ReprConfig(IntMode: mode);
+        var config = new ReprConfig(IntFormatString: format);
         Assert.Equal(expected: expected,
             actual: i128.Repr(config: config));
     }
 
     [Theory]
-    [InlineData(IntReprMode.Binary,
+    [InlineData("B",
         "Int128(0b1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)")]
-    [InlineData(IntReprMode.Decimal, "Int128(170141183460469231731687303715884105727)")]
-    [InlineData(IntReprMode.Hex, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
-    [InlineData(IntReprMode.HexBytes, "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
-    public void TestInt128Repr2(IntReprMode mode, string expected)
+    [InlineData("D", "Int128(170141183460469231731687303715884105727)")]
+    [InlineData("X", "Int128(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)")]
+    public void TestInt128Repr2(string format, string expected)
     {
         var i128 = Int128.MaxValue;
-        var config = new ReprConfig(IntMode: mode);
+        var config = new ReprConfig(IntFormatString: format);
         Assert.Equal(expected: expected,
             actual: i128.Repr(config: config));
     }
@@ -144,7 +141,6 @@ public class NumericFormatterTests
     [InlineData("X", "int(0x2A)")]
     [InlineData("x", "int(0x2a)")]
     [InlineData("N0", "int(42)")]
-    [InlineData("HB", "int(0x0000002A)")]
     [InlineData("B", "int(0b101010)")]
     [InlineData("b", "int(0b101010)")]
     public void TestIntFormatString_PositiveValues(string format, string expected)
@@ -157,7 +153,6 @@ public class NumericFormatterTests
     [InlineData("D", "int(-42)")]
     [InlineData("X", "int(-0x2A)")]
     [InlineData("x", "int(-0x2a)")]
-    [InlineData("HB", "int(0xFFFFFFD6)")]
     [InlineData("B", "int(-0b101010)")]
     [InlineData("b", "int(-0b101010)")]
     public void TestIntFormatString_NegativeValues(string format, string expected)
@@ -169,7 +164,6 @@ public class NumericFormatterTests
     [Theory]
     [InlineData("D", "byte(255)")]
     [InlineData("X", "byte(0xFF)")]
-    [InlineData("HB", "byte(0xFF)")]
     [InlineData("B", "byte(0b11111111)")]
     public void TestIntFormatString_ByteValues(string format, string expected)
     {
@@ -180,7 +174,6 @@ public class NumericFormatterTests
     [Theory]
     [InlineData("D", "long(9223372036854775807)")]
     [InlineData("X", "long(0x7FFFFFFFFFFFFFFF)")]
-    [InlineData("HB", "long(0x7FFFFFFFFFFFFFFF)")]
     public void TestIntFormatString_LongValues(string format, string expected)
     {
         var config = new ReprConfig(IntFormatString: format);
@@ -188,11 +181,11 @@ public class NumericFormatterTests
     }
 
     [Fact]
-    public void TestIntFormatString_FallbackToEnum()
+    public void TestIntFormatString_DefaultBehavior()
     {
-        // Empty format string should fall back to enum behavior
-        var config = new ReprConfig(IntFormatString: "", IntMode: IntReprMode.Hex);
-        Assert.Equal(expected: "int(0x2A)", actual: 42.Repr(config: config));
+        // Default format string should use decimal
+        var config = new ReprConfig();
+        Assert.Equal(expected: "int(42)", actual: 42.Repr(config: config));
     }
 
     #endregion
@@ -220,21 +213,14 @@ public class NumericFormatterTests
     }
 
     [Fact]
-    public void TestFloatFormatString_HexBytes()
+    public void TestFloatFormatString_HexPower()
     {
-        var config = new ReprConfig(FloatFormatString: "HB");
+        var config = new ReprConfig(FloatFormatString: "HP");
         var result = 3.14159f.Repr(config: config);
-        Assert.Equal(expected: "float(0x40490FD0)", actual: result);
+        Assert.Equal(expected: "float(0x1.921FA0P+001)", actual: result);
     }
 
-    [Fact]
-    public void TestFloatFormatString_BitField()
-    {
-        var config = new ReprConfig(FloatFormatString: "BF");
-        var result = 3.14159f.Repr(config: config);
-        Assert.Equal(expected: "float(0|10000000|10010010000111111010000)",
-            actual: result); // Positive number starts with 0
-    }
+    // Removed BitField test as BF format was deprecated
 
     [Theory]
     [InlineData("F2", "double(3.14)")]
@@ -260,20 +246,18 @@ public class NumericFormatterTests
     }
 
     [Fact]
-    public void TestFloatFormatString_FallbackToEnum()
+    public void TestFloatFormatString_FallbackToString()
     {
-        // Empty format string should fall back to enum behavior
-        var config = new ReprConfig(FloatFormatString: "", FloatMode: FloatReprMode.Round,
-            FloatPrecision: 2);
+        // Empty format string should fall back to toString behavior
+        var config = new ReprConfig(FloatFormatString: "");
         var result = 3.14159.Repr(config: config);
-        Assert.Equal(expected: "double(3.14)", actual: result);
+        Assert.Equal(expected: "double(3.14159)", actual: result);
     }
 
     #if NET5_0_OR_GREATER
     [Theory]
     [InlineData("F2", "Half(3.14)")]
-    [InlineData("HB", "Half(0x4248)")] // HB should produce hex representation
-    [InlineData("BF", "Half(0|10000|1001001000)")] // BF should produce bit field
+    [InlineData("HP", "Half(0x1.920P+001)")] // HP should produce hex power representation
     public void TestFloatFormatString_HalfValues(string format, string expectedOrSpecial)
     {
         var config = new ReprConfig(FloatFormatString: format);
@@ -284,31 +268,51 @@ public class NumericFormatterTests
 
     #endregion
 
-    #region Backward Compatibility Tests
+    #region New Custom Format Tests
 
-    [Fact]
-    public void TestBackwardCompatibility_IntModeStillWorks()
+    [Theory]
+    [InlineData("O", "int(0o52)")]      // Octal with 0o prefix
+    [InlineData("Q", "int(0q222)")]     // Quaternary with 0q prefix
+    public void TestIntFormatString_NewCustomFormats(string format, string expected)
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Hex);
-        Assert.Equal(expected: "int(0x2A)", actual: 42.Repr(config: config));
+        var config = new ReprConfig(IntFormatString: format);
+        Assert.Equal(expected: expected, actual: 42.Repr(config: config));
+    }
+
+    [Theory]
+    [InlineData("O", "byte(0o377)")]    // Octal 255
+    [InlineData("Q", "byte(0q3333)")]   // Quaternary 255
+    public void TestIntFormatString_NewCustomFormats_Byte(string format, string expected)
+    {
+        var config = new ReprConfig(IntFormatString: format);
+        Assert.Equal(expected: expected, actual: ((byte)255).Repr(config: config));
     }
 
     [Fact]
-    public void TestBackwardCompatibility_FloatModeStillWorks()
+    public void TestFloatFormatString_HexPower_Detailed()
     {
-        var config = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 2);
-        Assert.Equal(expected: "float(3.14)", actual: 3.14159f.Repr(config: config));
+        var config = new ReprConfig(FloatFormatString: "HP");
+        
+        // Test positive number - should use IEEE 754 hex notation
+        var result = 3.14159f.Repr(config: config);
+        Assert.Contains("0x1.", result);  // Should start with 0x1. for normalized numbers
+        Assert.Contains("P+", result);    // Should have power notation
+        
+        // Test negative number - should have minus sign
+        result = (-3.14159f).Repr(config: config);
+        Assert.Contains("-0x1.", result);
+        Assert.Contains("P+", result);
     }
 
     [Fact]
-    public void TestFormatStringTakesPrecedenceOverEnum()
+    public void TestFloatFormatString_HexPower_SpecialValues()
     {
-        // Format string should take precedence over enum when both are specified
-        var config = new ReprConfig(
-            IntFormatString: "X",
-            IntMode: IntReprMode.Binary // This should be ignored
-        );
-        Assert.Equal(expected: "int(0x2A)", actual: 42.Repr(config: config));
+        var config = new ReprConfig(FloatFormatString: "HP");
+        
+        // Special values should still work with HP format
+        Assert.Equal(expected: "float(Quiet NaN)", actual: Single.NaN.Repr(config: config));
+        Assert.Equal(expected: "float(Infinity)", actual: Single.PositiveInfinity.Repr(config: config));
+        Assert.Equal(expected: "float(-Infinity)", actual: Single.NegativeInfinity.Repr(config: config));
     }
 
     #endregion
@@ -342,6 +346,86 @@ public class NumericFormatterTests
         var result = 42.Repr(config: config);
         Assert.Equal(expected: expected,
             actual: result); // Should use C# binary formatter with prefix.
+    }
+
+    #endregion
+
+    #region CultureInfo Tests
+
+    [Fact]
+    public void TestCultureInfo_InvariantCulture()
+    {
+        var config = new ReprConfig(
+            FloatFormatString: "F2",
+            Culture: CultureInfo.InvariantCulture
+        );
+        
+        // Should use period as decimal separator regardless of system culture
+        Assert.Equal(expected: "float(3.14)", actual: 3.14159f.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestCultureInfo_GermanCulture()
+    {
+        var config = new ReprConfig(
+            FloatFormatString: "F2",
+            Culture: new CultureInfo("de-DE")
+        );
+        
+        // German culture uses comma as decimal separator
+        Assert.Equal(expected: "float(3,14)", actual: 3.14159f.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestCultureInfo_NumberFormatting()
+    {
+        var config = new ReprConfig(
+            FloatFormatString: "N2",
+            Culture: CultureInfo.InvariantCulture
+        );
+        
+        // Number format with thousand separators
+        Assert.Equal(expected: "float(1,234.57)", actual: 1234.5678f.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestCultureInfo_DefaultBehavior()
+    {
+        var config = new ReprConfig(
+            FloatFormatString: "F2",
+            Culture: null  // Should use current culture
+        );
+        
+        // Should not throw and produce some valid output
+        var result = 3.14159f.Repr(config: config);
+        Assert.Contains("3", result);
+        Assert.Contains("14", result);
+    }
+
+    [Fact]
+    public void TestCultureInfo_CustomFormatsIgnoreCulture()
+    {
+        var config = new ReprConfig(
+            FloatFormatString: "EX",
+            Culture: new CultureInfo("de-DE")
+        );
+        
+        // EX format should ignore culture and always use invariant formatting
+        var result = 3.14159f.Repr(config: config);
+        Assert.Contains(".", result);  // Should use period, not comma
+        Assert.Contains("E+", result);
+    }
+
+    [Fact]
+    public void TestCultureInfo_IntegerFormattingWithCulture()
+    {
+        var config = new ReprConfig(
+            IntFormatString: "N0",
+            Culture: CultureInfo.InvariantCulture
+        );
+        
+        // Integer with thousand separators
+        Assert.Equal(expected: "int(1,234)", actual: 1234.Repr(config: config));
     }
 
     #endregion

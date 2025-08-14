@@ -20,8 +20,8 @@ internal static class SpanFormatter
         var hitLimit = false;
         for (var i = 0; i < obj.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -33,7 +33,7 @@ internal static class SpanFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 items.Add(item: $"... ({remainingCount} more items)");
@@ -62,8 +62,8 @@ internal static class SpanFormatter
 
         for (var i = 0; i < obj.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -75,7 +75,7 @@ internal static class SpanFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 entries.Add(value: $"... ({remainingCount} more items)");
@@ -108,8 +108,8 @@ internal static class ReadOnlySpanFormatter
         var hitLimit = false;
         for (var i = 0; i < obj.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -121,7 +121,7 @@ internal static class ReadOnlySpanFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 items.Add(item: $"... ({remainingCount} more items)");
@@ -150,8 +150,8 @@ internal static class ReadOnlySpanFormatter
 
         for (var i = 0; i < obj.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -163,7 +163,7 @@ internal static class ReadOnlySpanFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 entries.Add(value: $"... ({remainingCount} more items)");
@@ -200,8 +200,8 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
         var hitLimit = false;
         for (var i = 0; i < array.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -216,7 +216,7 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
             return "[" + String.Join(separator: ", ", values: items) + "]";
         }
 
-        var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+        var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
         if (remainingCount > 0)
         {
             items.Add(item: $"... ({remainingCount} more items)");
@@ -244,8 +244,8 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
 
         for (var i = 0; i < array.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -257,7 +257,7 @@ internal class MemoryFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 entries.Add(value: $"... ({remainingCount} more items)");
@@ -294,8 +294,8 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
         var hitLimit = false;
         for (var i = 0; i < array.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -307,7 +307,7 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 items.Add(item: $"... ({remainingCount} more items)");
@@ -336,8 +336,8 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 
         for (var i = 0; i < array.Length; i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -349,7 +349,7 @@ internal class ReadOnlyMemoryFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+            var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 entries.Add(value: $"... ({remainingCount} more items)");

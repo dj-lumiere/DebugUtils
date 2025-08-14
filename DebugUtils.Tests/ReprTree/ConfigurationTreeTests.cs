@@ -119,7 +119,7 @@ public class ConfigurationTreeTests
     public void TestReprConfig_MaxCollectionItems_ReprTree()
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
-        var config = new ReprConfig(MaxElementsPerCollection: 3);
+        var config = new ReprConfig(MaxItemsPerContainer: 3);
         var actualJson = JsonNode.Parse(json: list.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -139,7 +139,7 @@ public class ConfigurationTreeTests
             actual: actualJson[propertyName: "value"]![index: 3]
               ?.ToString());
 
-        config = new ReprConfig(MaxElementsPerCollection: 0);
+        config = new ReprConfig(MaxItemsPerContainer: 0);
         actualJson = JsonNode.Parse(json: list.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -173,7 +173,7 @@ public class ConfigurationTreeTests
     {
         var classified =
             new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
-        var config = new ReprConfig(ShowNonPublicProperties: false);
+        var config = new ReprConfig(ViewMode: MemberReprMode.PublicFieldAutoProperty);
         var actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
         Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]
@@ -190,7 +190,7 @@ public class ConfigurationTreeTests
           ?.ToString());
 
 
-        config = new ReprConfig(ShowNonPublicProperties: true);
+        config = new ReprConfig(ViewMode: MemberReprMode.AllFieldAutoProperty);
         actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
         Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]

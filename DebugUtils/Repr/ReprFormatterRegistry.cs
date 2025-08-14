@@ -104,11 +104,6 @@ internal static class ReprFormatterRegistry
     }
     public static IReprFormatter GetStandardFormatter(Type type, ReprContext context)
     {
-        if (context.Config.FormattingMode == FormattingMode.Reflection)
-        {
-            return new ObjectFormatter();
-        }
-
         if (ReprFormatters.TryGetValue(key: type, value: out var directFormatter))
         {
             return directFormatter;

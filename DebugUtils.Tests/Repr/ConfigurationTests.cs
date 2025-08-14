@@ -21,11 +21,11 @@ public class ConfigurationTests
     public void TestReprConfig_MaxElementsPerCollection()
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
-        var config = new ReprConfig(MaxElementsPerCollection: 3);
+        var config = new ReprConfig(MaxItemsPerContainer: 3);
         Assert.Equal(expected: "[int(1), int(2), int(3), ... (2 more items)]",
             actual: list.Repr(config: config));
 
-        config = new ReprConfig(MaxElementsPerCollection: 0);
+        config = new ReprConfig(MaxItemsPerContainer: 0);
         Assert.Equal(expected: "[... (5 more items)]", actual: list.Repr(config: config));
     }
 
@@ -47,13 +47,13 @@ public class ConfigurationTests
     {
         var classified =
             new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
-        var config = new ReprConfig(ShowNonPublicProperties: false);
+        var config = new ReprConfig(ViewMode: MemberReprMode.PublicFieldAutoProperty);
         Assert.Equal(
             expected:
             "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\")",
             actual: classified.Repr(config: config));
 
-        config = new ReprConfig(ShowNonPublicProperties: true);
+        config = new ReprConfig(ViewMode: MemberReprMode.AllFieldAutoProperty);
         Assert.Equal(
             expected:
             "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
@@ -93,9 +93,9 @@ public class ConfigurationTests
 
         Assert.Equal(expected: "int(42)", actual: 42.Repr());
         Assert.Equal(expected: "int(0x2A)",
-            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Hex)));
+            actual: 42.Repr(config: new ReprConfig(IntFormatString: "X")));
         Assert.Equal(expected: "int(0b101010)",
-            actual: 42.Repr(config: new ReprConfig(IntMode: IntReprMode.Binary)));
+            actual: 42.Repr(config: new ReprConfig(IntFormatString: "B")));
 
         Assert.Equal(
             expected: "double(3.000000000000000444089209850062616169452667236328125E-001)",
@@ -106,11 +106,11 @@ public class ConfigurationTests
             actual: 0.3.Repr());
         Assert.Equal(expected: "double(0.30000000000000004)",
             actual: (0.1 + 0.2)
-           .Repr(config: new ReprConfig(FloatMode: FloatReprMode.General)));
+           .Repr(config: new ReprConfig(FloatFormatString: "G")));
 
         var hideTypes = new ReprConfig(
             TypeMode: TypeReprMode.AlwaysHide,
-            ContainerReprMode: ContainerReprMode.UseParentConfig
+            UseSimpleFormatsInContainers: false
         );
         Assert.Equal(expected: "[1, 2, 3]", actual: new[] { 1, 2, 3 }.Repr(config: hideTypes));
 
@@ -125,7 +125,7 @@ public class ConfigurationTests
         var list = new List<int> { 1, 2, 3 };
         Assert.Equal(expected: "[int(1), int(2), int(3)]", actual: list.Repr());
 
-        var config = new ReprConfig(FloatMode: FloatReprMode.Exact);
+        var config = new ReprConfig(FloatFormatString: "EX");
         var f = 3.14f;
         Assert.Equal(expected: "float(3.1400001049041748046875E+000)",
             actual: f.Repr(config: config));

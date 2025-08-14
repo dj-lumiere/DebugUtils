@@ -82,8 +82,8 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
         var propertyCount = 0;
         foreach (var property in propertiesStartsWithIs)
         {
-            if (context.Config.MaxPropertiesPerObject >= 0 &&
-                propertyCount >= context.Config.MaxPropertiesPerObject)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                propertyCount >= context.Config.MaxItemsPerContainer)
             {
                 if (availableProperties.Count != 0)
                 {
