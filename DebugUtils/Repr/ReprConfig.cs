@@ -188,9 +188,16 @@ public enum MemberReprMode
 /// Enabling this significantly increases output size but improves human readability.
 /// </param>
 /// <param name="Culture">
-/// Specifies the culture to use for number formatting. When null, uses the current thread's culture.
-/// Affects decimal separators, thousand separators, and other culture-specific formatting.
-/// Use CultureInfo.InvariantCulture for consistent, culture-independent output.
+/// Specifies the culture to use for standard numeric formatting. When null, uses the current thread's culture.
+/// Affects decimal separators, thousand separators, and other locale-specific number formatting.
+/// <para><b>Examples:</b></para>
+/// <list type="bullet">
+/// <item><description>en-US: 1,234.56 (comma thousands, period decimal)</description></item>
+/// <item><description>de-DE: 1.234,56 (period thousands, comma decimal)</description></item>
+/// <item><description>InvariantCulture: 1234.56 (no thousands separator, period decimal)</description></item>
+/// </list>
+/// <para><b>Limitation:</b> Does not affect special format modes (EX, HP, B, Q, O, X) or
+/// DateTime/TimeSpan formatting, which always use culture-independent formats for debugging clarity.</para>
 /// </param>
 /// <remarks>
 /// <para><strong>Configuration Strategies:</strong></para>

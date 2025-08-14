@@ -18,7 +18,8 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
         {
             "HP" => dec.FormatAsHexPower(),
             "EX" => dec.FormatAsExact(),
-            _ => dec.ToString(format: context.Config.FloatFormatString)
+            _ => dec.ToString(format: context.Config.FloatFormatString,
+                provider: context.Config.Culture)
         };
     }
 

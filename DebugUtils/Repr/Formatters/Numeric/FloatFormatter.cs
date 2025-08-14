@@ -39,7 +39,8 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         };
     }
 
-    private static string FormatWithCustomString(object obj, FloatInfo info, string formatString, CultureInfo? culture)
+    private static string FormatWithCustomString(object obj, FloatInfo info, string formatString,
+        CultureInfo? culture)
     {
         return formatString switch
         {
@@ -53,7 +54,8 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         };
     }
 
-    private static string FormatWithBuiltInToString(object obj, string formatString, CultureInfo? culture)
+    private static string FormatWithBuiltInToString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return obj switch
         {

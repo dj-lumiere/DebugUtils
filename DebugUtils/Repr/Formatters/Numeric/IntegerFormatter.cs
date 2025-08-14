@@ -20,29 +20,32 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        return FormatWithCustomString(obj: obj, formatString: context.Config.IntFormatString, culture: context.Config.Culture);
+        return FormatWithCustomString(obj: obj, formatString: context.Config.IntFormatString,
+            culture: context.Config.Culture);
     }
 
-    private static string FormatWithCustomString(object obj, string formatString, CultureInfo? culture)
+    private static string FormatWithCustomString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return formatString switch
         {
             _ when formatString.StartsWith(value: 'B') || formatString.StartsWith(value: 'b') =>
-                obj.FormatAsBinaryWithPadding(formatString: formatString),
+                obj.FormatAsBinaryWithPadding(format: formatString),
             _ when formatString.StartsWith(value: 'Q') || formatString.StartsWith(value: 'q') =>
-                obj.FormatAsQuaternaryWithPadding(formatString: formatString),
+                obj.FormatAsQuaternaryWithPadding(format: formatString),
             _ when formatString.StartsWith(value: 'O') || formatString.StartsWith(value: 'o') =>
-                obj.FormatAsOctalWithPadding(formatString: formatString),
+                obj.FormatAsOctalWithPadding(format: formatString),
             _ when formatString.StartsWith(value: 'X') =>
-                obj.FormatAsHexWithPadding(formatString: formatString),
+                obj.FormatAsHexWithPadding(format: formatString),
             _ when formatString.StartsWith(value: 'x') =>
-                obj.FormatAsHexWithPadding(formatString: formatString)
+                obj.FormatAsHexWithPadding(format: formatString)
                    .ToLowerInvariant(),
             _ => FormatWithBuiltInToString(obj: obj, formatString: formatString, culture: culture)
         };
     }
 
-    private static string FormatWithBuiltInToString(object obj, string formatString, CultureInfo? culture)
+    private static string FormatWithBuiltInToString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return obj switch
         {
