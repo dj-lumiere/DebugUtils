@@ -68,17 +68,19 @@ public enum TypeReprMode
 }
 
 /// <summary>
-/// Specifies the level of member detail included in object representations.
-/// Determines the scope of fields and properties to display for debugging purposes.
+/// Controls how many an object's members are included in a representation (repr).
 /// </summary>
 /// <remarks>
-/// The modes provide varying degrees of detail for member representation:
-/// <list type="bullet">
-/// <item><description>PublicFieldAutoProperty - Includes public fields and auto-properties</description></item>
-/// <item><description>AllPublic - Includes all public members</description></item>
-/// <item><description>AllFieldAutoProperty - Includes all fields and auto-properties regardless of visibility</description></item>
-/// <item><description>Everything - Includes all accessible members, offering maximum detail</description></item>
-/// </list>
+/// <para><b>Safety:</b> Accessing properties can execute arbitrary user code and may block,
+/// throw, deadlock, or crash (e.g., <c>StackOverflowException</c> cannot be caught).
+/// By default, the formatter reads <b>storage</b> only: fields and auto-property
+/// <i>backing fields</i>. Non-storage property getters are considered <b>risky</b>
+/// and are <b>not</b> invoked unless explicitly enabled in <see cref="ReprConfig"/>.</para>
+/// <para><b>Auto-properties:</b> Detected by compiler-generated backing fields:
+/// <c>"&lt;Name&gt;k__BackingField"</c> (normal/record) and <c>"&lt;Name&gt;i__Field"</c>
+/// (anonymous types). On IL2CPP, only backing-field access is supported (no IL inspection).</para>
+/// <para><b>Platform:</b> Any editor-only timeouts guard <i>waiting</i> but do not abort
+/// user code. In player builds, risky getters should remain disabled.</para>
 /// </remarks>
 public enum MemberReprMode
 {
@@ -156,6 +158,10 @@ public enum MemberReprMode
 /// <param name="ViewMode">
 /// Specifies the level of member detail included in object representations.
 /// Determines the scope of fields and properties to display for debugging purposes.
+/// <remarks>
+/// It is generally NOT RECOMMENDED to try fetching for ANY properties.
+/// It is generally NOT RECOMMENDED to try fetching for PRIVATE fields/properties.
+/// </remarks>
 /// </param>
 /// <param name="UseSimpleFormatsInContainers">
 /// When true, uses simplified formatting ("G" for floats, "D" for integers) within containers.
@@ -177,11 +183,15 @@ public enum MemberReprMode
 /// Higher values may significantly increase processing time and memory usage.
 /// Set to a negative integer (e.g., -1) to disable depth limiting entirely.
 /// </param>
-/// <param name="MaxStringLength">
-/// Specifies the maximum length for a string to be visible.
-/// Strings exceeding this length will be truncated with a suffix like "...{count} more characters".
-/// Higher values may significantly increase processing time and output size.
-/// Set to a negative integer (e.g., -1) to disable string length limiting entirely.
+/// <param name="MaxMemberTimeMs">
+/// Specifies the maximum time in milliseconds for a single property getter to execute.
+/// Property getters exceeding this time limit will be marked as "[Timed Out]".
+/// <para><b>Scope:</b> Only applies to non-auto properties. Fields and auto-property backing fields are always safe to access.</para>
+/// <para><b>Limitation:</b> Cannot prevent process crashes from StackOverflowException or similar unrecoverable exceptions.</para>
+/// <para><b>Default:</b> 1ms provides safety while allowing most normal getters to complete.</para>
+/// <para><b>Performance:</b> Higher values increase the risk of blocking on problematic getters.</para>
+/// Set to 0 to disable property getter access entirely (recommended for production/release builds).
+/// Set to a negative integer (e.g., -1) to disable property getter access entirely (NOT recommended for production/release builds).
 /// </param>
 /// <param name="EnablePrettyPrintForReprTree">
 /// Specifies whether to format ReprTree output with indentation and line breaks for readability.
@@ -210,7 +220,7 @@ public enum MemberReprMode
 /// 
 /// <para><strong>Performance Considerations:</strong></para>
 /// <list type="bullet">
-/// <item><description>"EX" (exact) and "HP" (hex power) float formats have higher computational cost</description></item>
+/// <item><description>"EX" (exact) float formats have a higher computational cost</description></item>
 /// <item><description>EnablePrettyPrintForReprTree produces larger output and requires more processing</description></item>
 /// <item><description>ViewMode.Everything may be slower due to reflection overhead</description></item>
 /// <item><description>Higher MaxDepth and MaxItemsPerContainer values increase processing time</description></item>
