@@ -1,383 +1,299 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Extensions;
 
+using System;
+using System.Numerics;
+
 internal static class IntegerExtensions
 {
-    public static string FormatAsBinary(this object obj)
+    // Digit alphabets per base-2^k
+    private static readonly string Digits = "0123456789ABCDEF";
+
+    // Public API (with prefixes and optional zero-padding)
+
+    public static string FormatAsHexWithPadding(this object value, string format)
     {
-        var size = obj.GetByteSize();
-        var bytes = obj.GetBytes();
-        var isNegative = false;
-        if ((obj.IsSignedPrimitive() || obj is BigInteger) && bytes[^1] >= 0x80)
-        {
-            isNegative = true;
-            FilpBytes(in bytes, size);
-        }
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 4, digits: Digits);
 
-        var result = new StringBuilder();
-        if (isNegative)
-        {
-            result.Append('-');
-        }
-        var gotFirstNonZeroBit = false;
-
-        // Process each byte into 8 bits
-        for (var i = size - 1; i >= 0; i -= 1)
-        {
-            for (var bit = 7; bit >= 0; bit -= 1)
-            {
-                var bitValue = (bytes[i] >> bit) & 1;
-                if (!gotFirstNonZeroBit && bitValue == 0)
-                    continue;
-
-                gotFirstNonZeroBit = true;
-                result.Append(bitValue);
-            }
-        }
-
-        return gotFirstNonZeroBit
-            ? result.ToString()
-            : "0";
-    }
-    public static string FormatAsHex(this object obj)
-    {
-        var size = obj.GetByteSize();
-        var bytes = obj.GetBytes();
-        var isNegative = false;
-        if ((obj.IsSignedPrimitive() || obj is BigInteger) && bytes[^1] >= 0x80)
-        {
-            isNegative = true;
-            FilpBytes(in bytes, size);
-        }
-
-        var result = new StringBuilder();
-        if (isNegative)
-        {
-            result.Append('-');
-        }
-
-        var gotFirstNonZeroHex = false;
-
-        // Process bits in groups of 2 for quaternary
-        var bitArray = new List<int>();
-        for (var i = 0; i < size; i += 1)
-        {
-            for (var bit = 0; bit < 8; bit += 1)
-            {
-                bitArray.Add((bytes[i] >> bit) & 1);
-            }
-        }
-
-        // Pad to multiple of 2 bits if needed
-        while (bitArray.Count % 4 != 0)
-        {
-            bitArray.Add(0);
-        }
-
-        // Process from most significant bits
-        for (var i = bitArray.Count - 4; i >= 0; i -= 4)
-        {
-            var hexValue = bitArray[i + 3] * 8 + bitArray[i + 2] * 4 + bitArray[i + 1] * 2 +
-                           bitArray[i];
-            if (!gotFirstNonZeroHex && hexValue == 0)
-                continue;
-
-            gotFirstNonZeroHex = true;
-            if (hexValue < 10)
-            {
-                result.Append((char)(hexValue + '0'));
-            }
-            else
-            {
-                result.Append((char)(hexValue - 10 + 'A')); // 10 is 'A'
-            }
-        }
-
-        return gotFirstNonZeroHex
-            ? result.ToString()
-            : "0";
+        return isNegative
+            ? "-0x" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0x" + digits.PadLeft(totalWidth: width, paddingChar: '0');
     }
 
-    public static string FormatAsOctal(this object obj)
+    public static string FormatAsOctalWithPadding(this object value, string format)
     {
-        var size = obj.GetByteSize();
-        var bytes = obj.GetBytes();
-        var isNegative = false;
-        if ((obj.IsSignedPrimitive() || obj is BigInteger) && bytes[^1] >= 0x80)
-        {
-            isNegative = true;
-            FilpBytes(in bytes, size);
-        }
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 3, digits: Digits);
 
-        var result = new StringBuilder();
-        if (isNegative)
-        {
-            result.Append('-');
-        }
-        var gotFirstNonZeroOctal = false;
-
-        // Process bits in groups of 3 for octal
-        var bitArray = new List<int>();
-        for (var i = 0; i < size; i += 1)
-        {
-            for (var bit = 0; bit < 8; bit += 1)
-            {
-                bitArray.Add((bytes[i] >> bit) & 1);
-            }
-        }
-
-        // Pad to multiple of 3 bits if needed
-        while (bitArray.Count % 3 != 0)
-        {
-            bitArray.Add(0);
-        }
-
-        // Process from most significant bits
-        for (var i = bitArray.Count - 3; i >= 0; i -= 3)
-        {
-            var octalValue = bitArray[i + 2] * 4 + bitArray[i + 1] * 2 + bitArray[i];
-            if (!gotFirstNonZeroOctal && octalValue == 0)
-                continue;
-
-            gotFirstNonZeroOctal = true;
-            result.Append(octalValue);
-        }
-
-        return gotFirstNonZeroOctal
-            ? result.ToString()
-            : "0";
+        return isNegative
+            ? "-0o" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0o" + digits.PadLeft(totalWidth: width, paddingChar: '0');
     }
 
-    public static string FormatAsQuaternary(this object obj)
+    public static string FormatAsQuaternaryWithPadding(this object value, string format)
     {
-        var size = obj.GetByteSize();
-        var bytes = obj.GetBytes();
-        var isNegative = false;
-        if ((obj.IsSignedPrimitive() || obj is BigInteger) && bytes[^1] >= 0x80)
-        {
-            isNegative = true;
-            FilpBytes(in bytes, size);
-        }
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 2, digits: Digits);
 
-        var result = new StringBuilder();
-        if (isNegative)
-        {
-            result.Append('-');
-        }
-        var gotFirstNonZeroQuaternary = false;
-
-        // Process bits in groups of 2 for quaternary
-        var bitArray = new List<int>();
-        for (var i = 0; i < size; i += 1)
-        {
-            for (var bit = 0; bit < 8; bit += 1)
-            {
-                bitArray.Add((bytes[i] >> bit) & 1);
-            }
-        }
-
-        // Pad to multiple of 2 bits if needed
-        while (bitArray.Count % 2 != 0)
-        {
-            bitArray.Add(0);
-        }
-
-        // Process from most significant bits
-        for (var i = bitArray.Count - 2; i >= 0; i -= 2)
-        {
-            var quaternaryValue = bitArray[i + 1] * 2 + bitArray[i];
-            if (!gotFirstNonZeroQuaternary && quaternaryValue == 0)
-                continue;
-
-            gotFirstNonZeroQuaternary = true;
-            result.Append(quaternaryValue);
-        }
-
-        return gotFirstNonZeroQuaternary
-            ? result.ToString()
-            : "0";
+        return isNegative
+            ? "-0q" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0q" + digits.PadLeft(totalWidth: width, paddingChar: '0');
     }
 
-    private static byte[] GetBytes(this object obj)
+    public static string FormatAsBinaryWithPadding(this object value, string format)
     {
-        return obj switch
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 1, digits: Digits);
+
+        return isNegative
+            ? "-0b" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0b" + digits.PadLeft(totalWidth: width, paddingChar: '0');
+    }
+
+    // ---------- Helpers ----------
+
+    /// <summary>
+    /// Format an unsigned magnitude (little-endian) into base-2^k without building a per-bit list.
+    /// Emits the leading partial group (if any) first, then full-size groups.
+    /// </summary>
+    private static string FormatBasePowerOfTwo(byte[] littleEndianMagnitude, int bitsPerDigit,
+        string digits)
+    {
+        if (littleEndianMagnitude == null || littleEndianMagnitude.Length == 0)
         {
-            sbyte sb => new[]
+            return "0";
+        }
+
+        // Find index of most-significant non-zero byte.
+        var mostSignificantIndex = littleEndianMagnitude.Length - 1;
+        while (mostSignificantIndex >= 0 && littleEndianMagnitude[mostSignificantIndex] == 0)
+        {
+            mostSignificantIndex -= 1;
+        }
+
+        if (mostSignificantIndex < 0)
+        {
+            return "0";
+        }
+
+        // Find index (0..7) of top set bit in that byte.
+        var mostSignificantByte = littleEndianMagnitude[mostSignificantIndex];
+        var mostSignificantBitIndex = 7;
+        while (mostSignificantBitIndex >= 0 &&
+               mostSignificantByte.GetBit(mostSignificantBitIndex) == 0)
+        {
+            mostSignificantBitIndex -= 1;
+        }
+
+        // Total significant bits = full bytes below MSB * 8 + bits in MSB.
+        var totalBits = mostSignificantIndex * 8 + mostSignificantBitIndex + 1;
+        var maxDigits = (totalBits + bitsPerDigit - 1) / bitsPerDigit;
+        var outputBuffer = new char[maxDigits];
+        var digitIndex = 0;
+        var groupAccumulator = (totalBits - 1) % bitsPerDigit + 1;
+        var cache = 0;
+        for (var i = totalBits - 1; i >= 0; i -= 1)
+        {
+            cache <<= 1;
+            cache |= littleEndianMagnitude[i >> 3]
+               .GetBit(i & 7);
+            groupAccumulator -= 1;
+            Console.WriteLine(
+                $"{i} {digitIndex} {groupAccumulator} {cache} {outputBuffer.ToRepr()}");
+            if (groupAccumulator == 0)
             {
-                (byte)(sb < 0
-                    ? sb + 256
-                    : sb)
-            },
-            byte b => new[] { b }, // BitConverter.GetBytes(byte) doesn't exist
-            short s => BitConverter.GetBytes(value: s),
-            ushort us => BitConverter.GetBytes(value: us),
-            int i => BitConverter.GetBytes(value: i),
-            uint ui => BitConverter.GetBytes(value: ui),
-            long l => BitConverter.GetBytes(value: l),
-            ulong ul => BitConverter.GetBytes(value: ul),
+                groupAccumulator = bitsPerDigit;
+                outputBuffer[digitIndex] = digits[cache];
+                digitIndex += 1;
+                cache = 0;
+            }
+
+            Console.WriteLine(
+                $"{i} {digitIndex} {groupAccumulator} {cache} {outputBuffer.ToRepr()}");
+        }
+
+        return new string(outputBuffer, 0, digitIndex);
+    }
+
+    /// <summary>
+    /// Returns the absolute-value magnitude of an integer as little-endian bytes,
+    /// and a flag indicating if the original value was negative.
+    /// - For signed primitives: converts two's complement to magnitude in-place.
+    /// - For BigInteger: uses Abs and unsigned representation (no sign byte).
+    /// </summary>
+    private static byte[] GetMagnitudeBytesLittleEndian(object value, out bool isNegative)
+    {
+        isNegative = false;
+
+        switch (value)
+        {
+            case sbyte v:
+                if (v < 0)
+                {
+                    isNegative = true;
+                    return new[] { (byte)-v };
+                }
+
+                return new[] { (byte)v };
+
+            case byte v:
+                return new[] { v };
+
+            case short v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case ushort v:
+                return BitConverter.GetBytes(value: v);
+
+            case int v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case uint v:
+                return BitConverter.GetBytes(value: v);
+
+            case long v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case ulong v:
+                return BitConverter.GetBytes(value: v);
+
             #if NET7_0_OR_GREATER
-            Int128 i128 => i128.GetBytesFromInt128(),
-            UInt128 u128 => u128.GetBytesFromUInt128(),
+            case Int128 v:
+            {
+                isNegative = v < 0;
+                var unsigned = isNegative ? (UInt128)(-v) : (UInt128)v;
+                return GetBytesFromUInt128(unsigned);
+            }
+
+            case UInt128 v:
+                return GetBytesFromUInt128(v);
             #endif
-            BigInteger bi => bi.ToByteArray(),
-            _ => throw new ArgumentException(message: "Invalid type")
-        };
-    }
-    private static long GetByteSize<T>(this T obj)
-    {
-        return obj switch
-        {
-            byte or sbyte => 1,
-            short or ushort => 2,
-            int or uint => 4,
-            long or ulong => 8,
-            #if NET7_0_OR_GREATER
-            Int128 or UInt128 => 16,
-            #endif
-            BigInteger bi => (bi.GetBitLength() + 7) >> 3, // ceil(log2(bi))
-            _ => throw new ArgumentException(message: "Invalid type")
-        };
+
+            case BigInteger big:
+            {
+                isNegative = big.Sign < 0;
+                var magnitude = BigInteger.Abs(value: big);
+                #if NET7_0_OR_GREATER
+                return magnitude.ToByteArray(isUnsigned: true, isBigEndian: false);
+                #else
+                // Positive, minimal two's complement little-endian.
+                var bytes = magnitude.ToByteArray();
+                // Trim possible sign-extension 0x00 at the MSB end (last element).
+                if (bytes.Length > 1 && bytes[bytes.Length - 1] == 0x00)
+                {
+                    Array.Resize(array: ref bytes, newSize: bytes.Length - 1);
+                }
+
+                return bytes;
+                #endif
+            }
+
+            default:
+                throw new ArgumentException(message: "Invalid type");
+        }
     }
 
     #if NET7_0_OR_GREATER
-
-    private static byte[] GetBytesFromInt128(this Int128 value)
+    private static byte[] GetBytesFromUInt128(UInt128 value)
     {
-        var ui128 = (UInt128)value;
-        var isNegative = value < 0;
-        if (isNegative)
-        {
-            ui128 = ~ui128 +
-                    1; // negating all the bits means subtracting ui128 from 0xFFFF_FFFF_FFFF_FFFF, hence the +1 offset afterward.
-        }
+        var low = (ulong)value;
+        var high = (ulong)(value >> 64);
 
-        return ui128.GetBytesFromUInt128();
-    }
-    private static byte[] GetBytesFromUInt128(this UInt128 value)
-    {
-        var highBytes = (ulong)(value >> 64);
-        var lowBytes = (ulong)value;
         var bytes = new byte[16];
-        Array.Copy(sourceArray: BitConverter.GetBytes(value: lowBytes), sourceIndex: 0,
-            destinationArray: bytes, destinationIndex: 0, length: 8);
-        Array.Copy(sourceArray: BitConverter.GetBytes(value: highBytes), sourceIndex: 0,
-            destinationArray: bytes, destinationIndex: 8, length: 8);
+        var lowBytes = BitConverter.GetBytes(low);
+        var highBytes = BitConverter.GetBytes(high);
+
+        Array.Copy(lowBytes,  0, bytes, 0, 8);
+        Array.Copy(highBytes, 0, bytes, 8, 8);
         return bytes;
     }
-
     #endif
 
-    private static void FilpBytes(in byte[] bytes, long size)
+    /// <summary>
+    /// Converts a two's-complement little-endian byte array to its magnitude (absolute value) in-place.
+    /// </summary>
+    private static void ConvertTwosComplementToMagnitudeInPlace(byte[] bytes)
     {
-        for (var i = 0; i < size; i += 1)
+        var i = 0;
+        while (i < bytes.Length)
         {
             bytes[i] = (byte)~bytes[i];
+            i += 1;
         }
 
-        var carry = bytes[0] == 0xff;
-        bytes[0] += 1;
-
-        for (var i = 1; i < size; i += 1)
+        // Add 1 with carry
+        var index = 0;
+        var carry = true;
+        while (index < bytes.Length && carry)
         {
-            if (!carry)
-            {
-                break;
-            }
-
-            bytes[i] += 1;
-            if (bytes[i] != 0) 
-            {
-                break;
-            }
+            var sum = bytes[index] + 1;
+            bytes[index] = (byte)sum;
+            carry = sum == 0;
+            index += 1;
         }
     }
 
-    public static string FormatAsHexWithPadding(this object obj, string formatString)
+    /// <summary>
+    /// Parses an optional width suffix from a format string like "X8" / "O12".
+    /// Returns 0 when no width is provided.
+    /// </summary>
+    private static int ParseOptionalWidth(string format)
     {
-        var padding = 0;
-        if (formatString.Length >= 2 && !Int32.TryParse(s: formatString[1..], result: out padding))
+        if (String.IsNullOrEmpty(value: format) || format.Length < 2)
+        {
+            return 0;
+        }
+
+        var widthText = format[1..];
+        if (!Int32.TryParse(s: widthText, result: out var width))
         {
             throw new ArgumentException(message: "Invalid format string");
         }
 
-        var result = obj.FormatAsHex();
-
-        if (formatString.Length < 2)
-        {
-            return result[0] == '-'
-                ? $"-0x{result[1..]}"
-                : $"0x{result}";
-        }
-
-        return result[0] == '-'
-            ? $"-0x{result[1..].PadLeft(totalWidth: padding, paddingChar: '0')}"
-            : $"0x{result.PadLeft(totalWidth: padding, paddingChar: '0')}";
-    }
-    public static string FormatAsQuaternaryWithPadding(this object obj, string formatString)
-    {
-        var padding = 0;
-        if (formatString.Length >= 2 && !Int32.TryParse(s: formatString[1..], result: out padding))
-        {
-            throw new ArgumentException(message: "Invalid format string");
-        }
-
-        var result = obj.FormatAsQuaternary();
-
-        if (formatString.Length < 2)
-        {
-            return result[0] == '-'
-                ? $"-0q{result[1..]}"
-                : $"0q{result}";
-        }
-
-        return result[0] == '-'
-            ? $"-0q{result[1..].PadLeft(totalWidth: padding, paddingChar: '0')}"
-            : $"0q{result.PadLeft(totalWidth: padding, paddingChar: '0')}";
-    }
-    public static string FormatAsOctalWithPadding(this object obj, string formatString)
-    {
-        var padding = 0;
-        if (formatString.Length >= 2 && !Int32.TryParse(s: formatString[1..], result: out padding))
-        {
-            throw new ArgumentException(message: "Invalid format string");
-        }
-
-        var result = obj.FormatAsOctal();
-
-        if (formatString.Length < 2)
-        {
-            return result[0] == '-'
-                ? $"-0o{result[1..]}"
-                : $"0o{result}";
-        }
-
-        return result[0] == '-'
-            ? $"-0o{result[1..].PadLeft(totalWidth: padding, paddingChar: '0')}"
-            : $"0o{result.PadLeft(totalWidth: padding, paddingChar: '0')}";
+        return width < 0
+            ? 0
+            : width;
     }
 
-    public static string FormatAsBinaryWithPadding(this object obj, string formatString)
-    {
-        var padding = 0;
-        if (formatString.Length >= 2 && !Int32.TryParse(s: formatString[1..], result: out padding))
-        {
-            throw new ArgumentException(message: "Invalid format string");
-        }
-
-        var result = obj.FormatAsBinary();
-
-        if (formatString.Length < 2)
-        {
-            return result[0] == '-'
-                ? $"-0b{result[1..]}"
-                : $"0b{result}";
-        }
-
-        return result[0] == '-'
-            ? $"-0b{result[1..].PadLeft(totalWidth: padding, paddingChar: '0')}"
-            : $"0b{result.PadLeft(totalWidth: padding, paddingChar: '0')}";
-    }
+    private static int GetBit(this byte b, int bit) => (b >> bit) & 1;
 }
