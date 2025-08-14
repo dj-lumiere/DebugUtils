@@ -150,4 +150,23 @@ internal static class DecimalExactExtensions
 
         return $"{sign}{integerPart}.{fractionalPart}E{expSign}{realPowerOf10:D3}";
     }
+
+    public static string FormatAsHexPower(this decimal value)
+    {
+        // Get the internal bits
+        var bits = Decimal.GetBits(d: value);
+        // Extract components
+        var lo = (uint)bits[0]; // Low 32 bits of 96-bit integer
+        var mid = (uint)bits[1]; // Middle 32 bits  
+        var hi = (uint)bits[2]; // High 32 bits
+        var flags = bits[3]; // Scale and sign
+        var scale = (byte)(flags >> 16); // How many digits after decimal
+        var isNegative = (flags & 0x80000000) != 0 && !(hi == 0 && mid == 0 && lo == 0);
+        var sign = isNegative
+            ? "-"
+            : "";
+        return scale == 0
+            ? $"{sign}0x{hi:X8}{mid:X8}{lo:X8}" // All 24 hex digits
+            : $"{sign}0x{hi:X8}{mid:X8}{lo:X8}P-{scale:D3}"; // All 24 hex digits + scale
+    }
 }

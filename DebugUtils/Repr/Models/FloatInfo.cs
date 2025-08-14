@@ -69,4 +69,8 @@ internal readonly record struct FloatInfo(
                    (Bits & Spec.MantissaMsbMask) == 0;
         }
     }
+
+    public bool IsNaN => IsQuietNaN || IsSignalingNaN;
+
+    public bool IsSubnormal => (Bits & Spec.ExpMask) == 0;
 };

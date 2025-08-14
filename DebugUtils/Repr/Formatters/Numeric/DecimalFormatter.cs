@@ -40,6 +40,7 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
             {
                 "HB" => $"0x{flags:X8}{hi:X8}{mid:X8}{lo:X8}",
                 "BF" => $"{(isNegative ? 1 : 0)}|{scaleBits}|{hiBits}{midBits}{loBits}",
+                "HP" => dec.FormatAsHexPower(),
                 "EX" => dec.FormatAsExact(),
                 _ => dec.ToString(format: context.Config.FloatFormatString)
             };

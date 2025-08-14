@@ -55,6 +55,7 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
             _ when info.IsQuietNaN => "Quiet NaN",
             _ when info.IsSignalingNaN => FormatSignalingNaN(info: info),
             "EX" => obj.FormatAsExact(info: info),
+            "HP" => obj.FormatAsHexPower(info: info),
             _ => FormatWithBuiltInToString(obj: obj, formatString: formatString)
         };
     }
