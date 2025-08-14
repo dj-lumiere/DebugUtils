@@ -65,7 +65,7 @@ public class NumericFormatterTests
     public void TestDecimalRepr_HexPower()
     {
         var config = new ReprConfig(FloatFormatString: "HP");
-        Assert.Equal(expected: "decimal(0x6582A5360B14388541B65F29P-028)",
+        Assert.Equal(expected: "decimal(0x6582A536_0B143885_41B65F29p10-028)",
             actual: 3.1415926535897932384626433832795m.Repr(
                 config: config));
     }
@@ -74,7 +74,7 @@ public class NumericFormatterTests
     public void TestHalfRepr_HexPower()
     {
         var config = new ReprConfig(FloatFormatString: "HP");
-        Assert.Equal(expected: "Half(0x1.920P+001)", actual: Half.Parse(s: "3.14159")
+        Assert.Equal(expected: "Half(0x1.920p+001)", actual: Half.Parse(s: "3.14159")
            .Repr(config: config));
     }
 
@@ -217,7 +217,7 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(FloatFormatString: "HP");
         var result = 3.14159f.Repr(config: config);
-        Assert.Equal(expected: "float(0x1.921FA0P+001)", actual: result);
+        Assert.Equal(expected: "float(0x1.921FA0p+001)", actual: result);
     }
 
     // Removed BitField test as BF format was deprecated
@@ -257,7 +257,7 @@ public class NumericFormatterTests
     #if NET5_0_OR_GREATER
     [Theory]
     [InlineData("F2", "Half(3.14)")]
-    [InlineData("HP", "Half(0x1.920P+001)")] // HP should produce hex power representation
+    [InlineData("HP", "Half(0x1.920p+001)")] // HP should produce hex power representation
     public void TestFloatFormatString_HalfValues(string format, string expectedOrSpecial)
     {
         var config = new ReprConfig(FloatFormatString: format);
@@ -271,8 +271,8 @@ public class NumericFormatterTests
     #region New Custom Format Tests
 
     [Theory]
-    [InlineData("O", "int(0o52)")]      // Octal with 0o prefix
-    [InlineData("Q", "int(0q222)")]     // Quaternary with 0q prefix
+    [InlineData("O", "int(0o52)")] // Octal with 0o prefix
+    [InlineData("Q", "int(0q222)")] // Quaternary with 0q prefix
     public void TestIntFormatString_NewCustomFormats(string format, string expected)
     {
         var config = new ReprConfig(IntFormatString: format);
@@ -280,8 +280,8 @@ public class NumericFormatterTests
     }
 
     [Theory]
-    [InlineData("O", "byte(0o377)")]    // Octal 255
-    [InlineData("Q", "byte(0q3333)")]   // Quaternary 255
+    [InlineData("O", "byte(0o377)")] // Octal 255
+    [InlineData("Q", "byte(0q3333)")] // Quaternary 255
     public void TestIntFormatString_NewCustomFormats_Byte(string format, string expected)
     {
         var config = new ReprConfig(IntFormatString: format);
@@ -292,27 +292,27 @@ public class NumericFormatterTests
     public void TestFloatFormatString_HexPower_Detailed()
     {
         var config = new ReprConfig(FloatFormatString: "HP");
-        
+
         // Test positive number - should use IEEE 754 hex notation
         var result = 3.14159f.Repr(config: config);
-        Assert.Contains("0x1.", result);  // Should start with 0x1. for normalized numbers
-        Assert.Contains("P+", result);    // Should have power notation
-        
+        Assert.Equal("float(0x1.921FA0p+001)", result); // Should have power notation
+
         // Test negative number - should have minus sign
         result = (-3.14159f).Repr(config: config);
-        Assert.Contains("-0x1.", result);
-        Assert.Contains("P+", result);
+        Assert.Equal("float(-0x1.921FA0p+001)", result);
     }
 
     [Fact]
     public void TestFloatFormatString_HexPower_SpecialValues()
     {
         var config = new ReprConfig(FloatFormatString: "HP");
-        
+
         // Special values should still work with HP format
         Assert.Equal(expected: "float(Quiet NaN)", actual: Single.NaN.Repr(config: config));
-        Assert.Equal(expected: "float(Infinity)", actual: Single.PositiveInfinity.Repr(config: config));
-        Assert.Equal(expected: "float(-Infinity)", actual: Single.NegativeInfinity.Repr(config: config));
+        Assert.Equal(expected: "float(Infinity)",
+            actual: Single.PositiveInfinity.Repr(config: config));
+        Assert.Equal(expected: "float(-Infinity)",
+            actual: Single.NegativeInfinity.Repr(config: config));
     }
 
     #endregion
@@ -359,7 +359,7 @@ public class NumericFormatterTests
             FloatFormatString: "F2",
             Culture: CultureInfo.InvariantCulture
         );
-        
+
         // Should use period as decimal separator regardless of system culture
         Assert.Equal(expected: "float(3.14)", actual: 3.14159f.Repr(config: config));
     }
@@ -369,9 +369,9 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(
             FloatFormatString: "F2",
-            Culture: new CultureInfo("de-DE")
+            Culture: new CultureInfo(name: "de-DE")
         );
-        
+
         // German culture uses comma as decimal separator
         Assert.Equal(expected: "float(3,14)", actual: 3.14159f.Repr(config: config));
     }
@@ -383,7 +383,7 @@ public class NumericFormatterTests
             FloatFormatString: "N2",
             Culture: CultureInfo.InvariantCulture
         );
-        
+
         // Number format with thousand separators
         Assert.Equal(expected: "float(1,234.57)", actual: 1234.5678f.Repr(config: config));
     }
@@ -393,13 +393,13 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(
             FloatFormatString: "F2",
-            Culture: null  // Should use current culture
+            Culture: null // Should use current culture
         );
-        
+
         // Should not throw and produce some valid output
         var result = 3.14159f.Repr(config: config);
-        Assert.Contains("3", result);
-        Assert.Contains("14", result);
+        Assert.Contains(expectedSubstring: "3", actualString: result);
+        Assert.Contains(expectedSubstring: "14", actualString: result);
     }
 
     [Fact]
@@ -407,13 +407,14 @@ public class NumericFormatterTests
     {
         var config = new ReprConfig(
             FloatFormatString: "EX",
-            Culture: new CultureInfo("de-DE")
+            Culture: new CultureInfo(name: "de-DE")
         );
-        
+
         // EX format should ignore culture and always use invariant formatting
         var result = 3.14159f.Repr(config: config);
-        Assert.Contains(".", result);  // Should use period, not comma
-        Assert.Contains("E+", result);
+        Assert.Contains(expectedSubstring: ".",
+            actualString: result); // Should use period, not comma
+        Assert.Contains(expectedSubstring: "E+", actualString: result);
     }
 
     [Fact]
@@ -423,7 +424,7 @@ public class NumericFormatterTests
             IntFormatString: "N0",
             Culture: CultureInfo.InvariantCulture
         );
-        
+
         // Integer with thousand separators
         Assert.Equal(expected: "int(1,234)", actual: 1234.Repr(config: config));
     }

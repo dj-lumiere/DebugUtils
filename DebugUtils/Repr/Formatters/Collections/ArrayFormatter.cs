@@ -44,7 +44,7 @@ internal class ArrayFormatter : IReprFormatter, IReprTreeFormatter
                                .GetElementType()
                               ?.GetReprTypeName() ?? "object";
         var dimensions = new JsonArray();
-        for (var i = 0; i < array.Rank; i++)
+        for (var i = 0; i < array.Rank; i += 1)
         {
             dimensions.Add(value: array.GetLength(dimension: i));
         }

@@ -110,7 +110,7 @@ public class NumericFormatterTreeTests
         {
             [propertyName: "type"] = "decimal",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "0x6582A5360B14388541B65F29P-028"
+            [propertyName: "value"] = "0x6582A536_0B143885_41B65F29p10-028"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
@@ -125,7 +125,7 @@ public class NumericFormatterTreeTests
         {
             [propertyName: "type"] = "Half",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "0x1.920P+001"
+            [propertyName: "value"] = "0x1.920p+001"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
