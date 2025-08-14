@@ -122,7 +122,7 @@ internal static class DecimalFormattingExtensions
             ? "-"
             : "";
         return scale == 0
-            ? $"{sign}0x{hi:X8}{mid:X8}{lo:X8}" // All 24 hex digits
-            : $"{sign}0x{hi:X8}{mid:X8}{lo:X8}P-{scale:D3}"; // All 24 hex digits + scale
+            ? $"{sign}0x{hi:X8}_{mid:X8}_{lo:X8}" // All 24 hex digits
+            : $"{sign}0x{hi:X8}_{mid:X8}_{lo:X8}p10-{scale:D3}"; // All 24 hex digits + scale
     }
 }
