@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Formatters;
@@ -137,6 +138,13 @@ public static class ReprExtensions
         var context = config == null
             ? new ReprContext()
             : new ReprContext(config: config);
+
+
+        if (context.Config.Culture is null)
+        {
+            context.Config = context.Config with { Culture = CultureInfo.CurrentCulture };
+        }
+
         return obj.ToRepr(context: context);
     }
 

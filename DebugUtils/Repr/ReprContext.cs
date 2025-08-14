@@ -11,7 +11,7 @@ public record ReprContext
     /// <remarks>
     /// Config provides initialization options for the ReprContext enabling custom behaviors or functionalities.
     /// </remarks>
-    public ReprConfig Config { get; } = new();
+    public ReprConfig Config { get; set; } = new();
 
     /// <summary>
     /// Tracks the set of visited object identifiers during the representation process.
@@ -194,8 +194,8 @@ public record ReprContext
     internal ReprContext WithContainerConfig()
     {
         return new ReprContext(
-            config: GetContainerConfig(), 
-            visited: Visited, 
+            config: GetContainerConfig(),
+            visited: Visited,
             depth: Depth
         );
     }
@@ -203,7 +203,7 @@ public record ReprContext
     private ReprConfig GetContainerConfig()
     {
         var newConfig = Config;
-        
+
         if (Config.UseSimpleFormatsInContainers)
         {
             newConfig = newConfig with
@@ -212,7 +212,7 @@ public record ReprContext
                 IntFormatString = "D"
             };
         }
-        
+
         if (Config.HideChildTypes)
         {
             newConfig = newConfig with
@@ -220,7 +220,7 @@ public record ReprContext
                 TypeMode = TypeReprMode.AlwaysHide
             };
         }
-        
+
         return newConfig;
     }
 }
