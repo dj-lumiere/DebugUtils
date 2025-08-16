@@ -8,7 +8,7 @@ using DebugUtils.Repr.TypeHelpers;
 namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(IntPtr))]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -21,6 +21,10 @@ internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return ToRepr(obj, context)!;
+        }
         return new JsonObject
         {
             { "type", type.GetReprTypeName() },
@@ -31,7 +35,7 @@ internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
 }
 
 [ReprFormatter(typeof(UIntPtr))]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class UIntPtrFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -44,6 +48,10 @@ internal class UIntPtrFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return ToRepr(obj, context)!;
+        }
         return new JsonObject
         {
             { "type", type.GetReprTypeName() },

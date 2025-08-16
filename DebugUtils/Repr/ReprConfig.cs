@@ -26,7 +26,7 @@ public enum TypeReprMode
     /// </remarks>
     /// <example>
     /// "hello" → string("hello")
-    /// [1, 2, 3] → List([int(1), int(2), int(3)])
+    /// [1, 2, 3] → List([1i32, 2i32, 3i32])
     /// </example>
     AlwaysShow,
 
@@ -45,7 +45,7 @@ public enum TypeReprMode
     /// </remarks>
     /// <example>
     /// "hello" → "hello"  (string type is obvious)
-    /// [1, 2, 3] → [1, 2, 3]  (List type is obvious)
+    /// [1, 2, 3] → [1i32, 2i32, 3i32]  (List type is obvious)
     /// myCustomObject → MyCustomType(field1: value1)  (custom type shown)
     /// </example>
     HideObvious,

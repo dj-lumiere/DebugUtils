@@ -111,8 +111,6 @@ internal static class IntegerExtensions
             cache |= littleEndianMagnitude[i >> 3]
                .GetBit(i & 7);
             groupAccumulator -= 1;
-            Console.WriteLine(
-                $"{i} {digitIndex} {groupAccumulator} {cache} {outputBuffer.ToRepr()}");
             if (groupAccumulator == 0)
             {
                 groupAccumulator = bitsPerDigit;
@@ -120,9 +118,6 @@ internal static class IntegerExtensions
                 digitIndex += 1;
                 cache = 0;
             }
-
-            Console.WriteLine(
-                $"{i} {digitIndex} {groupAccumulator} {cache} {outputBuffer.ToRepr()}");
         }
 
         return new string(outputBuffer, 0, digitIndex);

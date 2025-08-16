@@ -15,7 +15,7 @@ namespace DebugUtils.Repr.Formatters;
     , typeof(Int128), typeof(UInt128)
     #endif
 )]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -69,6 +69,10 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return (ToRepr(obj, context) + TypeNameMappings.TypeSuffixNames[type])!;
+        }
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),

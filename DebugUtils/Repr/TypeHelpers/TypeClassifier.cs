@@ -133,17 +133,10 @@ internal static class TypeClassifier
         }
 
         // Check if the formatter for this type has a ReprOptions attribute
-        var formatter =
-            ReprFormatterRegistry.GetStandardFormatter(type: type, context: new ReprContext());
+        var formatter = type.GetStandardFormatter();
         var formatterAttr = formatter.GetType()
                                      .GetCustomAttribute<ReprOptionsAttribute>();
-        if (formatterAttr != null)
-        {
-            return formatterAttr.NeedsPrefix;
-        }
-
-        // Record types and types that doesn't override ToString need type prefix.
-        return type.IsRecordType() && !type.OverridesToStringType();
+        return formatterAttr?.NeedsPrefix ?? type.IsRecordType();
     }
     public static bool IsGenericTypeOf(this Type type, Type genericTypeDefinition)
     {

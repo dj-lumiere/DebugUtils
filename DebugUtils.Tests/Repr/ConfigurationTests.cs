@@ -10,7 +10,7 @@ public class ConfigurationTests
     {
         var nestedList = new List<object> { 1, new List<object> { 2, new List<object> { 3 } } };
         var config = new ReprConfig(MaxDepth: 1);
-        Assert.Equal(expected: "[int(1), <Max Depth Reached>]",
+        Assert.Equal(expected: "[1i32, <Max Depth Reached>]",
             actual: nestedList.Repr(config: config));
 
         config = new ReprConfig(MaxDepth: 0);
@@ -22,7 +22,7 @@ public class ConfigurationTests
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
         var config = new ReprConfig(MaxItemsPerContainer: 3);
-        Assert.Equal(expected: "[int(1), int(2), int(3), ... (2 more items)]",
+        Assert.Equal(expected: "[1i32, 2i32, 3i32, ... (2 more items)]",
             actual: list.Repr(config: config));
 
         config = new ReprConfig(MaxItemsPerContainer: 0);
@@ -50,13 +50,13 @@ public class ConfigurationTests
         var config = new ReprConfig(ViewMode: MemberReprMode.PublicFieldAutoProperty);
         Assert.Equal(
             expected:
-            "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\")",
+            "ClassifiedData(Age: 10i32, Id: 5i64, Name: \"Lumi\", Writer: \"writer\")",
             actual: classified.Repr(config: config));
 
         config = new ReprConfig(ViewMode: MemberReprMode.AllFieldAutoProperty);
         Assert.Equal(
             expected:
-            "ClassifiedData(Age: int(10), Id: long(5), Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
+            "ClassifiedData(Age: 10i32, Id: 5i64, Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
             actual: classified.Repr(config: config));
     }
 
@@ -74,37 +74,37 @@ public class ConfigurationTests
         var data = new { Name = "Alice", Age = 30, Scores = new[] { 95, 87, 92 } };
         Assert.Equal(
             expected:
-            "Anonymous(Age: int(30), Name: \"Alice\", Scores: 1DArray([int(95), int(87), int(92)]))",
+            "Anonymous(Age: 30i32, Name: \"Alice\", Scores: 1DArray([95i32, 87i32, 92i32]))",
             actual: data.Repr());
 
-        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+        Assert.Equal(expected: "1DArray([1i32, 2i32, 3i32])",
             actual: new[] { 1, 2, 3 }.Repr());
-        Assert.Equal(expected: "2DArray([[int(1), int(2)], [int(3), int(4)]])",
+        Assert.Equal(expected: "2DArray([[1i32, 2i32], [3i32, 4i32]])",
             actual: new[,] { { 1, 2 }, { 3, 4 } }.Repr());
-        Assert.Equal(expected: "JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])",
+        Assert.Equal(expected: "JaggedArray([[1i32, 2i32], [3i32, 4i32, 5i32]])",
             actual: new int[][] { new[] { 1, 2 }, new[] { 3, 4, 5 } }.Repr());
 
-        Assert.Equal(expected: "[int(1), int(2), int(3)]",
+        Assert.Equal(expected: "[1i32, 2i32, 3i32]",
             actual: new List<int> { 1, 2, 3 }.Repr());
         Assert.Equal(expected: "{\"a\", \"b\"}",
             actual: new HashSet<string> { "a", "b" }.Repr());
-        Assert.Equal(expected: "{\"x\": int(1)}",
+        Assert.Equal(expected: "{\"x\": 1i32}",
             actual: new Dictionary<string, int> { { "x", 1 } }.Repr());
 
-        Assert.Equal(expected: "int(42)", actual: 42.Repr());
-        Assert.Equal(expected: "int(0x2A)",
+        Assert.Equal(expected: "42i32", actual: 42.Repr());
+        Assert.Equal(expected: "0x2Ai32",
             actual: 42.Repr(config: new ReprConfig(IntFormatString: "X")));
-        Assert.Equal(expected: "int(0b101010)",
+        Assert.Equal(expected: "0b101010i32",
             actual: 42.Repr(config: new ReprConfig(IntFormatString: "B")));
 
         Assert.Equal(
-            expected: "double(3.000000000000000444089209850062616169452667236328125E-001)",
+            expected: "3.000000000000000444089209850062616169452667236328125E-001f64",
             actual: (0.1 + 0.2)
            .Repr());
         Assert.Equal(
-            expected: "double(2.99999999999999988897769753748434595763683319091796875E-001)",
+            expected: "2.99999999999999988897769753748434595763683319091796875E-001f64",
             actual: 0.3.Repr());
-        Assert.Equal(expected: "double(0.30000000000000004)",
+        Assert.Equal(expected: "0.30000000000000004f64",
             actual: (0.1 + 0.2)
            .Repr(config: new ReprConfig(FloatFormatString: "G")));
 
@@ -115,7 +115,7 @@ public class ConfigurationTests
         Assert.Equal(expected: "[1, 2, 3]", actual: new[] { 1, 2, 3 }.Repr(config: hideTypes));
 
         var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
-        Assert.Equal(expected: "1DArray([int(1), int(2), int(3)])",
+        Assert.Equal(expected: "1DArray([1i32, 2i32, 3i32])",
             actual: new[] { 1, 2, 3 }.Repr(config: showTypes));
     }
 
@@ -123,11 +123,11 @@ public class ConfigurationTests
     public void TestExampleTestRepr()
     {
         var list = new List<int> { 1, 2, 3 };
-        Assert.Equal(expected: "[int(1), int(2), int(3)]", actual: list.Repr());
+        Assert.Equal(expected: "[1i32, 2i32, 3i32]", actual: list.Repr());
 
         var config = new ReprConfig(FloatFormatString: "EX");
         var f = 3.14f;
-        Assert.Equal(expected: "float(3.1400001049041748046875E+000)",
+        Assert.Equal(expected: "3.1400001049041748046875E+000f32",
             actual: f.Repr(config: config));
 
         int? nullable = 123;

@@ -190,7 +190,7 @@ public void ProcessItems(List<Item> items)
 }
 
 // ❌ Bad: Calling inside a high-frequency loop
-for (int i = 0; i < 1000000; i++)
+for (int i = 0; i < 1000000; i += 1)
 {
     var caller = CallStack.GetCallerInfo(); // Unnecessary overhead!
     ProcessItem(i);

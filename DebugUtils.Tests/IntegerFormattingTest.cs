@@ -10,15 +10,15 @@ public class IntegerFormattingTest
     public void TestBinaryFormatting()
     {
         // Test positive values
-        Assert.Equal(expected: "int(0b101010)",
+        Assert.Equal(expected: "0b101010i32",
             actual: 42.Repr(config: new ReprConfig(IntFormatString: "B")));
-        Assert.Equal(expected: "byte(0b11111111)",
+        Assert.Equal(expected: "0b11111111u8",
             actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "B")));
-        Assert.Equal(expected: "int(0b0)",
+        Assert.Equal(expected: "0b0i32",
             actual: 0.Repr(config: new ReprConfig(IntFormatString: "B")));
 
         // Test negative values
-        Assert.Equal(expected: "int(-0b101010)",
+        Assert.Equal(expected: "-0b101010i32",
             actual: (-42).Repr(config: new ReprConfig(IntFormatString: "B")));
     }
 
@@ -26,15 +26,15 @@ public class IntegerFormattingTest
     public void TestOctalFormatting()
     {
         // Test positive values
-        Assert.Equal(expected: "int(0o52)",
+        Assert.Equal(expected: "0o52i32",
             actual: 42.Repr(config: new ReprConfig(IntFormatString: "O")));
-        Assert.Equal(expected: "byte(0o377)",
+        Assert.Equal(expected: "0o377u8",
             actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "O")));
-        Assert.Equal(expected: "int(0o0)",
+        Assert.Equal(expected: "0o0i32",
             actual: 0.Repr(config: new ReprConfig(IntFormatString: "O")));
 
         // Test negative values
-        Assert.Equal(expected: "int(-0o52)",
+        Assert.Equal(expected: "-0o52i32",
             actual: (-42).Repr(config: new ReprConfig(IntFormatString: "O")));
     }
 
@@ -42,15 +42,15 @@ public class IntegerFormattingTest
     public void TestQuaternaryFormatting()
     {
         // Test positive values
-        Assert.Equal(expected: "int(0q222)",
+        Assert.Equal(expected: "0q222i32",
             actual: 42.Repr(config: new ReprConfig(IntFormatString: "Q")));
-        Assert.Equal(expected: "byte(0q3333)",
+        Assert.Equal(expected: "0q3333u8",
             actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "Q")));
-        Assert.Equal(expected: "int(0q0)",
+        Assert.Equal(expected: "0q0i32",
             actual: 0.Repr(config: new ReprConfig(IntFormatString: "Q")));
 
         // Test negative values
-        Assert.Equal(expected: "int(-0q222)",
+        Assert.Equal(expected: "-0q222i32",
             actual: (-42).Repr(config: new ReprConfig(IntFormatString: "Q")));
     }
 }

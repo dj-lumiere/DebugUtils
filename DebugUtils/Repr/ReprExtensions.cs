@@ -106,13 +106,13 @@ public static class ReprExtensions
     /// // Basic usage
     /// var list = new List&lt;int&gt; { 1, 2, 3 };
     /// Console.WriteLine(list.Repr()); 
-    /// // Output: [int(1), int(2), int(3)]
+    /// // Output: [1i32, 2i32, 3i32]
     ///
     /// 
     /// // With custom configuration
     /// var config = new ReprConfig(FloatFormatString: "EX");
     /// Console.WriteLine(3.14f.Repr(config)); 
-    /// // Output: float(3.1400001049041748046875E0)
+    /// // Output: 3.1400001049041748046875E+000f32
     ///
     /// 
     /// // Nullable types

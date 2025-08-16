@@ -138,7 +138,7 @@ public class NumericFormatterTreeTests
         {
             [propertyName: "type"] = "float",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "Quiet NaN"
+            [propertyName: "value"] = "QuietNaN(0x400000)"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
 
@@ -169,7 +169,7 @@ public class NumericFormatterTreeTests
         {
             [propertyName: "type"] = "double",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "Quiet NaN"
+            [propertyName: "value"] = "QuietNaN(0x8000000000000)"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
 
@@ -201,7 +201,7 @@ public class NumericFormatterTreeTests
         {
             [propertyName: "type"] = "Half",
             [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "Quiet NaN"
+            [propertyName: "value"] = "QuietNaN(0x200)"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
 

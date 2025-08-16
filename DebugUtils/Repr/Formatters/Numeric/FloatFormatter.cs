@@ -16,7 +16,7 @@ namespace DebugUtils.Repr.Formatters;
     typeof(Half)
     #endif
 )]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -46,7 +46,7 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         {
             _ when info.IsPositiveInfinity => "Infinity",
             _ when info.IsNegativeInfinity => "-Infinity",
-            _ when info.IsQuietNaN => "Quiet NaN",
+            _ when info.IsQuietNaN => FormatQuietNaN(info: info),
             _ when info.IsSignalingNaN => FormatSignalingNaN(info: info),
             "EX" => obj.FormatAsExact(info: info),
             "HP" => obj.FormatAsHexPower(info: info),
@@ -66,12 +66,23 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         };
     }
 
+    private static string FormatQuietNaN(FloatInfo info)
+    {
+        return info.TypeName switch
+        {
+            FloatTypeKind.Half => $"QuietNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Float => $"QuietNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Double => $"QuietNaN(0x{info.Mantissa:X3})",
+            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
+        };
+    }
     private static string FormatSignalingNaN(FloatInfo info)
     {
         return info.TypeName switch
         {
-            FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                $"Signaling NaN, Payload: 0x{info.Mantissa.ToString(format: $"X{(info.Spec.MantissaBitSize + 3) / 4}")}",
+            FloatTypeKind.Half => $"SignalingNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Float => $"SignalingNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Double => $"SignalingNaN(0x{info.Mantissa:X3})",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
@@ -79,6 +90,10 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return (ToRepr(obj, context) + TypeNameMappings.TypeSuffixNames[type])!;
+        }
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),

@@ -32,10 +32,10 @@ Console.WriteLine(dict.ToString()); // 😞 "System.Collections.Generic.Dictiona
 using DebugUtils.Repr;
 
 var arr = new int[] {1, 2, 3, 4};
-Console.WriteLine(arr.Repr());  // 😍 "[int(1), int(2), int(3), int(4)]"
+Console.WriteLine(arr.Repr());  // 😍 "[1i32, 2i32, 3i32, 4i32]"
 
 var dict = new Dictionary<string, int> {{"a", 1}, {"b", 2}};
-Console.WriteLine(dict.Repr()); // 😍 "{"a": int(1), "b": int(2)}"
+Console.WriteLine(dict.Repr()); // 😍 "{"a": 1i32, "b": 2i32}"
 ```
 
 ## Features
@@ -48,25 +48,25 @@ Works with any type - see actual data instead of useless type names.
 
 ```csharp
 // Arrays (1D, 2D, jagged)
-new[] {1, 2, 3}.Repr()                    // 1DArray([int(1), int(2), int(3)])
-new[,] {{1, 2}, {3, 4}}.Repr()              // 2DArray([[int(1), int(2)], [int(3), int(4)]])
-new[][] {{1, 2}, {3, 4, 5}}.Repr()           // JaggedArray([[int(1), int(2)], [int(3), int(4), int(5)]])
+new[] {1, 2, 3}.Repr()                    // 1DArray([1, 2, 3])
+new[,] {{1, 2}, {3, 4}}.Repr()              // 2DArray([[1, 2], [3, 4]])
+new[][] {{1, 2}, {3, 4, 5}}.Repr()           // JaggedArray([[1, 2], [3, 4, 5]])
 
 // Lists, Sets, Dictionaries
-new List<int> {1, 2, 3}.Repr()           // [int(1), int(2), int(3)]
+new List<int> {1, 2, 3}.Repr()           // [1, 2, 3]
 new HashSet<string> {"a", "b"}.Repr()    // {"a", "b"}
-new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": int(1)}
+new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": 1}
 ```
 
 ### Numeric Types
 
 ```csharp
 // Integers with different representations
-42.Repr()                                              // int(42)
-42.Repr(new ReprConfig(IntFormatString: "X"))          // int(0x2A)
-42.Repr(new ReprConfig(IntFormatString: "B"))          // int(0b101010)
-42.Repr(new ReprConfig(IntFormatString: "HB"))         // int(0x0000002A) - raw hex bytes
--42.Repr(new ReprConfig(IntFormatString: "HB"))         // int(0xFFFFFFD6) - raw hex bytes
+42.Repr()                                              // 42
+42.Repr(new ReprConfig(IntFormatString: "X"))          // 0x2A
+42.Repr(new ReprConfig(IntFormatString: "B"))          // 0b101010
+42.Repr(new ReprConfig(IntFormatString: "HB"))         // 0x0000002A - raw hex bytes
+-42.Repr(new ReprConfig(IntFormatString: "HB"))         // 0xFFFFFFD6 - raw hex bytes
 
 // Floating point with exact representation
 // You can now recognize the real floating point value
@@ -189,23 +189,20 @@ var oldRounded = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 
 ### Integer Formatting (NEW: Format Strings)
 
 ```csharp
-// NEW APPROACH: Format strings (recommended)
 var hex = new ReprConfig(IntFormatString: "X");
-255.Repr(hex);            // Hexadecimal: int(0xFF)
+255.Repr(hex);            // Hexadecimal: 0xFF
+
+var binary = new ReprConfig(IntFormatString: "O");
+255.Repr(binary);         // Binary: 0o377
+
+var binary = new ReprConfig(IntFormatString: "Q");
+255.Repr(binary);         // Binary: 0q3333
 
 var binary = new ReprConfig(IntFormatString: "B");
-255.Repr(binary);         // Binary: int(0b11111111)
-
-var hexBytes = new ReprConfig(IntFormatString: "HB");
-255.Repr(hexBytes);       // Hex bytes: int(0x000000FF)
+255.Repr(binary);         // Binary: 0b11111111
 
 var decimal = new ReprConfig(IntFormatString: "D");
-255.Repr(decimal);        // Standard decimal: int(255)
-
-// OLD APPROACH: Enum modes (deprecated but still supported)
-var oldHex = new ReprConfig(IntMode: IntReprMode.Hex);
-var oldBinary = new ReprConfig(IntMode: IntReprMode.Binary);
-var oldBytes = new ReprConfig(IntMode: IntReprMode.HexBytes);
+255.Repr(decimal);        // Standard decimal: 255
 ```
 
 ### Type Display
@@ -218,7 +215,7 @@ var hideTypes = new ReprConfig(
 new[] {1, 2, 3}.Repr(hideTypes);  // [1, 2, 3] (no type prefix to child element.)
 
 var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
-new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([int(1), int(2), int(3)])
+new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([1, 2, 3])
 ```
 
 ## Real-World Use Cases
@@ -302,23 +299,12 @@ obj.FormatAsJsonNode(context)        // For building custom tree structures, sho
 ### Configuration
 
 ```csharp
-// NEW APPROACH: Format strings (recommended)
 var config = new ReprConfig(
     FloatFormatString: "EX",           // Exact floating-point representation
     IntFormatString: "D",              // Decimal integers
     TypeMode: TypeReprMode.HideObvious,
     MaxDepth: 5,
-    MaxElementsPerCollection: 50,
-    EnablePrettyPrintForReprTree: true
-);
-
-// OLD APPROACH: Enum modes (deprecated but still supported)
-var oldConfig = new ReprConfig(
-    FloatMode: FloatReprMode.Exact,
-    IntMode: IntReprMode.Decimal,
-    TypeMode: TypeReprMode.HideObvious,
-    MaxDepth: 5,
-    MaxElementsPerCollection: 50,
+    MaxItemsPerContainer: 50,
     EnablePrettyPrintForReprTree: true
 );
 

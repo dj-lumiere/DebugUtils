@@ -35,18 +35,23 @@ internal static class ReprEngine
         try
         {
             // Get formatter and format - no safety concerns needed in formatters!
-            var formatter =
-                ReprFormatterRegistry.GetStandardFormatter(type: obj.GetType(), context: context);
-
+            var type = obj.GetType();
+            var formatter = type.GetStandardFormatter();
             var result = formatter.ToRepr(obj: obj, context: context);
+            var haveTypeSuffix =
+                TypeNameMappings.TypeSuffixNames.TryGetValue(key: type, out var suffix);
+            var needsTypePrefix = obj.NeedsTypePrefix();
 
             // Apply type prefix
-            return context.Config.TypeMode switch
+            return (context.Config.TypeMode, haveTypeSuffix, needsTypePrefix) switch
             {
-                TypeReprMode.AlwaysHide => result,
-                TypeReprMode.HideObvious => obj.NeedsTypePrefix()
-                    ? $"{obj.GetReprTypeName()}({result})"
-                    : result,
+                (_, true, true) => throw new InvalidOperationException(
+                    message: "Should not be possible"),
+                (TypeReprMode.AlwaysHide, _, _) => result,
+                (TypeReprMode.HideObvious, true, false) => $"{result}{suffix}",
+                (TypeReprMode.HideObvious, false, true) => $"{obj.GetReprTypeName()}({result})",
+                (TypeReprMode.HideObvious, false, false) => $"{result}",
+                (_, true, false) => $"{result}{suffix}",
                 _ => $"{obj.GetReprTypeName()}({result})"
             };
         }
@@ -60,7 +65,6 @@ internal static class ReprEngine
             }
         }
     }
-
     private static string FormatNullableValueType<T>(this T nullable, ReprContext context)
     {
         var type = typeof(T);
@@ -103,8 +107,8 @@ internal static class ReprEngine
 
         try
         {
-            var formatter =
-                ReprFormatterRegistry.GetTreeFormatter(type: obj.GetType(), context: context);
+            var type = obj.GetType();
+            var formatter = type.GetTreeFormatter();
             return formatter.ToReprTree(obj: obj, context: context);
         }
         finally
@@ -169,8 +173,8 @@ internal static class ReprEngine
         }
 
         var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
-        var formatter =
-            ReprFormatterRegistry.GetTreeFormatter(type: value.GetType(), context: context);
+        var formatter = value.GetType()
+                             .GetTreeFormatter();
         var valueRepr = formatter.ToReprTree(obj: value, context: context);
         valueRepr[propertyName: "type"] = reprName;
 

@@ -142,7 +142,7 @@ public class StandardFormatterTests
     {
         var array = new[] { 1, 2, 3, 4, 5 };
         var memory = new Memory<int>(array: array, start: 1, length: 3);
-        Assert.Equal(expected: "Memory([int(2), int(3), int(4)])", actual: memory.Repr());
+        Assert.Equal(expected: "Memory([2i32, 3i32, 4i32])", actual: memory.Repr());
 
         var emptyMemory = Memory<int>.Empty;
         Assert.Equal(expected: "Memory([])", actual: emptyMemory.Repr());
@@ -153,7 +153,7 @@ public class StandardFormatterTests
     {
         var array = new[] { 1, 2, 3, 4, 5 };
         var readOnlyMemory = new ReadOnlyMemory<int>(array: array, start: 1, length: 3);
-        Assert.Equal(expected: "ReadOnlyMemory([int(2), int(3), int(4)])",
+        Assert.Equal(expected: "ReadOnlyMemory([2i32, 3i32, 4i32])",
             actual: readOnlyMemory.Repr());
 
         var emptyReadOnlyMemory = ReadOnlyMemory<int>.Empty;
@@ -165,7 +165,7 @@ public class StandardFormatterTests
     {
         var array = new[] { 1, 2, 3, 4, 5 };
         var span = new Span<int>(array: array, start: 1, length: 3);
-        Assert.Equal(expected: "Span([int(2), int(3), int(4)])", actual: span.Repr());
+        Assert.Equal(expected: "Span([2i32, 3i32, 4i32])", actual: span.Repr());
 
         var emptySpan = Span<int>.Empty;
         Assert.Equal(expected: "Span([])", actual: emptySpan.Repr());
@@ -176,7 +176,7 @@ public class StandardFormatterTests
     {
         var array = new[] { 1, 2, 3, 4, 5 };
         var readOnlySpan = new ReadOnlySpan<int>(array: array, start: 1, length: 3);
-        Assert.Equal(expected: "ReadOnlySpan([int(2), int(3), int(4)])",
+        Assert.Equal(expected: "ReadOnlySpan([2i32, 3i32, 4i32])",
             actual: readOnlySpan.Repr());
 
         var emptyReadOnlySpan = ReadOnlySpan<int>.Empty;
@@ -233,6 +233,6 @@ public class StandardFormatterTests
     public void TestListWithNullElements()
     {
         var listWithNull = new List<List<int>?> { new() { 1 }, null };
-        Assert.Equal(expected: "[[int(1)], null]", actual: listWithNull.Repr());
+        Assert.Equal(expected: "[[1i32], null]", actual: listWithNull.Repr());
     }
 }

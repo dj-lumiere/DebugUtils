@@ -1,5 +1,107 @@
 # Changelog
 
+# [v1.7.0] Released at 2025.08.14
+
+## 🚀 Major Features
+
+### Consistent Explicit Bit-Width Numeric Suffixes
+- **NEW**: All numeric types now use explicit bit-width suffixes for maximum consistency
+- **Integer suffixes**: `sbyte=>i8`, `byte=>u8`, `short=>i16`, `ushort=>u16`, `int=>i32`, `uint=>u32`, `long=>i64`, `ulong=>u64`, `Int128=>i128`, `UInt128=>u128`
+- **Pointer suffixes**: `IntPtr=>iptr`, `UIntPtr=>uptr` 
+- **Float suffixes**: `Half=>f16`, `float=>f32`, `double=>f64`
+- **Special types**: `BigInteger=>n`, `decimal=>m` (unchanged)
+- **Unity/Cross-platform optimized**: Explicit bit widths are ideal for Unity development and cross-platform debugging
+- **Consistent pattern**: All types follow `{i|u|f}{bitwidth}` pattern except special cases
+
+### Benefits
+- **Perfect consistency**: No exceptions to the bit-width pattern for standard numeric types
+- **Unity-friendly**: Explicit bit widths matter for Unity's cross-platform nature and performance debugging
+- **Future-proof**: Scales naturally as new numeric types are added to C#
+- **Clear semantics**: Immediately see signedness and size information
+
+### Enhanced ReprOptionsAttribute with TypeAppendMode
+- **BREAKING**: `ReprOptionsAttribute` constructor now takes `TypeAppendMode` instead of `bool needsPrefix`
+- **NEW**: `TypeAppendMode` enum provides three positioning options:
+  - `Prefix` - Traditional "TypeName(content)" format
+  - `Suffix` - New "content + type suffix" format (perfect for numeric types like "42i32")
+  - `None` - Just content without type information
+- **Nullable support ready**: Architecture prepared for nullable type suffix handling (e.g., "42i32?")
+- **Improved flexibility**: More precise control over type information positioning
+
+### Safety-First Member Access System
+- **NEW**: `MemberReprMode` enum with `ViewMode` parameter replaces boolean flags
+- **Safety by default**: Only accesses fields and auto-property backing fields (no risky property getters)
+- **Timeout protection**: `MaxMemberTimeMs` parameter with 1ms default timeout for property getters  
+- **Exception handling**: Failed property getters show `[ExceptionType: Message]` instead of crashing
+- **Fine-grained control** over member visibility:
+  - `PublicFieldAutoProperty` - Public fields and auto-property backing fields (default, safe)
+  - `AllPublic` - All public fields and properties (with timeout protection when enabled)
+  - `AllFieldAutoProperty` - All fields and auto-property backing fields (public and private)
+  - `Everything` - All accessible members including computed properties (the highest risk)
+
+### Major Configuration Simplification
+- **Massive ReprConfig cleanup**
+- **Complete enum removal**: All deprecated `FloatReprMode`, `FloatPrecision`, and `IntMode` enums removed
+- **Format string consolidation**: Simplified to `FloatFormatString` and `IntFormatString` only
+- **Efficient HexPower mode**: "HP" format string for fast IEEE 754 hexadecimal representation/.net decimal bit 
+  representation (simple bit conversion), replacing "BF" mode for more readable bit field representation
+- **Streamlined documentation**: Cleaner API surface with comprehensive examples
+
+### Integer Formatting Expansion  
+- **Complete implementation**: Binary ("B"), octal ("O"), and quaternary ("Q") formatting fully implemented
+- **High-performance bit-grouping algorithm**: New efficient approach processes bits in groups without intermediate lists
+- **Consistent byte-based approach**: All formats use the same two's complement logic with proper magnitude conversion
+- **Format string support**: "B", "O", "Q", "X" with optional padding (e.g., "B8", "O12", "Q16", "X4")
+- **Prefix consistency**: Binary uses "0b", quaternary uses "0q", octal uses "0o", hex uses "0x"
+
+## 📋 Breaking Changes
+- **BREAKING**: All numeric type suffixes changed from C# literal style to explicit bit-width style
+  - `int: 42` → `42i32`
+  - `uint: 42u` → `42u32` 
+  - `long: 42L` → `42i64`
+  - `ulong: 42UL` → `42u64`
+  - `float: 3.14f` → `3.14f32`
+  - `double: 3.14d` → `3.14f64`
+- **BREAKING**: `ReprOptionsAttribute` constructor changed from `bool needsPrefix` to `TypeAppendMode` parameter
+- **BREAKING**: All enum-based formatting completely removed (`FloatReprMode`, `FloatPrecision`, `IntMode`)
+- **BREAKING**: Member visibility now controlled via `ViewMode: MemberReprMode` instead of boolean flags
+- **BREAKING**: `FormattingMode.Reflection` removed from `ReprFormatterRegistry`  
+- **BREAKING**: Integer binary/quaternary/octal/hex formatting now uses format strings instead of enums
+- **BREAKING**: Significant API surface reduction in ReprConfig
+
+## 🔧 Code Architecture Improvements
+- **File reorganization**: 
+  - `DecimalExactExtensions.cs` → `DecimalFormattingExtensions.cs`
+  - Deleted `FloatExactExtensions.cs` (functionality merged into `FloatFormattingExtensions.cs`)
+  - Deleted `ToStringFormatter.cs` (no longer needed)
+  - Deleted `ExactFormatBenchmarkTest.cs` (replaced by new performance tests)
+- **New utility classes**: `ObjectExtensions` with compiler-generated name detection
+- **Cleaner extension methods**: Simplified integer and float formatting logic
+- **Test consolidation**: Updated all tests to use new format string system
+- **Culture info support**: Fixed missing culture info injection in integer and float formatters
+
+## 💡 Migration Guide
+```csharp
+// OLD: Enum-based configuration (removed)
+var oldConfig = new ReprConfig(
+    ShowNonPublicProperties: true,
+    FloatMode: FloatReprMode.Exact,
+    IntMode: IntReprMode.Binary
+);
+
+// NEW: Format string + visibility mode (recommended)
+var newConfig = new ReprConfig(
+    ViewMode: MemberReprMode.Everything,
+    FloatFormatString: "EX",    // Exact representation
+    IntFormatString: "B"        // Binary (also supports "O" octal, "Q" quaternary, "X" hex)
+);
+```
+
+## 📚 Documentation Updates
+- **Updated README**: Reflects new member visibility system and format strings
+- **Migration examples**: Clear before/after comparisons for breaking changes
+- **Performance benchmarks**: Documentation of new exact formatting performance gains
+
 # [v1.6.0] Released at 2025.08.13
 ## 📋 Breaking Changes
 - Temporarily deleted unlimited property access from Object

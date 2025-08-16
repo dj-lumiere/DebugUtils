@@ -8,7 +8,7 @@ using DebugUtils.Repr.TypeHelpers;
 namespace DebugUtils.Repr.Formatters;
 
 [ReprFormatter(typeof(decimal))]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
@@ -26,6 +26,10 @@ internal class DecimalFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return (ToRepr(obj, context) + "m")!;
+        }
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),
