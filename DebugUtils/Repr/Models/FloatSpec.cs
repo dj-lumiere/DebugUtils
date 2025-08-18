@@ -7,7 +7,6 @@
 internal readonly record struct FloatSpec(
     int ExpBitSize,
     int MantissaBitSize,
-    int TotalSize,
     long MantissaMask,
     long MantissaMsbMask,
     long ExpMask,
