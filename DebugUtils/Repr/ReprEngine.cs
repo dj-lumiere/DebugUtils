@@ -13,7 +13,7 @@ internal static class ReprEngine
         // Handle ALL edge cases in the main entry point
         if (obj.IsNullableStruct())
         {
-            return obj.FormatNullableValueType(context: context.WithTypeHide());
+            return obj.FormatNullableValueType(context: context);
         }
 
         if (obj is null)
@@ -39,7 +39,7 @@ internal static class ReprEngine
             var formatter = type.GetStandardFormatter();
             var result = formatter.ToRepr(obj: obj, context: context);
             var haveTypeSuffix =
-                TypeNameMappings.TypeSuffixNames.TryGetValue(key: type, out var suffix);
+                TypeNameMappings.TypeSuffixNames.TryGetValue(key: type, value: out var suffix);
             var needsTypePrefix = obj.NeedsTypePrefix();
 
             // Apply type prefix
@@ -47,11 +47,10 @@ internal static class ReprEngine
             {
                 (_, true, true) => throw new InvalidOperationException(
                     message: "Should not be possible"),
+                (_, true, false) => $"{result}_{suffix}",
                 (TypeReprMode.AlwaysHide, _, _) => result,
-                (TypeReprMode.HideObvious, true, false) => $"{result}{suffix}",
                 (TypeReprMode.HideObvious, false, true) => $"{obj.GetReprTypeName()}({result})",
                 (TypeReprMode.HideObvious, false, false) => $"{result}",
-                (_, true, false) => $"{result}{suffix}",
                 _ => $"{obj.GetReprTypeName()}({result})"
             };
         }
@@ -69,15 +68,33 @@ internal static class ReprEngine
     {
         var type = typeof(T);
         var reprName = type.GetReprTypeName();
-
+        var haveTypeSuffix =
+            TypeNameMappings.TypeSuffixNames.TryGetValue(key: type, value: out var suffix);
+        string result;
         if (nullable == null)
         {
-            return $"{reprName}(null)";
+            if (haveTypeSuffix)
+            {
+                result = "null_" + suffix;
+            }
+            else
+            {
+                result = "null";
+            }
+        }
+        else
+        {
+            var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
+            result = value.Repr(context: context.WithTypeHide()) + "?";
         }
 
-        var value = type.GetProperty(name: "Value")!.GetValue(obj: nullable)!;
-        return
-            $"{reprName}({value.Repr(context: context.WithTypeHide())})";
+        return (context.Config.TypeMode, haveTypeSuffix) switch
+        {
+            (_, true) => $"{result}",
+            (TypeReprMode.AlwaysHide, _) => result,
+            _ => $"{reprName}({result})"
+        };
+
     }
 
     public static JsonNode ToReprTree<T>(this T obj, ReprContext? context = null)
@@ -89,9 +106,14 @@ internal static class ReprEngine
             return obj.FormatNullableAsHierarchical(context: context);
         }
 
-        if (obj is null)
+        if (obj is null && context.Depth == 0)
         {
             return CreateNullObjectJson<T>();
+        }
+
+        if (obj is null)
+        {
+            return null!;
         }
 
         // ✅ Add circular reference detection!
@@ -160,13 +182,29 @@ internal static class ReprEngine
     {
         var type = typeof(T);
         var reprName = type.GetReprTypeName();
+        var typeKind = type.UnderlyingSystemType.GetTypeKind();
+        var haveTypeSuffix =
+            TypeNameMappings.TypeSuffixNames.TryGetValue(key: type, value: out var suffix);
 
-        if (nullable == null)
+        // Handle depth > 0 case like other formatters - show with suffix for numeric types
+        if (context.Depth > 0 && haveTypeSuffix)
         {
+            var stringRepr = nullable.FormatNullableValueType(context: context);
+            return stringRepr!;
+        }
+
+        if (nullable is null)
+        {
+            // Handle depth > 0 case for null values with suffix
+            if (context.Depth > 0 && haveTypeSuffix)
+            {
+                return nullable.FormatNullableValueType(context: context)!;
+            }
+
             var nullJson = new JsonObject
             {
                 [propertyName: "type"] = reprName,
-                [propertyName: "kind"] = type.UnderlyingSystemType.GetTypeKind(),
+                [propertyName: "kind"] = typeKind,
                 [propertyName: "value"] = null
             };
             return nullJson;

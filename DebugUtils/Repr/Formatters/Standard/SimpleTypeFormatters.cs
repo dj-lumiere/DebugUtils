@@ -21,7 +21,7 @@ internal class BoolFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         if (context.Depth > 0)
         {
-            return ToRepr(obj, context)!;
+            return ToRepr(obj: obj, context: context)!;
         }
 
         return new JsonObject
