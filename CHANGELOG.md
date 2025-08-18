@@ -9,7 +9,7 @@
 - **Integer suffixes**: `sbyte=>i8`, `byte=>u8`, `short=>i16`, `ushort=>u16`, `int=>i32`, `uint=>u32`, `long=>i64`, `ulong=>u64`, `Int128=>i128`, `UInt128=>u128`
 - **Pointer suffixes**: `IntPtr=>iptr`, `UIntPtr=>uptr` 
 - **Float suffixes**: `Half=>f16`, `float=>f32`, `double=>f64`
-- **Special types**: `BigInteger=>n`, `decimal=>m` (unchanged)
+- **Special types**: `BigInteger=>n`, `decimal=>m`
 - **Unity/Cross-platform optimized**: Explicit bit widths are ideal for Unity development and cross-platform debugging
 - **Consistent pattern**: All types follow `{i|u|f}{bitwidth}` pattern except special cases
 
@@ -19,14 +19,13 @@
 - **Future-proof**: Scales naturally as new numeric types are added to C#
 - **Clear semantics**: Immediately see signedness and size information
 
-### Enhanced ReprOptionsAttribute with TypeAppendMode
-- **BREAKING**: `ReprOptionsAttribute` constructor now takes `TypeAppendMode` instead of `bool needsPrefix`
-- **NEW**: `TypeAppendMode` enum provides three positioning options:
-  - `Prefix` - Traditional "TypeName(content)" format
-  - `Suffix` - New "content + type suffix" format (perfect for numeric types like "42i32")
-  - `None` - Just content without type information
-- **Nullable support ready**: Architecture prepared for nullable type suffix handling (e.g., "42i32?")
-- **Improved flexibility**: More precise control over type information positioning
+### Enhanced Nullable Type Support with Bit-Width Suffixes
+- **NEW**: Nullable numeric types now display with proper bit-width suffixes
+  - `int?(42)` → `42_i32?`
+  - `int?(null)` → `null_i32?`
+  - `double?(3.14)` → `3.14_f64?`
+- **Improved de-nesting**: Nullable values in containers (depth > 0) show correctly with suffixes
+- **Consistent formatting**: Both string and tree representations handle nullable types uniformly
 
 ### Safety-First Member Access System
 - **NEW**: `MemberReprMode` enum with `ViewMode` parameter replaces boolean flags
@@ -42,9 +41,7 @@
 ### Major Configuration Simplification
 - **Massive ReprConfig cleanup**
 - **Complete enum removal**: All deprecated `FloatReprMode`, `FloatPrecision`, and `IntMode` enums removed
-- **Format string consolidation**: Simplified to `FloatFormatString` and `IntFormatString` only
-- **Efficient HexPower mode**: "HP" format string for fast IEEE 754 hexadecimal representation/.net decimal bit 
-  representation (simple bit conversion), replacing "BF" mode for more readable bit field representation
+- **Efficient HexPower mode**: "HP" format string for fast IEEE 754 hexadecimal representation/.net decimal bit representation (simple bit conversion), replacing "BF" mode for more readable bit field representation
 - **Streamlined documentation**: Cleaner API surface with comprehensive examples
 
 ### Integer Formatting Expansion  
@@ -55,30 +52,18 @@
 - **Prefix consistency**: Binary uses "0b", quaternary uses "0q", octal uses "0o", hex uses "0x"
 
 ## 📋 Breaking Changes
-- **BREAKING**: All numeric type suffixes changed from C# literal style to explicit bit-width style
-  - `int: 42` → `42i32`
-  - `uint: 42u` → `42u32` 
-  - `long: 42L` → `42i64`
-  - `ulong: 42UL` → `42u64`
-  - `float: 3.14f` → `3.14f32`
-  - `double: 3.14d` → `3.14f64`
-- **BREAKING**: `ReprOptionsAttribute` constructor changed from `bool needsPrefix` to `TypeAppendMode` parameter
+- **BREAKING**: All numeric type suffixes changed from type prefix to explicit bit-width style
+  - `int(42)` → `42i32`
+  - `uint(42)` → `42u32` 
+  - `long(42)` → `42i64`
+  - `ulong(42)` → `42u64`
+  - `float(42)` → `3.14f32`
+  - `double(42)` → `3.14f64`
 - **BREAKING**: All enum-based formatting completely removed (`FloatReprMode`, `FloatPrecision`, `IntMode`)
 - **BREAKING**: Member visibility now controlled via `ViewMode: MemberReprMode` instead of boolean flags
-- **BREAKING**: `FormattingMode.Reflection` removed from `ReprFormatterRegistry`  
-- **BREAKING**: Integer binary/quaternary/octal/hex formatting now uses format strings instead of enums
+- **BREAKING**: Numeric types ignore type suffix hide settings
+- **BREAKING**: `FormattingMode.Reflection` removed from `ReprFormatterRegistry`
 - **BREAKING**: Significant API surface reduction in ReprConfig
-
-## 🔧 Code Architecture Improvements
-- **File reorganization**: 
-  - `DecimalExactExtensions.cs` → `DecimalFormattingExtensions.cs`
-  - Deleted `FloatExactExtensions.cs` (functionality merged into `FloatFormattingExtensions.cs`)
-  - Deleted `ToStringFormatter.cs` (no longer needed)
-  - Deleted `ExactFormatBenchmarkTest.cs` (replaced by new performance tests)
-- **New utility classes**: `ObjectExtensions` with compiler-generated name detection
-- **Cleaner extension methods**: Simplified integer and float formatting logic
-- **Test consolidation**: Updated all tests to use new format string system
-- **Culture info support**: Fixed missing culture info injection in integer and float formatters
 
 ## 💡 Migration Guide
 ```csharp

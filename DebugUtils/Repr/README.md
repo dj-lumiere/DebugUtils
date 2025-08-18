@@ -32,56 +32,47 @@ Console.WriteLine(dict.ToString()); // 😞 "System.Collections.Generic.Dictiona
 using DebugUtils.Repr;
 
 var arr = new int[] {1, 2, 3, 4};
-Console.WriteLine(arr.Repr());  // 😍 "[1i32, 2i32, 3i32, 4i32]"
+Console.WriteLine(arr.Repr());  // 😍 "1DArray([1_i32, 2_i32, 3_i32, 4_i32])"
 
 var dict = new Dictionary<string, int> {{"a", 1}, {"b", 2}};
-Console.WriteLine(dict.Repr()); // 😍 "{"a": 1i32, "b": 2i32}"
+Console.WriteLine(dict.Repr()); // 😍 "{\"a\": 1_i32, \"b\": 2_i32}"
 ```
 
 ## Features
 
 ### 🔍 Object Representation (`.Repr()`)
 
-Works with any type - see actual data instead of useless type names.
+Works with any type—see actual data instead of useless type names.
 
 ### Collections
 
 ```csharp
 // Arrays (1D, 2D, jagged)
-new[] {1, 2, 3}.Repr()                    // 1DArray([1, 2, 3])
-new[,] {{1, 2}, {3, 4}}.Repr()              // 2DArray([[1, 2], [3, 4]])
-new[][] {{1, 2}, {3, 4, 5}}.Repr()           // JaggedArray([[1, 2], [3, 4, 5]])
+new[] {1, 2, 3}.Repr()                    // 1DArray([1_i32, 2_i32, 3_i32])
+new[,] {{1, 2}, {3, 4}}.Repr()              // 2DArray([[1_i32, 2_i32], [3_i32, 4_i32]])
+new[][] {{1, 2}, {3, 4, 5}}.Repr()           // JaggedArray([[1_i32, 2_i32], [3_i32, 4_i32, 5_i32]])
 
 // Lists, Sets, Dictionaries
-new List<int> {1, 2, 3}.Repr()           // [1, 2, 3]
+new List<int> {1, 2, 3}.Repr()           // [1_i32, 2_i32, 3_i32]
 new HashSet<string> {"a", "b"}.Repr()    // {"a", "b"}
-new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": 1}
+new Dictionary<string, int> {{"x", 1}}.Repr() // {"x": 1_i32}
 ```
 
 ### Numeric Types
 
 ```csharp
 // Integers with different representations
-42.Repr()                                              // 42
-42.Repr(new ReprConfig(IntFormatString: "X"))          // 0x2A
-42.Repr(new ReprConfig(IntFormatString: "B"))          // 0b101010
-42.Repr(new ReprConfig(IntFormatString: "HB"))         // 0x0000002A - raw hex bytes
--42.Repr(new ReprConfig(IntFormatString: "HB"))         // 0xFFFFFFD6 - raw hex bytes
+42.Repr()                                              // 42_i32
+42.Repr(new ReprConfig(IntFormatString: "X"))          // 0x2A_i32
+42.Repr(new ReprConfig(IntFormatString: "B"))          // 0b101010_i32
 
 // Floating point with exact representation
 // You can now recognize the real floating point value
 // and find what went wrong when doing arithmetics!
-(0.1 + 0.2).Repr()                            
-// double(3.00000000000000444089209850062616169452667236328125E-001)
-0.3.Repr()                                    
-// double(2.99999999999999988897769753748434595763683319091796875E-001)
-
-(0.1 + 0.2).Repr(new ReprConfig(FloatFormatString: "G"))
-// double(0.30000000000000004)
-
-// New special formatting modes
-3.14f.Repr(new ReprConfig(FloatFormatString: "BF"))    // IEEE 754 bit field
-3.14f.Repr(new ReprConfig(FloatFormatString: "HB"))    // Raw hex bytes
+(0.1f + 0.2f).Repr()                       
+// 3.00000011920928955078125E-001_f32
+0.3f.Repr()                                    
+// 2.99999988079071044921875E-001_f32
 ```
 
 ### 🌳 Tree Representation (`.ReprTree()`)
@@ -108,7 +99,7 @@ Console.WriteLine(student.ReprTree());
 //   "type": "Student",
 //   "kind": "class",
 //   "hashCode": "0xABCDABCD",
-//   "Age": { "type": "int", "kind": "struct", "value": "30" },
+//   "Age": "30_i32",
 //   "Hobbies": {
 //     "type": "List",
 //     "kind": "class",
@@ -163,46 +154,38 @@ public class Vector3Formatter : IReprFormatter, IReprTreeFormatter
 ### Float Formatting (NEW: Format Strings)
 
 ```csharp
-// NEW APPROACH: Format strings (recommended)
-var exact = new ReprConfig(FloatFormatString: "EX");
-3.14159f.Repr(exact);     // Exact decimal representation (custom arithmetic engine)
 
 var scientific = new ReprConfig(FloatFormatString: "E5");
-3.14159.Repr(scientific); // Scientific notation with 5 decimal places
+3.14159.Repr(scientific); // Scientific notation with 5 decimal places + _f64 suffix
 
 var rounded = new ReprConfig(FloatFormatString: "F2");
-3.14159.Repr(rounded);    // Fixed point with 2 decimal places
+3.14159.Repr(rounded);    // Fixed point with 2 decimal places + _f64 suffix
 
 // Special debugging modes
-var bitField = new ReprConfig(FloatFormatString: "BF");
-3.14f.Repr(bitField);     // IEEE 754 bit field: 0|10000000|10010001111010111000011
+var hexPower = new ReprConfig(FloatFormatString: "HP");
+3.14f.Repr(hexPower);     // IEEE 754 hex power: 0x1.91EB86p+001_f32 (fast bit conversion)
 
-var hexBytes = new ReprConfig(FloatFormatString: "HB");
-3.14f.Repr(hexBytes);     // Raw hex bytes: 0x4048F5C3
-
-// OLD APPROACH: Enum modes (deprecated but still supported)
-var oldExact = new ReprConfig(FloatMode: FloatReprMode.Exact);
-var oldLegacy = new ReprConfig(FloatMode: FloatReprMode.Exact_Old);  // BigInteger-based
-var oldRounded = new ReprConfig(FloatMode: FloatReprMode.Round, FloatPrecision: 2);
+var exact = new ReprConfig(FloatFormatString: "EX");
+3.14159f.Repr(exact);     // Exact decimal representation down to very last digit + _f32 suffix
 ```
 
 ### Integer Formatting (NEW: Format Strings)
 
 ```csharp
 var hex = new ReprConfig(IntFormatString: "X");
-255.Repr(hex);            // Hexadecimal: 0xFF
+255.Repr(hex);            // Hexadecimal: 0xFF_i32
 
-var binary = new ReprConfig(IntFormatString: "O");
-255.Repr(binary);         // Binary: 0o377
+var octal = new ReprConfig(IntFormatString: "O");
+255.Repr(octal);          // Octal: 0o377_i32
 
-var binary = new ReprConfig(IntFormatString: "Q");
-255.Repr(binary);         // Binary: 0q3333
+var quaternary = new ReprConfig(IntFormatString: "Q");
+255.Repr(quaternary);     // Quaternary: 0q3333_i32
 
 var binary = new ReprConfig(IntFormatString: "B");
-255.Repr(binary);         // Binary: 0b11111111
+255.Repr(binary);         // Binary: 0b11111111_i32
 
 var decimal = new ReprConfig(IntFormatString: "D");
-255.Repr(decimal);        // Standard decimal: 255
+255.Repr(decimal);        // Standard decimal: 255_i32
 ```
 
 ### Type Display
@@ -212,10 +195,18 @@ var hideTypes = new ReprConfig(
     TypeMode: TypeReprMode.AlwaysHide,
     ContainerReprMode: ContainerReprMode.UseParentConfig
     );
-new[] {1, 2, 3}.Repr(hideTypes);  // [1, 2, 3] (no type prefix to child element.)
+new[] {1, 2, 3}.Repr(hideTypes);  // [1_i32, 2_i32, 3_i32] (no type prefix to child element.)
 
 var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
-new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([1, 2, 3])
+new[] {1, 2, 3}.Repr(showTypes);  // 1DArray([1_i32, 2_i32, 3_i32])
+
+// IMPORTANT: Numeric types always show explicit bit-width suffixes (_i32, _f32, _u8, etc.)
+// regardless of TypeMode setting. The suffix provides precision/bit-width information
+// rather than just type decoration, making it always valuable for debugging.
+var numbers = new ReprConfig(TypeMode: TypeReprMode.AlwaysHide);
+42.Repr(numbers);     // 42_i32 (suffix always shown)
+3.14f.Repr(numbers);  // 3.14_f32 (suffix always shown)
+((byte)255).Repr(numbers);  // 255_u8 (suffix always shown)
 ```
 
 ## Real-World Use Cases
