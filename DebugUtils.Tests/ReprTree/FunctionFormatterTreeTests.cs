@@ -65,8 +65,7 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]!);
 
         actualJson = JsonNode.Parse(json: a.ReprTree())!;
         Assert.Equal(expected: "Function", actual: actualJson[propertyName: "type"]
@@ -87,16 +86,14 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]!);
         Assert.Equal(expected: "int", actual: parameterArray[index: 1]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "b", actual: parameterArray[index: 1]![propertyName: "name"]
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 1]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 1]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 1]![propertyName: "defaultValue"]);
 
         actualJson = JsonNode.Parse(json: b.ReprTree())!;
         Assert.Equal(expected: "Function", actual: actualJson[propertyName: "type"]
@@ -117,8 +114,7 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]);
 
         actualJson = JsonNode.Parse(json: c.ReprTree())!;
         Assert.Equal(expected: "Function", actual: actualJson[propertyName: "type"]
@@ -139,8 +135,7 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]);
 
         actualJson = JsonNode.Parse(json: d.ReprTree())!;
         Assert.Equal(expected: "Function", actual: actualJson[propertyName: "type"]
@@ -161,16 +156,14 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "in", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]);
         Assert.Equal(expected: "ref int", actual: parameterArray[index: 1]![propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: "b", actual: parameterArray[index: 1]![propertyName: "name"]
           ?.ToString());
         Assert.Equal(expected: "out", actual: parameterArray[index: 1]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 1]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 1]![propertyName: "defaultValue"]);
 
         actualJson = JsonNode.Parse(json: e.ReprTree())!;
         Assert.Equal(expected: "Function", actual: actualJson[propertyName: "type"]
@@ -191,7 +184,6 @@ public class FunctionFormatterTreeTests
           ?.ToString());
         Assert.Equal(expected: "", actual: parameterArray[index: 0]![propertyName: "modifier"]
           ?.ToString());
-        Assert.True(condition: JsonNode.DeepEquals(node1: nullJsonObject,
-            node2: parameterArray[index: 0]![propertyName: "defaultValue"]!));
+        Assert.Null(parameterArray[index: 0]![propertyName: "defaultValue"]);
     }
 }

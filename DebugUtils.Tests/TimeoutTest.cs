@@ -93,14 +93,15 @@ public class TimeoutTest
     public void TestMemberError_ShouldCatchException()
     {
         var obj = new ErrorObject();
-        var config = new ReprConfig(ViewMode: MemberReprMode.AllPublic);
+        var config = new ReprConfig(ViewMode: MemberReprMode.AllPublic, MaxMemberTimeMs: 5);
 
         var result = obj.Repr(config: config);
 
         // Should handle exceptions gracefully
         Assert.Equal(
+            expected:
             "ErrorObject(BadProperty: [InvalidOperationException: I always fail!], GoodProperty: \"I work fine\")",
-            result);
+            actual: result);
     }
 
     public class InfiniteLoopClass

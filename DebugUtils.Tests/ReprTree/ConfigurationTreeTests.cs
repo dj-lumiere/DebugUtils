@@ -30,11 +30,8 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
           ?.ToString());
 
-        var ageNode = actualJson[propertyName: "Age"]!.AsObject();
-        Assert.Equal(expected: "int", actual: ageNode[propertyName: "type"]
-          ?.ToString());
-        Assert.Equal(expected: "30", actual: ageNode[propertyName: "value"]
-          ?.ToString());
+        var ageNode = actualJson[propertyName: "Age"]!;
+        Assert.Equal(expected: "30_i32", actual: ageNode.GetValue<string>());
 
         var hobbiesNode = actualJson[propertyName: "Hobbies"]!.AsObject();
         Assert.Equal(expected: "List", actual: hobbiesNode[propertyName: "type"]
@@ -67,11 +64,8 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: "John", actual: nameNode[propertyName: "value"]
           ?.ToString());
 
-        var ageNode = actualJson[propertyName: "Age"]!.AsObject();
-        Assert.Equal(expected: "int", actual: ageNode[propertyName: "type"]
-          ?.ToString());
-        Assert.Equal(expected: "30", actual: ageNode[propertyName: "value"]
-          ?.ToString());
+        var ageNode = actualJson[propertyName: "Age"]!;
+        Assert.Equal(expected: "30_i32", actual: ageNode.GetValue<string>());
     }
     [Fact]
     public void TestReprConfig_MaxDepth_ReprTree()
@@ -82,15 +76,8 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
         Assert.Equal(expected: 2, actual: actualJson[propertyName: "count"]!.GetValue<int>());
-        Assert.Equal(expected: "int",
-            actual: actualJson[propertyName: "value"]![index: 0]![propertyName: "type"]
-              ?.ToString());
-        Assert.Equal(expected: "struct",
-            actual: actualJson[propertyName: "value"]![index: 0]![propertyName: "kind"]
-              ?.ToString());
-        Assert.Equal(expected: "1",
-            actual: actualJson[propertyName: "value"]![index: 0]![propertyName: "value"]
-              ?.ToString());
+        Assert.Equal(expected: "1_i32",
+            actual: actualJson[propertyName: "value"]![index: 0]!.GetValue<string>());
         Assert.Equal(expected: "List",
             actual: actualJson[propertyName: "value"]![index: 1]![propertyName: "type"]
               ?.ToString());
@@ -126,15 +113,12 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: 5, actual: actualJson[propertyName: "count"]!.GetValue<int>());
         Assert.Equal(expected: 4, actual: actualJson[propertyName: "value"]!.AsArray()
            .Count);
-        Assert.Equal(expected: "int",
-            actual: actualJson[propertyName: "value"]![index: 0]![propertyName: "type"]
-              ?.ToString());
-        Assert.Equal(expected: "int",
-            actual: actualJson[propertyName: "value"]![index: 1]![propertyName: "type"]
-              ?.ToString());
-        Assert.Equal(expected: "int",
-            actual: actualJson[propertyName: "value"]![index: 2]![propertyName: "type"]
-              ?.ToString());
+        Assert.Equal(expected: "1_i32",
+            actual: actualJson[propertyName: "value"]![index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32",
+            actual: actualJson[propertyName: "value"]![index: 1]!.GetValue<string>());
+        Assert.Equal(expected: "3_i32",
+            actual: actualJson[propertyName: "value"]![index: 2]!.GetValue<string>());
         Assert.Equal(expected: "... (2 more items)",
             actual: actualJson[propertyName: "value"]![index: 3]
               ?.ToString());
@@ -235,11 +219,9 @@ public class ConfigurationTreeTests
         Assert.Equal(expected: "class", actual: actualJson[propertyName: "kind"]
           ?.ToString());
         Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
-        Assert.Equal(expected: "3.14",
-            actual: actualJson[propertyName: "x"]?[propertyName: "value"]
-              ?.ToString());
-        Assert.Equal(expected: "2.71",
-            actual: actualJson[propertyName: "y"]?[propertyName: "value"]
-              ?.ToString());
+        Assert.Equal(expected: "3.14_f32",
+            actual: actualJson[propertyName: "x"]!.GetValue<string>());
+        Assert.Equal(expected: "2.71_f32",
+            actual: actualJson[propertyName: "y"]!.GetValue<string>());
     }
 }

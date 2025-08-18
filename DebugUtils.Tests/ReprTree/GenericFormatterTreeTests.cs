@@ -15,16 +15,8 @@ public class GenericFormatterTreeTests
         {
             [propertyName: "type"] = "Point",
             [propertyName: "kind"] = "struct",
-            [propertyName: "X"] = new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "10"
-            },
-            [propertyName: "Y"] = new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "20"
-            }
+            [propertyName: "X"] = "10_i32",
+            [propertyName: "Y"] = "20_i32"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
@@ -51,13 +43,8 @@ public class GenericFormatterTreeTests
         Assert.Equal(expected: "test", actual: nameNode[propertyName: "value"]
           ?.ToString());
 
-        var valueNode = actualJson[propertyName: "Value"]!.AsObject();
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "42"
-            }, node2: valueNode));
+        var valueNode = actualJson[propertyName: "Value"]!;
+        Assert.Equal(expected: "42_i32", actual: valueNode.GetValue<string>());
     }
 
     [Fact]
@@ -82,13 +69,8 @@ public class GenericFormatterTreeTests
         Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
           ?.ToString());
 
-        var ageNode = actualJson[propertyName: "Age"]!.AsObject();
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "30"
-            }, node2: ageNode));
+        var ageNode = actualJson[propertyName: "Age"]!;
+        Assert.Equal(expected: "30_i32", actual: ageNode.GetValue<string>());
     }
 
     [Fact]
@@ -113,14 +95,8 @@ public class GenericFormatterTreeTests
         Assert.Equal(expected: "data", actual: dataNode[propertyName: "value"]
           ?.ToString());
 
-        var numberNode = actualJson[propertyName: "Number"]!.AsObject();
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "123"
-            },
-            node2: numberNode));
+        var numberNode = actualJson[propertyName: "Number"]!;
+        Assert.Equal(expected: "123_i32", actual: numberNode.GetValue<string>());
     }
 
     [Fact]
@@ -164,26 +140,15 @@ public class GenericFormatterTreeTests
             settingsArray.FirstOrDefault(predicate: s =>
                 s![propertyName: "key"]![propertyName: "value"]!.ToString() == "Temp (C)");
         Assert.NotNull(@object: tempSetting);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "200"
-            },
-            node2: tempSetting[propertyName: "value"]));
+        Assert.Equal(expected: "200_f64",
+            actual: tempSetting[propertyName: "value"]!.GetValue<string>());
 
         var speedSetting =
             settingsArray.FirstOrDefault(predicate: s =>
                 s![propertyName: "key"]![propertyName: "value"]!.ToString() ==
                 "PrintSpeed (mm/s)");
         Assert.NotNull(@object: speedSetting);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "30"
-            },
-            node2: speedSetting[propertyName: "value"]));
+        Assert.Equal(expected: "30_f64", actual: speedSetting[propertyName: "value"]!.ToString());
     }
 
 
@@ -196,11 +161,7 @@ public class GenericFormatterTreeTests
             [propertyName: "type"] = "Colors",
             [propertyName: "kind"] = "enum",
             [propertyName: "name"] = "GREEN",
-            [propertyName: "value"] = new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            }
+            [propertyName: "value"] = "1_i32"
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
@@ -228,13 +189,8 @@ public class GenericFormatterTreeTests
         Assert.Equal(expected: "Alice", actual: nameNode[propertyName: "value"]
           ?.ToString());
 
-        var ageNode = actualJsonNode[propertyName: "Age"]!.AsObject();
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "30"
-            }, node2: ageNode));
+        var ageNode = actualJsonNode[propertyName: "Age"]!;
+        Assert.Equal(expected: "30_i32", actual: ageNode.GetValue<string>());
     }
 
     [Fact]
