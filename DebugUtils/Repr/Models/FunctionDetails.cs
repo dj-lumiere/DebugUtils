@@ -55,7 +55,6 @@ internal static class FunctionDetailsExtensions
     public static string GetSanitizedName(this MethodInfo methodInfo)
     {
         var unsanitizedName = methodInfo.Name;
-        var sanitizedName = "";
         if (unsanitizedName.Contains(value: "g__"))
         {
             // Since we are finding "g__" and "|", which consist of ascii character,
@@ -70,8 +69,7 @@ internal static class FunctionDetailsExtensions
         // lambda functions always contain "b__".
         if (unsanitizedName.Contains(value: "b__"))
         {
-            sanitizedName = "Lambda";
-            return sanitizedName;
+            return "Lambda";
         }
 
         return unsanitizedName;

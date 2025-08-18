@@ -106,13 +106,13 @@ public static class ReprExtensions
     /// // Basic usage
     /// var list = new List&lt;int&gt; { 1, 2, 3 };
     /// Console.WriteLine(list.Repr()); 
-    /// // Output: [1i32, 2i32, 3i32]
+    /// // Output: [1_i32, 2_i32, 3_i32]
     ///
     /// 
     /// // With custom configuration
     /// var config = new ReprConfig(FloatFormatString: "EX");
     /// Console.WriteLine(3.14f.Repr(config)); 
-    /// // Output: 3.1400001049041748046875E+000f32
+    /// // Output: 3.1400001049041748046875E+000_f32
     ///
     /// 
     /// // Nullable types
@@ -147,7 +147,6 @@ public static class ReprExtensions
 
         return obj.ToRepr(context: context);
     }
-
     /// <summary>
     /// Generates a hierarchical JSON representation of any object for structured analysis and debugging.
     /// This method produces detailed JSON output with complete type information, object relationships,
@@ -212,7 +211,6 @@ public static class ReprExtensions
         return obj.ToReprTree(context: context)
                   .ToJsonString(options: formatOption);
     }
-
     /// <summary>
     /// Generates a detailed string representation of a Span&lt;T&gt;.
     /// </summary>
@@ -374,7 +372,6 @@ public static class ReprExtensions
         ArgumentNullException.ThrowIfNull(argument: context);
         return obj.ToRepr(context: context);
     }
-
     /// <summary>
     /// Gets the JsonNode representation of an object for use in custom tree formatters.
     /// This method is primarily intended for developers implementing IReprTreeFormatter
@@ -444,7 +441,6 @@ public static class ReprExtensions
         ArgumentNullException.ThrowIfNull(argument: context);
         return obj.ToReprTree(context: context);
     }
-
     /// <summary>
     /// Generates a detailed string representation of a Span&lt;T&gt; using the provided context.
     /// This method is intended for plugin developers and custom formatters who need precise control 
@@ -481,7 +477,6 @@ public static class ReprExtensions
             _ => $"ReadOnlySpan({result})"
         };
     }
-
     /// <summary>
     /// Generates a detailed string representation of a ReadOnlySpan&lt;T&gt; using the provided context.
     /// This method is intended for plugin developers and custom formatters who need precise control 
@@ -518,7 +513,6 @@ public static class ReprExtensions
             _ => $"ReadOnlySpan({result})"
         };
     }
-
     /// <summary>
     /// Gets the JsonNode representation of a Span&lt;T&gt; for use in custom tree formatters.
     /// This method is intended for developers implementing custom formatters who need to 
@@ -551,7 +545,6 @@ public static class ReprExtensions
         ArgumentNullException.ThrowIfNull(argument: context);
         return SpanFormatter.ToReprTree(obj: span, context: context);
     }
-
     /// <summary>
     /// Gets the JsonNode representation of a ReadOnlySpan&lt;T&gt; for use in custom tree formatters.
     /// This method is intended for developers implementing custom formatters who need to 

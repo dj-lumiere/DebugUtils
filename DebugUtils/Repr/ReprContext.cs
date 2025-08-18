@@ -63,7 +63,7 @@ public record ReprContext
 
     /// <summary>
     /// Initializes a new instance of the ReprContext class with full control over all context properties.
-    /// This constructor provides complete flexibility for creating contexts with specific state.
+    /// This constructor provides complete flexibility for creating contexts with a specific state.
     /// </summary>
     /// <param name="config">
     /// Optional configuration controlling formatting behavior. If null, uses ReprConfig.GlobalDefaults.
@@ -119,7 +119,7 @@ public record ReprContext
     /// </summary>
     /// <returns>
     /// A new ReprContext instance with depth increased by 1, sharing the same configuration
-    /// and visited set as the current context.
+    /// and a visited set as the current context.
     /// </returns>
     /// <remarks>
     /// <para>This method serves several critical purposes:</para>

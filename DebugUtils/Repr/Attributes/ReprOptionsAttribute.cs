@@ -23,8 +23,8 @@ namespace DebugUtils.Repr.Attributes;
 /// // Output: Content: "test"  (no "SimpleValue(...)" wrapper)
 /// 
 /// // For numeric types, explicit bit-width suffixes are automatically added:
-/// Console.WriteLine(42.Repr());     // Output: 42i32
-/// Console.WriteLine(3.14f.Repr());  // Output: 3.14f32
+/// Console.WriteLine(42.Repr());     // Output: 42_i32
+/// Console.WriteLine(3.14f.Repr());  // Output: 3.14_f32
 /// </code>
 /// </example>
 [AttributeUsage(validOn: AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum)]
@@ -55,7 +55,7 @@ public class ReprOptionsAttribute : Attribute
     /// <para>When true: Output format is "TypeName(content)"</para>
     /// <para>When false: Output format is just "content"</para>
     /// <para>This setting interacts with the global TypeReprMode configuration.</para>
-    /// <para>Note: For numeric types with explicit bit-width suffixes (like "42i32"), 
+    /// <para>Note: For numeric types with explicit bit-width suffixes (like "42_i32"), 
     /// this property may be overridden by the formatting engine.</para>
     /// </remarks>
     public bool NeedsPrefix { get; set; }

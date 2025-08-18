@@ -26,7 +26,7 @@ public enum TypeReprMode
     /// </remarks>
     /// <example>
     /// "hello" → string("hello")
-    /// [1, 2, 3] → List([1i32, 2i32, 3i32])
+    /// [1, 2, 3] → List([1_i32, 2_i32, 3_i32])
     /// </example>
     AlwaysShow,
 
@@ -44,8 +44,8 @@ public enum TypeReprMode
     /// <para>Still shows type information for complex, ambiguous, or less common types.</para>
     /// </remarks>
     /// <example>
-    /// "hello" → "hello"  (string type is obvious)
-    /// [1, 2, 3] → [1i32, 2i32, 3i32]  (List type is obvious)
+    /// "hello" → "hello"  (strings are self-explaining)
+    /// [1, 2, 3] → [1_i32, 2_i32, 3_i32]  (Lists are self-explaining)
     /// myCustomObject → MyCustomType(field1: value1)  (custom type shown)
     /// </example>
     HideObvious,
@@ -68,7 +68,7 @@ public enum TypeReprMode
 }
 
 /// <summary>
-/// Controls how many an object's members are included in a representation (repr).
+/// Controls how many an object's members are included in a representation (Repr).
 /// </summary>
 /// <remarks>
 /// <para><b>Safety:</b> Accessing properties can execute arbitrary user code and may block,
@@ -178,6 +178,11 @@ public enum MemberReprMode
 /// Higher values may significantly increase processing time and output size.
 /// Set to a negative integer (e.g., -1) to disable element limiting entirely.
 /// </param>
+/// <param name="MaxStringLength">
+/// Specifies the maximum length limit for string.
+/// Higher values may significantly increase processing time and memory usage.
+/// Set to a negative integer (e.g., -1) to disable length limiting entirely.
+/// </param>
 /// <param name="MaxDepth">
 /// Specifies the maximum recursion depth for nested objects.
 /// Higher values may significantly increase processing time and memory usage.
@@ -199,7 +204,7 @@ public enum MemberReprMode
 /// </param>
 /// <param name="Culture">
 /// Specifies the culture to use for standard numeric formatting. When null, uses the current thread's culture.
-/// Affects decimal separators, thousand separators, and other locale-specific number formatting.
+/// Affects decimal separators, three-digit separators, and other locale-specific number formatting.
 /// <para><b>Examples:</b></para>
 /// <list type="bullet">
 /// <item><description>en-US: 1,234.56 (comma thousands, period decimal)</description></item>
@@ -296,29 +301,4 @@ public record ReprConfig(
     int MaxMemberTimeMs = 1,
     bool EnablePrettyPrintForReprTree = false,
     CultureInfo? Culture = null
-)
-{
-    /// <summary>
-    /// Gets the default configuration optimized for formatting container contents.
-    /// Provides clean, readable formatting suitable for elements within collections,
-    /// arrays, and object properties.
-    /// </summary>
-    /// <value>
-    /// A configuration with "G" float formatting, "D" integer formatting,
-    /// simple container formatting, and obvious type hiding for clean container display.
-    /// </value>
-    /// <remarks>
-    /// This configuration prioritizes readability over detailed numeric representation
-    /// within containers, using simplified formatting and hiding obvious type information.
-    /// </remarks>
-    public static ReprConfig ContainerDefaults => new(
-        FloatFormatString: "G",
-        IntFormatString: "D",
-        TypeMode: TypeReprMode.HideObvious,
-        UseSimpleFormatsInContainers: true,
-        MaxDepth: 5,
-        MaxItemsPerContainer: 50,
-        MaxStringLength: 120,
-        Culture: CultureInfo.InvariantCulture
-    );
-}
+);

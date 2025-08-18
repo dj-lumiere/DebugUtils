@@ -96,7 +96,7 @@ internal static class ObjectExtensions
         // Use timeout protection
         try
         {
-            var task = Task.Run(() => p.GetValue(obj: obj));
+            var task = Task.Run(function: () => p.GetValue(obj: obj));
             if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
             {
                 var value = task.Result;
@@ -150,7 +150,7 @@ internal static class ObjectExtensions
         // Use timeout protection
         try
         {
-            var task = Task.Run(() => p.GetValue(obj: obj));
+            var task = Task.Run(function: () => p.GetValue(obj: obj));
             if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
             {
                 var value = task.Result;
@@ -202,7 +202,7 @@ internal static class ObjectExtensions
         // Use timeout protection
         try
         {
-            var task = Task.Run(() => p.GetValue(obj: obj));
+            var task = Task.Run(function: () => p.GetValue(obj: obj));
             if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
             {
                 var value = task.Result;
@@ -258,7 +258,7 @@ internal static class ObjectExtensions
         // Use timeout protection
         try
         {
-            var task = Task.Run(() => p.GetValue(obj: obj));
+            var task = Task.Run(function: () => p.GetValue(obj: obj));
             if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
             {
                 var value = task.Result;
@@ -515,16 +515,17 @@ internal static class ObjectExtensions
 
         return pairs;
     }
-    
+
     private static Exception GetRootException(this Exception exception)
     {
         return exception switch
         {
-            AggregateException { InnerExceptions.Count: 1 } aggEx => GetRootException(aggEx.InnerException!),
-            TargetInvocationException { InnerException: not null } targetEx => GetRootException(targetEx.InnerException),
+            AggregateException { InnerExceptions.Count: 1 } aggEx => GetRootException(
+                exception: aggEx.InnerException!),
+            TargetInvocationException { InnerException: not null } targetEx => GetRootException(
+                exception: targetEx.InnerException!),
             _ when exception.InnerException != null => exception.InnerException.GetRootException(),
             _ => exception
         };
     }
-
 }

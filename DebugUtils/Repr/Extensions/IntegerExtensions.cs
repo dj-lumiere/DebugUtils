@@ -93,7 +93,7 @@ internal static class IntegerExtensions
         var mostSignificantByte = littleEndianMagnitude[mostSignificantIndex];
         var mostSignificantBitIndex = 7;
         while (mostSignificantBitIndex >= 0 &&
-               mostSignificantByte.GetBit(mostSignificantBitIndex) == 0)
+               mostSignificantByte.GetBit(bit: mostSignificantBitIndex) == 0)
         {
             mostSignificantBitIndex -= 1;
         }
@@ -109,18 +109,18 @@ internal static class IntegerExtensions
         {
             cache <<= 1;
             cache |= littleEndianMagnitude[i >> 3]
-               .GetBit(i & 7);
+               .GetBit(bit: i & 7);
             groupAccumulator -= 1;
             if (groupAccumulator == 0)
             {
                 groupAccumulator = bitsPerDigit;
-                outputBuffer[digitIndex] = digits[cache];
+                outputBuffer[digitIndex] = digits[index: cache];
                 digitIndex += 1;
                 cache = 0;
             }
         }
 
-        return new string(outputBuffer, 0, digitIndex);
+        return new string(value: outputBuffer, startIndex: 0, length: digitIndex);
     }
 
     /// <summary>
@@ -290,5 +290,8 @@ internal static class IntegerExtensions
             : width;
     }
 
-    private static int GetBit(this byte b, int bit) => (b >> bit) & 1;
+    private static int GetBit(this byte b, int bit)
+    {
+        return b >> bit & 1;
+    }
 }
