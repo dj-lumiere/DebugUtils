@@ -23,8 +23,9 @@ internal class IntPtrFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         if (context.Depth > 0)
         {
-            return ToRepr(obj, context)!;
+            return obj.Repr(context: context)!;
         }
+
         return new JsonObject
         {
             { "type", type.GetReprTypeName() },
@@ -50,8 +51,9 @@ internal class UIntPtrFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         if (context.Depth > 0)
         {
-            return ToRepr(obj, context)!;
+            return obj.Repr(context: context)!;
         }
+
         return new JsonObject
         {
             { "type", type.GetReprTypeName() },
