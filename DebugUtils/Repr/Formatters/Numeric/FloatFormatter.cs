@@ -92,8 +92,9 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         var type = obj.GetType();
         if (context.Depth > 0)
         {
-            return (ToRepr(obj, context) + TypeNameMappings.TypeSuffixNames[type])!;
+            return obj.Repr(context: context)!;
         }
+
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),
