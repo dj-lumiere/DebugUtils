@@ -56,19 +56,19 @@ public static class TypeNaming
     /// <remarks>
     /// <para>This method handles several special cases:</para>
     /// <list type="bullet">
-    /// <item><description>Nullable value types are displayed with "?" suffix</description></item>
+    /// <item><description>Nullable value types are displayed with a "?" suffix</description></item>
     /// <item><description>Generic types show clean parameter names</description></item>
     /// <item><description>Arrays show dimensional information</description></item>
     /// <item><description>Task types show their result types</description></item>
     /// <item><description>Anonymous types are labeled as "Anonymous"</description></item>
-    /// <item><description>Reference types (ref parameters) show "ref" prefix</description></item>
+    /// <item><description>Reference types (ref parameters) show a "ref" prefix</description></item>
     /// </list>
     /// </remarks>
     /// <example>
     /// <code>
     /// Console.WriteLine(typeof(int).GetReprTypeName());        // "int"
     /// Console.WriteLine(typeof(List&lt;string&gt;).GetReprTypeName()); // "List"
-    /// Console.WriteLine(typeof(int?).GetReprTypeName());       // "int"
+    /// Console.WriteLine(typeof(int?).GetReprTypeName());       // "int?"
     /// Console.WriteLine(typeof(Task&lt;bool&gt;).GetReprTypeName());   // "Task&lt;bool&gt;"
     /// </code>
     /// </example>

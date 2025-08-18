@@ -18,43 +18,42 @@ namespace DebugUtils.Repr.Extensions;
 internal static class FloatAnalysisExtensions
 {
     #if NET5_0_OR_GREATER
-    // IEEE 754 binary16 (Half): 1 sign + 5 exponent + 10 mantissa = 16 bits
-    private static readonly FloatSpec halfSpec = new(ExpBitSize: 5, MantissaBitSize: 10,
-        TotalSize: 16, MantissaMask: 0x3FF, MantissaMsbMask: 0x200, ExpMask: 0x1F, ExpOffset: 15);
+    // IEEE 754 binary16 (Half): 1 sign bit + 5 exponent bits + 10 mantissa bits = 16 bits
+    private static readonly FloatSpec F16Spec = new(ExpBitSize: 5, MantissaBitSize: 10,
+        MantissaMask: 0x3FF, MantissaMsbMask: 0x200, ExpMask: 0x1F, ExpOffset: 15);
     #endif
-    // IEEE 754 binary32 (Float): 1 sign + 8 exponent + 23 mantissa = 32 bits  
-    private static readonly FloatSpec floatSpec = new(ExpBitSize: 8, MantissaBitSize: 23,
-        TotalSize: 32, MantissaMask: 0x7FFFFF, MantissaMsbMask: 0x400000, ExpMask: 0xFF,
+    // IEEE 754 binary32 (Float): 1 sign bit + 8 exponent bits + 23 mantissa bits = 32 bits  
+    private static readonly FloatSpec F32Spec = new(ExpBitSize: 8, MantissaBitSize: 23,
+        MantissaMask: 0x7FFFFF, MantissaMsbMask: 0x400000, ExpMask: 0xFF,
         ExpOffset: 127);
 
-    // IEEE 754 binary64 (Double): 1 sign + 11 exponent + 52 mantissa = 64 bits
-    private static readonly FloatSpec doubleSpec =
-        new(ExpBitSize: 11, MantissaBitSize: 52, TotalSize: 64, MantissaMask: 0xFFFFFFFFFFFFFL,
+    // IEEE 754 binary64 (Double): 1 sign bit + 11 exponent bits + 52 mantissa bits = 64 bits
+    private static readonly FloatSpec F64Spec =
+        new(ExpBitSize: 11, MantissaBitSize: 52, MantissaMask: 0xFFFFFFFFFFFFFL,
             MantissaMsbMask: 0x8000000000000L, ExpMask: 0x7FFL, ExpOffset: 1023);
 
+    
+    // IEEE 754 REAL EXPONENT CALCULATION:
+    // Normal numbers: realExp = rawExp - bias - mantissaBits
+    // Subnormal numbers: realExp = 1 - bias - mantissaBits (special case when rawExp = 0)
+    // REASON: Subnormal numbers have implicit leading 0, not 1, and use minimum exponent
+    
     #if NET5_0_OR_GREATER
     public static FloatInfo AnalyzeHalf(this Half value)
     {
         var bits = BitConverter.HalfToInt16Bits(value: value);
-        var rawExponent = (int)(bits >> halfSpec.MantissaBitSize & halfSpec.ExpMask);
-        var mantissa = bits & halfSpec.MantissaMask;
+        var rawExponent = (int)(bits >> F16Spec.MantissaBitSize & F16Spec.ExpMask);
+        var mantissa = bits & F16Spec.MantissaMask;
 
         return new FloatInfo(
-            Spec: halfSpec,
+            Spec: F16Spec,
             Bits: bits,
-            // IEEE 754 REAL EXPONENT CALCULATION:
-            // Normal numbers: realExp = rawExp - bias - mantissaBits  
-            // Subnormal numbers: realExp = 1 - bias - mantissaBits (special case when rawExp = 0)
-            // REASON: Subnormals have implicit leading 0, not 1, and use minimum exponent
-            RealExponent: rawExponent - halfSpec.ExpOffset + (rawExponent == 0
+            RealExponent: rawExponent - F16Spec.ExpOffset + (rawExponent == 0
                 ? 1
-                : 0) - halfSpec.MantissaBitSize,
-            // IEEE 754 SIGNIFICAND CONSTRUCTION:
-            // Normal: (2^mantissaBits + mantissa) - adds implicit leading 1
-            // Subnormal: mantissa - no implicit leading 1 (rawExponent == 0)
+                : 0) - F16Spec.MantissaBitSize,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
-                : (1 << halfSpec.MantissaBitSize) + mantissa),
+                : (1 << F16Spec.MantissaBitSize) + mantissa),
             TypeName: FloatTypeKind.Half
         );
     }
@@ -62,36 +61,36 @@ internal static class FloatAnalysisExtensions
     public static FloatInfo AnalyzeFloat(this float value)
     {
         var bits = BitConverter.SingleToInt32Bits(value: value);
-        var rawExponent = (int)(bits >> floatSpec.MantissaBitSize & floatSpec.ExpMask);
-        var mantissa = bits & floatSpec.MantissaMask;
+        var rawExponent = (int)(bits >> F32Spec.MantissaBitSize & F32Spec.ExpMask);
+        var mantissa = bits & F32Spec.MantissaMask;
 
         return new FloatInfo(
-            Spec: floatSpec,
+            Spec: F32Spec,
             Bits: bits,
-            RealExponent: rawExponent - floatSpec.ExpOffset + (rawExponent == 0
+            RealExponent: rawExponent - F32Spec.ExpOffset + (rawExponent == 0
                 ? 1
-                : 0) - floatSpec.MantissaBitSize,
+                : 0) - F32Spec.MantissaBitSize,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
-                : (1 << floatSpec.MantissaBitSize) + mantissa),
+                : (1 << F32Spec.MantissaBitSize) + mantissa),
             TypeName: FloatTypeKind.Float
         );
     }
     public static FloatInfo AnalyzeDouble(this double value)
     {
         var bits = BitConverter.DoubleToInt64Bits(value: value);
-        var rawExponent = (int)(bits >> doubleSpec.MantissaBitSize & doubleSpec.ExpMask);
-        var mantissa = bits & doubleSpec.MantissaMask;
+        var rawExponent = (int)(bits >> F64Spec.MantissaBitSize & F64Spec.ExpMask);
+        var mantissa = bits & F64Spec.MantissaMask;
 
         return new FloatInfo(
-            Spec: doubleSpec,
+            Spec: F64Spec,
             Bits: bits,
-            RealExponent: rawExponent - doubleSpec.ExpOffset + (rawExponent == 0
+            RealExponent: rawExponent - F64Spec.ExpOffset + (rawExponent == 0
                 ? 1
-                : 0) - doubleSpec.MantissaBitSize,
+                : 0) - F64Spec.MantissaBitSize,
             Significand: (ulong)(rawExponent == 0
                 ? mantissa
-                : (1L << doubleSpec.MantissaBitSize) + mantissa),
+                : (1L << F64Spec.MantissaBitSize) + mantissa),
             TypeName: FloatTypeKind.Double
         );
     }

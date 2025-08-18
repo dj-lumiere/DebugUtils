@@ -220,7 +220,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Negative()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         var timeSpan = TimeSpan.FromMinutes(minutes: -30);
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -242,7 +242,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Zero()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         var timeSpan = TimeSpan.Zero;
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -264,7 +264,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Positive()
     {
-        var config = new ReprConfig(IntMode: IntReprMode.Decimal);
+        var config = new ReprConfig();
         var timeSpan = TimeSpan.FromMinutes(minutes: 30);
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject

@@ -32,8 +32,8 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 
         foreach (var item in unorderedItems)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -53,7 +53,7 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            var remainingCount = count - context.Config.MaxElementsPerCollection;
+            var remainingCount = count - context.Config.MaxItemsPerContainer;
             if (remainingCount > 0)
             {
                 items.Add(item: $"... ({remainingCount} more items)");
@@ -110,8 +110,8 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 
         foreach (var item in unorderedItems)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -136,7 +136,7 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
 
         if (hitLimit)
         {
-            var remainingCount = count - context.Config.MaxElementsPerCollection;
+            var remainingCount = count - context.Config.MaxItemsPerContainer;
             entries.Add(value: $"... ({remainingCount} more items)");
         }
 

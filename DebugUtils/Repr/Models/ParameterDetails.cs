@@ -67,7 +67,7 @@ internal static class ParameterDetailsExtensions
             return "ref"; // Default for ByRef that's not in/out
         }
 
-        // Check for params array
+        // Check for a params array
         if (param.IsDefined(attributeType: typeof(ParamArrayAttribute)))
         {
             return "params";

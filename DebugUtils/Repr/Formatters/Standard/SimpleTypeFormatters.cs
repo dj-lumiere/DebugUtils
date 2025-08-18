@@ -19,6 +19,11 @@ internal class BoolFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return ToRepr(obj: obj, context: context)!;
+        }
+
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),
@@ -52,7 +57,8 @@ internal class EnumFormatter : IReprFormatter, IReprTreeFormatter
             [propertyName: "type"] = e.GetReprTypeName(),
             [propertyName: "kind"] = "enum",
             [propertyName: "name"] = e.ToString(),
-            [propertyName: "value"] = numericValue.FormatAsJsonNode(context: context)
+            [propertyName: "value"] =
+                numericValue.FormatAsJsonNode(context: context.WithIncrementedDepth())
         };
     }
 }

@@ -102,13 +102,8 @@ internal static class ReprFormatterRegistry
                 (t => t.IsAnonymousType(), new ObjectFormatter())
             });
     }
-    public static IReprFormatter GetStandardFormatter(Type type, ReprContext context)
+    public static IReprFormatter GetStandardFormatter(this Type type)
     {
-        if (context.Config.FormattingMode == FormattingMode.Reflection)
-        {
-            return new ObjectFormatter();
-        }
-
         if (ReprFormatters.TryGetValue(key: type, value: out var directFormatter))
         {
             return directFormatter;
@@ -124,7 +119,7 @@ internal static class ReprFormatterRegistry
 
         return new ObjectFormatter();
     }
-    public static IReprTreeFormatter GetTreeFormatter(Type type, ReprContext context)
+    public static IReprTreeFormatter GetTreeFormatter(this Type type)
     {
         if (ReprTreeFormatters.TryGetValue(key: type, value: out var directFormatter))
         {

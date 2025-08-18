@@ -11,14 +11,14 @@ internal static class ArrayExtensions
         {
             // Last dimension - collect actual values
             var items = new List<string>();
-            for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+            for (var i = 0; i < array.GetLength(dimension: dimension); i += 1)
             {
                 indices[dimension] = i;
-                if (context.Config.MaxElementsPerCollection >= 0 &&
-                    i >= context.Config.MaxElementsPerCollection)
+                if (context.Config.MaxItemsPerContainer >= 0 &&
+                    i >= context.Config.MaxItemsPerContainer)
                 {
                     var truncatedItemCount = array.GetLength(dimension: dimension) -
-                                             context.Config.MaxElementsPerCollection;
+                                             context.Config.MaxItemsPerContainer;
                     items.Add(item: $"... {truncatedItemCount} more items");
                     break;
                 }
@@ -44,13 +44,13 @@ internal static class ArrayExtensions
         } // Not last dimension - recurse deeper
 
         var subArrays = new List<string>();
-        for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+        for (var i = 0; i < array.GetLength(dimension: dimension); i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 var truncatedItemCount = array.GetLength(dimension: dimension) -
-                                         context.Config.MaxElementsPerCollection;
+                                         context.Config.MaxItemsPerContainer;
                 subArrays.Add(item: $"... {truncatedItemCount} more items");
                 break;
             }
@@ -71,14 +71,14 @@ internal static class ArrayExtensions
         {
             // Last dimension - collect actual values
             var items = new JsonArray();
-            for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+            for (var i = 0; i < array.GetLength(dimension: dimension); i += 1)
             {
                 indices[dimension] = i;
-                if (context.Config.MaxElementsPerCollection >= 0 &&
-                    i >= context.Config.MaxElementsPerCollection)
+                if (context.Config.MaxItemsPerContainer >= 0 &&
+                    i >= context.Config.MaxItemsPerContainer)
                 {
                     var truncatedItemCount = array.GetLength(dimension: dimension) -
-                                             context.Config.MaxElementsPerCollection;
+                                             context.Config.MaxItemsPerContainer;
                     items.Add(item: $"... ({truncatedItemCount} more items)");
                     break;
                 }
@@ -106,13 +106,13 @@ internal static class ArrayExtensions
         } // Not last dimension - recurse deeper
 
         var subArrays = new JsonArray();
-        for (var i = 0; i < array.GetLength(dimension: dimension); i++)
+        for (var i = 0; i < array.GetLength(dimension: dimension); i += 1)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 var truncatedItemCount = array.GetLength(dimension: dimension) -
-                                         context.Config.MaxElementsPerCollection;
+                                         context.Config.MaxItemsPerContainer;
                 subArrays.Add(item: $"... ({truncatedItemCount} more items)");
                 break;
             }

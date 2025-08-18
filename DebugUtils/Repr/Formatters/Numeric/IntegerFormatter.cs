@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Numerics;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
@@ -14,68 +15,53 @@ namespace DebugUtils.Repr.Formatters;
     , typeof(Int128), typeof(UInt128)
     #endif
 )]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
-        if (!String.IsNullOrEmpty(value: context.Config.IntFormatString))
-        {
-            return FormatWithCustomString(obj: obj, formatString: context.Config.IntFormatString);
-        }
-
-        return FormatWithMode(obj: obj, mode: context.Config.IntMode);
+        return FormatWithCustomString(obj: obj, formatString: context.Config.IntFormatString,
+            culture: context.Config.Culture);
     }
 
-    private static string FormatWithCustomString(object obj, string formatString)
+    private static string FormatWithCustomString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return formatString switch
         {
-            "HB" => obj.FormatAsHexBytes(),
-            "B" or "b" => obj.FormatAsBinary(),
-            "X" => obj.FormatAsHex(),
-            "x" => obj.FormatAsHex()
-                      .ToLowerInvariant(),
-            _ when formatString.StartsWith(value: "B") || formatString.StartsWith(value: "b") =>
-                obj.FormatAsBinaryWithPadding(formatString: formatString),
-            _ when formatString.StartsWith(value: "X") =>
-                obj.FormatAsHexWithPadding(formatString: formatString),
-            _ when formatString.StartsWith(value: "x") =>
-                obj.FormatAsHexWithPadding(formatString: formatString)
+            _ when formatString.StartsWith(value: 'B') || formatString.StartsWith(value: 'b') =>
+                obj.FormatAsBinaryWithPadding(format: formatString),
+            _ when formatString.StartsWith(value: 'Q') || formatString.StartsWith(value: 'q') =>
+                obj.FormatAsQuaternaryWithPadding(format: formatString),
+            _ when formatString.StartsWith(value: 'O') || formatString.StartsWith(value: 'o') =>
+                obj.FormatAsOctalWithPadding(format: formatString),
+            _ when formatString.StartsWith(value: 'X') =>
+                obj.FormatAsHexWithPadding(format: formatString),
+            _ when formatString.StartsWith(value: 'x') =>
+                obj.FormatAsHexWithPadding(format: formatString)
                    .ToLowerInvariant(),
-            _ => FormatWithBuiltInToString(obj: obj, formatString: formatString)
+            _ => FormatWithBuiltInToString(obj: obj, formatString: formatString, culture: culture)
         };
     }
 
-    private static string FormatWithBuiltInToString(object obj, string formatString)
+    private static string FormatWithBuiltInToString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return obj switch
         {
-            byte b => b.ToString(format: formatString),
-            sbyte sb => sb.ToString(format: formatString),
-            short s => s.ToString(format: formatString),
-            ushort us => us.ToString(format: formatString),
-            int i => i.ToString(format: formatString),
-            uint ui => ui.ToString(format: formatString),
-            long l => l.ToString(format: formatString),
-            ulong ul => ul.ToString(format: formatString),
-            BigInteger bi => bi.ToString(format: formatString),
+            byte b => b.ToString(format: formatString, provider: culture),
+            sbyte sb => sb.ToString(format: formatString, provider: culture),
+            short s => s.ToString(format: formatString, provider: culture),
+            ushort us => us.ToString(format: formatString, provider: culture),
+            int i => i.ToString(format: formatString, provider: culture),
+            uint ui => ui.ToString(format: formatString, provider: culture),
+            long l => l.ToString(format: formatString, provider: culture),
+            ulong ul => ul.ToString(format: formatString, provider: culture),
+            BigInteger bi => bi.ToString(format: formatString, provider: culture),
             #if NET7_0_OR_GREATER
-            Int128 i128 => i128.ToString(format: formatString),
-            UInt128 u128 => u128.ToString(format: formatString),
+            Int128 i128 => i128.ToString(format: formatString, provider: culture),
+            UInt128 u128 => u128.ToString(format: formatString, provider: culture),
             #endif
-            _ => throw new InvalidEnumArgumentException(message: "Invalid Repr Config")
-        };
-    }
-
-    private static string FormatWithMode(object obj, IntReprMode mode)
-    {
-        return mode switch
-        {
-            IntReprMode.Binary => obj.FormatAsBinary(),
-            IntReprMode.Decimal => obj.ToString()!,
-            IntReprMode.Hex => obj.FormatAsHex(),
-            IntReprMode.HexBytes => obj.FormatAsHexBytes(),
             _ => throw new InvalidEnumArgumentException(message: "Invalid Repr Config")
         };
     }
@@ -83,6 +69,11 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return obj.Repr(context: context)!;
+        }
+
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),

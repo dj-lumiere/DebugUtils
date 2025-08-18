@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
 using DebugUtils.Repr.Extensions;
@@ -15,20 +16,14 @@ namespace DebugUtils.Repr.Formatters;
     typeof(Half)
     #endif
 )]
-[ReprOptions(needsPrefix: true)]
+[ReprOptions(needsPrefix: false)]
 internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
 {
     public string ToRepr(object obj, ReprContext context)
     {
         var info = AnalyzeFloat(obj: obj);
-
-        if (!String.IsNullOrEmpty(value: context.Config.FloatFormatString))
-        {
-            return FormatWithCustomString(obj: obj, info: info,
-                formatString: context.Config.FloatFormatString);
-        }
-
-        return FormatWithMode(obj: obj, info: info, context: context);
+        return FormatWithCustomString(obj: obj, info: info,
+            formatString: context.Config.FloatFormatString, culture: context.Config.Culture);
     }
 
     private static FloatInfo AnalyzeFloat(object obj)
@@ -44,106 +39,50 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
         };
     }
 
-    private static string FormatWithCustomString(object obj, FloatInfo info, string formatString)
+    private static string FormatWithCustomString(object obj, FloatInfo info, string formatString,
+        CultureInfo? culture)
     {
         return formatString switch
         {
-            "HB" => FormatAsHexBytes(info: info),
-            "BF" => FormatAsBitField(info: info),
             _ when info.IsPositiveInfinity => "Infinity",
             _ when info.IsNegativeInfinity => "-Infinity",
-            _ when info.IsQuietNaN => "Quiet NaN",
+            _ when info.IsQuietNaN => FormatQuietNaN(info: info),
             _ when info.IsSignalingNaN => FormatSignalingNaN(info: info),
             "EX" => obj.FormatAsExact(info: info),
-            _ => FormatWithBuiltInToString(obj: obj, formatString: formatString)
+            "HP" => obj.FormatAsHexPower(info: info),
+            _ => FormatWithBuiltInToString(obj: obj, formatString: formatString, culture: culture)
         };
     }
 
-    private static string FormatWithBuiltInToString(object obj, string formatString)
+    private static string FormatWithBuiltInToString(object obj, string formatString,
+        CultureInfo? culture)
     {
         return obj switch
         {
-            Half h => h.ToString(format: formatString),
-            float f => f.ToString(format: formatString),
-            double d => d.ToString(format: formatString),
+            Half h => h.ToString(format: formatString, provider: culture),
+            float f => f.ToString(format: formatString, provider: culture),
+            double d => d.ToString(format: formatString, provider: culture),
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
 
-    private static string FormatWithMode(object obj, FloatInfo info, ReprContext context)
-    {
-        var config = context.Config;
-
-        // Handle bit-perfect representation modes first
-        if (config.FloatMode == FloatReprMode.HexBytes)
-        {
-            return FormatAsHexBytes(info: info);
-        }
-
-        if (config.FloatMode == FloatReprMode.BitField)
-        {
-            return FormatAsBitField(info: info);
-        }
-
-        // Handle special values
-        if (info.IsPositiveInfinity)
-        {
-            return "Infinity";
-        }
-
-        if (info.IsNegativeInfinity)
-        {
-            return "-Infinity";
-        }
-
-        if (info.IsQuietNaN)
-        {
-            return "Quiet NaN";
-        }
-
-        if (info.IsSignalingNaN)
-        {
-            return FormatSignalingNaN(info: info);
-        }
-
-        // Handle normal values
-        return config.FloatMode switch
-        {
-            FloatReprMode.Round => obj.FormatAsRounding(info: info, context: context),
-            FloatReprMode.Scientific => obj.FormatAsScientific(info: info, context: context),
-            FloatReprMode.General => obj.FormatAsGeneral(info: info, context: context),
-            FloatReprMode.Exact_Old => obj.FormatAsExact_Old(info: info),
-            FloatReprMode.Exact => obj.FormatAsExact(info: info),
-            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatReprMode")
-        };
-    }
-
-    private static string FormatAsHexBytes(FloatInfo info)
+    private static string FormatQuietNaN(FloatInfo info)
     {
         return info.TypeName switch
         {
-            FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                $"0x{info.Bits.ToString(format: $"X{info.Spec.TotalSize / 4}")}",
+            FloatTypeKind.Half => $"QuietNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Float => $"QuietNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Double => $"QuietNaN(0x{info.Mantissa:X3})",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
-
-    private static string FormatAsBitField(FloatInfo info)
-    {
-        return info.TypeName switch
-        {
-            FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                $"{(info.IsNegative ? 1 : 0)}|{info.ExpBits}|{info.MantissaBits}",
-            _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
-        };
-    }
-
     private static string FormatSignalingNaN(FloatInfo info)
     {
         return info.TypeName switch
         {
-            FloatTypeKind.Half or FloatTypeKind.Float or FloatTypeKind.Double =>
-                $"Signaling NaN, Payload: 0x{info.Mantissa.ToString(format: $"X{(info.Spec.MantissaBitSize + 3) / 4}")}",
+            FloatTypeKind.Half => $"SignalingNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Float => $"SignalingNaN(0x{info.Mantissa:X3})",
+            FloatTypeKind.Double => $"SignalingNaN(0x{info.Mantissa:X3})",
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")
         };
     }
@@ -151,6 +90,11 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
     public JsonNode ToReprTree(object obj, ReprContext context)
     {
         var type = obj.GetType();
+        if (context.Depth > 0)
+        {
+            return obj.Repr(context: context)!;
+        }
+
         return new JsonObject
         {
             [propertyName: "type"] = type.GetReprTypeName(),

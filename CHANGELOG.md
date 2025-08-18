@@ -1,5 +1,92 @@
 # Changelog
 
+# [v1.7.0] Released at 2025.08.14
+
+## 🚀 Major Features
+
+### Consistent Explicit Bit-Width Numeric Suffixes
+- **NEW**: All numeric types now use explicit bit-width suffixes for maximum consistency
+- **Integer suffixes**: `sbyte=>i8`, `byte=>u8`, `short=>i16`, `ushort=>u16`, `int=>i32`, `uint=>u32`, `long=>i64`, `ulong=>u64`, `Int128=>i128`, `UInt128=>u128`
+- **Pointer suffixes**: `IntPtr=>iptr`, `UIntPtr=>uptr` 
+- **Float suffixes**: `Half=>f16`, `float=>f32`, `double=>f64`
+- **Special types**: `BigInteger=>n`, `decimal=>m`
+- **Unity/Cross-platform optimized**: Explicit bit widths are ideal for Unity development and cross-platform debugging
+- **Consistent pattern**: All types follow `{i|u|f}{bitwidth}` pattern except special cases
+
+### Benefits
+- **Perfect consistency**: No exceptions to the bit-width pattern for standard numeric types
+- **Unity-friendly**: Explicit bit widths matter for Unity's cross-platform nature and performance debugging
+- **Future-proof**: Scales naturally as new numeric types are added to C#
+- **Clear semantics**: Immediately see signedness and size information
+
+### Enhanced Nullable Type Support with Bit-Width Suffixes
+- **NEW**: Nullable numeric types now display with proper bit-width suffixes
+  - `int?(42)` → `42_i32?`
+  - `int?(null)` → `null_i32?`
+  - `double?(3.14)` → `3.14_f64?`
+- **Improved de-nesting**: Nullable values in containers (depth > 0) show correctly with suffixes
+- **Consistent formatting**: Both string and tree representations handle nullable types uniformly
+
+### Safety-First Member Access System
+- **NEW**: `MemberReprMode` enum with `ViewMode` parameter replaces boolean flags
+- **Safety by default**: Only accesses fields and auto-property backing fields (no risky property getters)
+- **Timeout protection**: `MaxMemberTimeMs` parameter with 1ms default timeout for property getters  
+- **Exception handling**: Failed property getters show `[ExceptionType: Message]` instead of crashing
+- **Fine-grained control** over member visibility:
+  - `PublicFieldAutoProperty` - Public fields and auto-property backing fields (default, safe)
+  - `AllPublic` - All public fields and properties (with timeout protection when enabled)
+  - `AllFieldAutoProperty` - All fields and auto-property backing fields (public and private)
+  - `Everything` - All accessible members including computed properties (the highest risk)
+
+### Major Configuration Simplification
+- **Massive ReprConfig cleanup**
+- **Complete enum removal**: All deprecated `FloatReprMode`, `FloatPrecision`, and `IntMode` enums removed
+- **Efficient HexPower mode**: "HP" format string for fast IEEE 754 hexadecimal representation/.net decimal bit representation (simple bit conversion), replacing "BF" mode for more readable bit field representation
+- **Streamlined documentation**: Cleaner API surface with comprehensive examples
+
+### Integer Formatting Expansion  
+- **Complete implementation**: Binary ("B"), octal ("O"), and quaternary ("Q") formatting fully implemented
+- **High-performance bit-grouping algorithm**: New efficient approach processes bits in groups without intermediate lists
+- **Consistent byte-based approach**: All formats use the same two's complement logic with proper magnitude conversion
+- **Format string support**: "B", "O", "Q", "X" with optional padding (e.g., "B8", "O12", "Q16", "X4")
+- **Prefix consistency**: Binary uses "0b", quaternary uses "0q", octal uses "0o", hex uses "0x"
+
+## 📋 Breaking Changes
+- **BREAKING**: All numeric type suffixes changed from type prefix to explicit bit-width style
+  - `int(42)` → `42i32`
+  - `uint(42)` → `42u32` 
+  - `long(42)` → `42i64`
+  - `ulong(42)` → `42u64`
+  - `float(42)` → `3.14f32`
+  - `double(42)` → `3.14f64`
+- **BREAKING**: All enum-based formatting completely removed (`FloatReprMode`, `FloatPrecision`, `IntMode`)
+- **BREAKING**: Member visibility now controlled via `ViewMode: MemberReprMode` instead of boolean flags
+- **BREAKING**: Numeric types ignore type suffix hide settings
+- **BREAKING**: `FormattingMode.Reflection` removed from `ReprFormatterRegistry`
+- **BREAKING**: Significant API surface reduction in ReprConfig
+
+## 💡 Migration Guide
+```csharp
+// OLD: Enum-based configuration (removed)
+var oldConfig = new ReprConfig(
+    ShowNonPublicProperties: true,
+    FloatMode: FloatReprMode.Exact,
+    IntMode: IntReprMode.Binary
+);
+
+// NEW: Format string + visibility mode (recommended)
+var newConfig = new ReprConfig(
+    ViewMode: MemberReprMode.Everything,
+    FloatFormatString: "EX",    // Exact representation
+    IntFormatString: "B"        // Binary (also supports "O" octal, "Q" quaternary, "X" hex)
+);
+```
+
+## 📚 Documentation Updates
+- **Updated README**: Reflects new member visibility system and format strings
+- **Migration examples**: Clear before/after comparisons for breaking changes
+- **Performance benchmarks**: Documentation of new exact formatting performance gains
+
 # [v1.6.0] Released at 2025.08.13
 ## 📋 Breaking Changes
 - Temporarily deleted unlimited property access from Object

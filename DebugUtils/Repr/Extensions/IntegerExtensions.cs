@@ -1,401 +1,297 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Extensions;
 
+using System;
+using System.Numerics;
+
 internal static class IntegerExtensions
 {
-    public static string FormatAsBinary(this object obj)
+    // Digit alphabets per base-2^k
+    private static readonly string Digits = "0123456789ABCDEF";
+
+    // Public API (with prefixes and optional zero-padding)
+
+    public static string FormatAsHexWithPadding(this object value, string format)
     {
-        #if NET7_0_OR_GREATER
-        if (obj is Int128 i128)
-        {
-            var ui128 = (UInt128)i128;
-            // Check if the original value was negative by testing the sign bit (bit 63).
-            var isNegative = i128 < 0;
-            // If it is less than 0 in signed representation, then negate using that
-            // negative number is implemented using two's complement representation.
-            // Negating all the bits means subtracting ui128 from
-            // 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF,
-            // hence the +1 offset afterward.
-            // It has to be done this way because when the value is int128(-2**67) then
-            // simple negating would cause integer overflow.
-            if (isNegative)
-            {
-                ui128 = ~ui128 +
-                        1;
-            }
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 4, digits: Digits);
 
-            return isNegative
-                ? $"-0b{ui128.FormatUInt128AsBinary()}"
-                : $"0b{ui128.FormatUInt128AsBinary()}";
-        }
-
-        if (obj is UInt128 u128)
-        {
-            return $"0b{u128.FormatUInt128AsBinary()}";
-        }
-        #endif
-        if (obj.GetType()
-               .IsSignedPrimitiveType())
-        {
-            // cast sbyte, short, int, long to ulong
-            // Negative values get sign-extended, filling upper bits with 1s.
-            var ul = obj.SignExtendConvertToUlong();
-            // Check if the original value was negative by testing the sign bit (bit 63).
-            var isNegative = ul >= 0x8000000000000000L;
-            // If it is less than 0 in signed representation, then negate using that
-            // negative number is implemented using two's complement representation.
-            // negating all the bits means subtracting ul from 0xFFFF_FFFF_FFFF_FFFF,
-            // hence the +1 offset afterward.
-            // it has to be done this way because when the value is long(-2**63) then
-            // simple negating would cause integer overflow.
-            if (isNegative)
-            {
-                ul = ~ul + 1;
-            }
-
-            return isNegative
-                ? $"-0b{ul.FormatUlongAsBinary()}"
-                : $"0b{ul.FormatUlongAsBinary()}";
-        }
-
-        if (obj.GetType()
-               .IsIntegerPrimitiveType())
-        {
-            // cast byte, ushort, uint, ulong to ulong
-            var u = Convert.ToUInt64(value: obj);
-            return $"0b{u.FormatUlongAsBinary()}";
-        }
-
-        if (obj is BigInteger bi)
-        {
-            return bi.FormatBigIntegerAsBinary();
-        }
-
-        throw new ArgumentException(message: "Invalid type");
-    }
-    public static string FormatAsHex(this object obj)
-    {
-        #if NET7_0_OR_GREATER
-        if (obj is Int128 i128)
-        {
-            var ui128 = (UInt128)i128;
-            // Check if the original value was negative by testing the sign bit (bit 63).
-            var isNegative = i128 < 0;
-            // If it is less than 0 in signed representation, then negate using that
-            // negative number is implemented using two's complement representation.
-            // Negating all the bits means subtracting ui128 from
-            // 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF,
-            // hence the +1 offset afterward.
-            // It has to be done this way because when the value is int128(-2**67) then
-            // simple negating would cause integer overflow.
-            if (isNegative)
-            {
-                ui128 = ~ui128 +
-                        1;
-            }
-
-            return isNegative
-                ? $"-0x{ui128.FormatUInt128AsHex()}"
-                : $"0x{ui128.FormatUInt128AsHex()}";
-        }
-
-        if (obj is UInt128 u128)
-        {
-            return $"0x{u128.FormatUInt128AsHex()}";
-        }
-        #endif
-        if (obj.GetType()
-               .IsSignedPrimitiveType())
-        {
-            // cast sbyte, short, int, long to ulong
-            // Negative values get sign-extended, filling upper bits with ones.
-            var ul = obj.SignExtendConvertToUlong();
-            // Check if the original value was negative by testing the sign bit (bit 63).
-            var isNegative = ul >= 0x8000000000000000L;
-            // If it is less than 0 in signed representation, then negate using that
-            // negative number is implemented using two's complement representation.
-            // Negating all the bits means subtracting ul from 0xFFFF_FFFF_FFFF_FFFF,
-            // hence the +1 offset afterward.
-            // It has to be done this way because when the value is long(-2**63) then
-            // simple negating would cause integer overflow.
-            if (isNegative)
-            {
-                ul = ~ul + 1;
-            }
-
-            return isNegative
-                ? $"-0x{ul.FormatUlongAsHex()}"
-                : $"0x{ul.FormatUlongAsHex()}";
-        }
-
-        if (obj.GetType()
-               .IsIntegerPrimitiveType())
-        {
-            // cast byte, ushort, uint, ulong to ulong
-            var u = Convert.ToUInt64(value: obj);
-            return $"0x{u.FormatUlongAsHex()}";
-        }
-
-        if (obj is BigInteger bi)
-        {
-            return bi.FormatBigIntegerAsHex();
-        }
-
-        throw new ArgumentException(message: "Invalid type");
-    }
-    public static string FormatAsHexBytes(this object obj)
-    {
-        if (obj is BigInteger bi)
-        {
-            return bi.FormatBigIntegerAsHex();
-        }
-
-        var bytes = obj.GetBytes();
-
-        // Reverse for big-endian display (the most significant byte first)
-        Array.Reverse(array: bytes);
-        return "0x" + Convert.ToHexString(inArray: bytes);
+        return isNegative
+            ? "-0x" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0x" + digits.PadLeft(totalWidth: width, paddingChar: '0');
     }
 
-    private static byte[] GetBytes(this object obj)
+    public static string FormatAsOctalWithPadding(this object value, string format)
     {
-        return obj switch
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 3, digits: Digits);
+
+        return isNegative
+            ? "-0o" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0o" + digits.PadLeft(totalWidth: width, paddingChar: '0');
+    }
+
+    public static string FormatAsQuaternaryWithPadding(this object value, string format)
+    {
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 2, digits: Digits);
+
+        return isNegative
+            ? "-0q" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0q" + digits.PadLeft(totalWidth: width, paddingChar: '0');
+    }
+
+    public static string FormatAsBinaryWithPadding(this object value, string format)
+    {
+        var width = ParseOptionalWidth(format: format);
+        var bytes = GetMagnitudeBytesLittleEndian(value: value, isNegative: out var isNegative);
+        var digits =
+            FormatBasePowerOfTwo(littleEndianMagnitude: bytes, bitsPerDigit: 1, digits: Digits);
+
+        return isNegative
+            ? "-0b" + digits.PadLeft(totalWidth: width, paddingChar: '0')
+            : "0b" + digits.PadLeft(totalWidth: width, paddingChar: '0');
+    }
+
+    // ---------- Helpers ----------
+
+    /// <summary>
+    /// Format an unsigned magnitude (little-endian) into base-2^k without building a per-bit list.
+    /// Emits the leading partial group (if any) first, then full-size groups.
+    /// </summary>
+    private static string FormatBasePowerOfTwo(byte[] littleEndianMagnitude, int bitsPerDigit,
+        string digits)
+    {
+        if (littleEndianMagnitude == null || littleEndianMagnitude.Length == 0)
         {
-            sbyte sb => new[]
+            return "0";
+        }
+
+        // Find index of most-significant non-zero byte.
+        var mostSignificantIndex = littleEndianMagnitude.Length - 1;
+        while (mostSignificantIndex >= 0 && littleEndianMagnitude[mostSignificantIndex] == 0)
+        {
+            mostSignificantIndex -= 1;
+        }
+
+        if (mostSignificantIndex < 0)
+        {
+            return "0";
+        }
+
+        // Find index (0..7) of top set bit in that byte.
+        var mostSignificantByte = littleEndianMagnitude[mostSignificantIndex];
+        var mostSignificantBitIndex = 7;
+        while (mostSignificantBitIndex >= 0 &&
+               mostSignificantByte.GetBit(bit: mostSignificantBitIndex) == 0)
+        {
+            mostSignificantBitIndex -= 1;
+        }
+
+        // Total significant bits = full bytes below MSB * 8 + bits in MSB.
+        var totalBits = mostSignificantIndex * 8 + mostSignificantBitIndex + 1;
+        var maxDigits = (totalBits + bitsPerDigit - 1) / bitsPerDigit;
+        var outputBuffer = new char[maxDigits];
+        var digitIndex = 0;
+        var groupAccumulator = (totalBits - 1) % bitsPerDigit + 1;
+        var cache = 0;
+        for (var i = totalBits - 1; i >= 0; i -= 1)
+        {
+            cache <<= 1;
+            cache |= littleEndianMagnitude[i >> 3]
+               .GetBit(bit: i & 7);
+            groupAccumulator -= 1;
+            if (groupAccumulator == 0)
             {
-                (byte)(sb < 0
-                    ? sb + 256
-                    : sb)
-            },
-            byte b => new[] { b }, // BitConverter.GetBytes(byte) doesn't exist
-            short s => BitConverter.GetBytes(value: s),
-            ushort us => BitConverter.GetBytes(value: us),
-            int i => BitConverter.GetBytes(value: i),
-            uint ui => BitConverter.GetBytes(value: ui),
-            long l => BitConverter.GetBytes(value: l),
-            ulong ul => BitConverter.GetBytes(value: ul),
+                groupAccumulator = bitsPerDigit;
+                outputBuffer[digitIndex] = digits[index: cache];
+                digitIndex += 1;
+                cache = 0;
+            }
+        }
+
+        return new string(value: outputBuffer, startIndex: 0, length: digitIndex);
+    }
+
+    /// <summary>
+    /// Returns the absolute-value magnitude of an integer as little-endian bytes,
+    /// and a flag indicating if the original value was negative.
+    /// - For signed primitives: converts two's complement to magnitude in-place.
+    /// - For BigInteger: uses Abs and unsigned representation (no sign byte).
+    /// </summary>
+    private static byte[] GetMagnitudeBytesLittleEndian(object value, out bool isNegative)
+    {
+        isNegative = false;
+
+        switch (value)
+        {
+            case sbyte v:
+                if (v < 0)
+                {
+                    isNegative = true;
+                    return new[] { (byte)-v };
+                }
+
+                return new[] { (byte)v };
+
+            case byte v:
+                return new[] { v };
+
+            case short v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case ushort v:
+                return BitConverter.GetBytes(value: v);
+
+            case int v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case uint v:
+                return BitConverter.GetBytes(value: v);
+
+            case long v:
+            {
+                var bytes = BitConverter.GetBytes(value: v);
+                if (v < 0)
+                {
+                    isNegative = true;
+                    ConvertTwosComplementToMagnitudeInPlace(bytes: bytes);
+                }
+
+                return bytes;
+            }
+
+            case ulong v:
+                return BitConverter.GetBytes(value: v);
+
             #if NET7_0_OR_GREATER
-            Int128 i128 => i128.GetBytesFromInt128(),
-            UInt128 u128 => u128.GetBytesFromUInt128(),
-            #endif
-            _ => throw new ArgumentException(message: "Invalid type")
-        };
-    }
-    private static int GetByteSize<T>(this T obj)
-    {
-        return obj switch
-        {
-            byte or sbyte => 1,
-            short or ushort => 2,
-            int or uint => 4,
-            long or ulong => 8,
-            #if NET7_0_OR_GREATER
-            Int128 or UInt128 => 16,
-            #endif
-            _ => throw new ArgumentException(message: "Invalid type")
-        };
-    }
-    private static ulong SignExtendConvertToUlong<T>(this T obj)
-    {
-        if (obj is null)
-        {
-            throw new ArgumentNullException(paramName: nameof(obj));
-        }
-
-        if (!obj.IsIntegerPrimitive())
-        {
-            throw new ArgumentException(message: "Invalid type");
-        }
-
-        var byteSize = GetByteSize(obj: obj);
-        var buffer = new byte[8];
-        var bytes = obj.GetBytes();
-
-        for (var i = 0; i < byteSize; i++)
-        {
-            buffer[i] = bytes[i];
-        }
-
-        if (buffer[byteSize - 1] >= 0x80)
-        {
-            // sign-extend
-            for (var i = byteSize; i < 8; i++)
+            case Int128 v:
             {
-                buffer[i] = 0xFF;
+                isNegative = v < 0;
+                var unsigned = isNegative ? (UInt128)(-v) : (UInt128)v;
+                return GetBytesFromUInt128(unsigned);
             }
+
+            case UInt128 v:
+                return GetBytesFromUInt128(v);
+            #endif
+
+            case BigInteger big:
+            {
+                isNegative = big.Sign < 0;
+                var magnitude = BigInteger.Abs(value: big);
+                #if NET7_0_OR_GREATER
+                return magnitude.ToByteArray(isUnsigned: true, isBigEndian: false);
+                #else
+                // Positive, minimal two's complement little-endian.
+                var bytes = magnitude.ToByteArray();
+                // Trim possible sign-extension 0x00 at the MSB end (last element).
+                if (bytes.Length > 1 && bytes[bytes.Length - 1] == 0x00)
+                {
+                    Array.Resize(array: ref bytes, newSize: bytes.Length - 1);
+                }
+
+                return bytes;
+                #endif
+            }
+
+            default:
+                throw new ArgumentException(message: "Invalid type");
         }
-
-        var result = BitConverter.ToUInt64(value: buffer, startIndex: 0);
-        return result;
-    }
-
-    private static string FormatUlongAsBinary(this ulong value)
-    {
-        if (value == 0)
-        {
-            return "0";
-        }
-
-        var highBytes = (uint)(value >> 32);
-        var lowBytes = (uint)value;
-
-        return ((highBytes != 0
-                    ? Convert.ToString(value: highBytes, toBase: 2)
-                    : "") +
-                Convert.ToString(value: lowBytes, toBase: 2)
-                       .PadLeft(totalWidth: highBytes == 0
-                            ? 0
-                            : 32, paddingChar: '0'))
-           .ToUpper();
-    }
-    private static string FormatUlongAsHex(this ulong value)
-    {
-        if (value == 0)
-        {
-            return "0";
-        }
-
-        var highBytes = (uint)(value >> 32);
-        var lowBytes = (uint)value;
-
-        return ((highBytes != 0
-                    ? Convert.ToString(value: highBytes, toBase: 16)
-                    : "") +
-                Convert.ToString(value: lowBytes, toBase: 16)
-                       .PadLeft(totalWidth: highBytes == 0
-                            ? 0
-                            : 8, paddingChar: '0'))
-           .ToUpper();
-    }
-
-    private static string FormatBigIntegerAsBinary(this BigInteger value)
-    {
-        if (value == 0)
-        {
-            return "0";
-        }
-
-        var signed = value < 0;
-        if (signed)
-        {
-            value = -value;
-        }
-
-        var result = new StringBuilder();
-        while (value != 0)
-        {
-            result.Append(value: value % 2);
-            value /= 2;
-        }
-
-        var binaryString = String.Join(separator: "", values: result.ToString()
-           .Reverse());
-        return signed
-            ? $"-0b{binaryString}"
-            : $"0b{binaryString}";
-    }
-    private static string FormatBigIntegerAsHex(this BigInteger value)
-    {
-        if (value == 0)
-        {
-            return "0";
-        }
-
-        var signed = value < 0;
-        var absValue = BigInteger.Abs(value: value);
-        var hexString = absValue.ToString(format: "X"); // Built-in hex formatting
-
-        return signed
-            ? $"-0x{hexString}"
-            : $"0x{hexString}";
     }
 
     #if NET7_0_OR_GREATER
-    private static string FormatUInt128AsBinary(this UInt128 value)
+    private static byte[] GetBytesFromUInt128(UInt128 value)
     {
-        if (value == 0)
-        {
-            return "0";
-        }
+        var low = (ulong)value;
+        var high = (ulong)(value >> 64);
 
-        var highBytes = (ulong)(value >> 64);
-        var lowBytes = (ulong)value;
-
-        return ((highBytes != 0
-                    ? highBytes.FormatUlongAsBinary()
-                    : "") +
-                lowBytes.FormatUlongAsBinary()
-                        .PadLeft(totalWidth: highBytes == 0
-                             ? 0
-                             : 64, paddingChar: '0'))
-           .ToUpper();
-    }
-    private static string FormatUInt128AsHex(this UInt128 value)
-    {
-        if (value == 0)
-        {
-            return "0";
-        }
-
-        var highBytes = (ulong)(value >> 64);
-        var lowBytes = (ulong)value;
-
-        return ((highBytes != 0
-                    ? highBytes.FormatUlongAsHex()
-                    : "") +
-                lowBytes.FormatUlongAsHex()
-                        .PadLeft(totalWidth: highBytes == 0
-                             ? 0
-                             : 16, paddingChar: '0'))
-           .ToUpper();
-    }
-
-    private static byte[] GetBytesFromInt128(this Int128 value)
-    {
-        var ui128 = (UInt128)value;
-        var isNegative = value < 0;
-        if (isNegative)
-        {
-            ui128 = ~ui128 +
-                    1; // negating all the bits means subtracting ui128 from 0xFFFF_FFFF_FFFF_FFFF, hence the +1 offset afterward.
-        }
-
-        return ui128.GetBytesFromUInt128();
-    }
-    private static byte[] GetBytesFromUInt128(this UInt128 value)
-    {
-        var highBytes = (ulong)(value >> 64);
-        var lowBytes = (ulong)value;
         var bytes = new byte[16];
-        Array.Copy(sourceArray: BitConverter.GetBytes(value: lowBytes), sourceIndex: 0,
-            destinationArray: bytes, destinationIndex: 0, length: 8);
-        Array.Copy(sourceArray: BitConverter.GetBytes(value: highBytes), sourceIndex: 0,
-            destinationArray: bytes, destinationIndex: 8, length: 8);
+        var lowBytes = BitConverter.GetBytes(low);
+        var highBytes = BitConverter.GetBytes(high);
+
+        Array.Copy(lowBytes,  0, bytes, 0, 8);
+        Array.Copy(highBytes, 0, bytes, 8, 8);
         return bytes;
     }
-
     #endif
 
-    public static string FormatAsHexWithPadding(this object obj, string formatString)
+    /// <summary>
+    /// Converts a two's-complement little-endian byte array to its magnitude (absolute value) in-place.
+    /// </summary>
+    private static void ConvertTwosComplementToMagnitudeInPlace(byte[] bytes)
     {
-        if (!Int32.TryParse(s: formatString[1..], result: out var padding))
+        var i = 0;
+        while (i < bytes.Length)
         {
-            throw new ArgumentException(message: "Invalid format string");
+            bytes[i] = (byte)~bytes[i];
+            i += 1;
         }
 
-        return $"0x{obj.FormatAsHex()[2..].PadLeft(totalWidth: padding, paddingChar: '0')}";
+        // Add 1 with carry
+        var index = 0;
+        var carry = true;
+        while (index < bytes.Length && carry)
+        {
+            var sum = bytes[index] + 1;
+            bytes[index] = (byte)sum;
+            carry = sum == 0;
+            index += 1;
+        }
     }
 
-    public static string FormatAsBinaryWithPadding(this object obj, string formatString)
+    /// <summary>
+    /// Parses an optional width suffix from a format string like "X8" / "O12".
+    /// Returns 0 when no width is provided.
+    /// </summary>
+    private static int ParseOptionalWidth(string format)
     {
-        if (!Int32.TryParse(s: formatString[1..], result: out var padding))
+        if (String.IsNullOrEmpty(value: format) || format.Length < 2)
+        {
+            return 0;
+        }
+
+        var widthText = format[1..];
+        if (!Int32.TryParse(s: widthText, result: out var width))
         {
             throw new ArgumentException(message: "Invalid format string");
         }
 
-        return $"0b{obj.FormatAsBinary()[2..].PadLeft(totalWidth: padding, paddingChar: '0')}";
+        return width < 0
+            ? 0
+            : width;
+    }
+
+    private static int GetBit(this byte b, int bit)
+    {
+        return b >> bit & 1;
     }
 }

@@ -28,27 +28,9 @@ public class CollectionFormatterTreeTests
         Assert.Equal(expected: 3, actual: actualJson[propertyName: "count"]!.GetValue<int>());
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 3, actual: valueArray.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: valueArray[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: valueArray[index: 1]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
-            node2: valueArray[index: 2]));
+        Assert.Equal(expected: "1_i32", actual: valueArray[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32", actual: valueArray[index: 1]!.GetValue<string>());
+        Assert.Equal(expected: "3_i32", actual: valueArray[index: 2]!.GetValue<string>());
 
         // Test with a list of nullable strings
         actualJson = JsonNode.Parse(json: new List<string?> { "a", null, "c" }.ReprTree())!;
@@ -73,13 +55,7 @@ public class CollectionFormatterTreeTests
           ?.ToString());
 
         // Check second element: null
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "object", [propertyName: "kind"] = "class",
-                [propertyName: "value"] = null
-            },
-            node2: valueArray[index: 1]));
+        Assert.True(condition: JsonNode.DeepEquals(null, node2: valueArray[index: 1]));
 
         // Check third element: "c"
         var item3 = valueArray[index: 2]!.AsObject();
@@ -106,27 +82,9 @@ public class CollectionFormatterTreeTests
         Assert.Equal(expected: 3, actual: actualJson[propertyName: "count"]!.GetValue<int>());
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 3, actual: valueArray.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: valueArray[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: valueArray[index: 1]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
-            node2: valueArray[index: 2]));
+        Assert.Equal(expected: "1_i32", actual: valueArray[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32", actual: valueArray[index: 1]!.GetValue<string>());
+        Assert.Equal(expected: "3_i32", actual: valueArray[index: 2]!.GetValue<string>());
     }
 
     [Fact]
@@ -155,20 +113,8 @@ public class CollectionFormatterTreeTests
         Assert.Equal(expected: 2, actual: nested1[propertyName: "count"]!.GetValue<int>());
         var nested1Value = nested1[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 2, actual: nested1Value.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: nested1Value[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: nested1Value[index: 1]));
+        Assert.Equal(expected: "1_i32", actual: nested1Value[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32", actual: nested1Value[index: 1]!.GetValue<string>());
 
         // Check second nested list: { 3, 4, 5 }
         var nested2 = outerArray[index: 1]!.AsObject();
@@ -180,27 +126,9 @@ public class CollectionFormatterTreeTests
         Assert.Equal(expected: 3, actual: nested2[propertyName: "count"]!.GetValue<int>());
         var nested2Value = nested2[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 3, actual: nested2Value.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
-            node2: nested2Value[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "4"
-            },
-            node2: nested2Value[index: 1]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "5"
-            },
-            node2: nested2Value[index: 2]));
+        Assert.Equal(expected: "3_i32", actual: nested2Value[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "4_i32", actual: nested2Value[index: 1]!.GetValue<string>());
+        Assert.Equal(expected: "5_i32", actual: nested2Value[index: 2]!.GetValue<string>());
 
         // Check third nested list: { }
         var nested3 = outerArray[index: 2]!.AsObject();
@@ -237,27 +165,9 @@ public class CollectionFormatterTreeTests
             node2: actualJson[propertyName: "dimensions"]!));
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 3, actual: valueArray.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: valueArray[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: valueArray[index: 1]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
-            node2: valueArray[index: 2]));
+        Assert.Equal(expected: "1_i32", actual: valueArray[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32", actual: valueArray[index: 1]!.GetValue<string>());
+        Assert.Equal(expected: "3_i32", actual: valueArray[index: 2]!.GetValue<string>());
     }
 
     [Fact]
@@ -297,20 +207,10 @@ public class CollectionFormatterTreeTests
         var innerArray1Values = innerArray1Json[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 2, actual: innerArray1Values.Count);
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int",
-                [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1" // String value due to repr config
-            },
+            node1: "1_i32",
             node2: innerArray1Values[index: 0]));
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int",
-                [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2" // String value due to repr config
-            },
+            node1: "2_i32",
             node2: innerArray1Values[index: 1]));
 
         // Second inner array: int[] { 3 }
@@ -328,12 +228,7 @@ public class CollectionFormatterTreeTests
         var innerArray2Values = innerArray2Json[propertyName: "value"]!.AsArray();
         Assert.Single(collection: innerArray2Values);
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int",
-                [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3" // String value due to repr config
-            },
+            node1: "3_i32",
             node2: innerArray2Values[index: 0]));
     }
 
@@ -357,37 +252,13 @@ public class CollectionFormatterTreeTests
 
         var innerArray1 = outerArray[index: 0]!.AsArray();
         Assert.Equal(expected: 2, actual: innerArray1.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
-            node2: innerArray1[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
-            node2: innerArray1[index: 1]));
+        Assert.Equal(expected: "1_i32", actual: innerArray1[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "2_i32", actual: innerArray1[index: 1]!.GetValue<string>());
 
         var innerArray2 = outerArray[index: 1]!.AsArray();
         Assert.Equal(expected: 2, actual: innerArray2.Count);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
-            node2: innerArray2[index: 0]));
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "4"
-            },
-            node2: innerArray2[index: 1]));
+        Assert.Equal(expected: "3_i32", actual: innerArray2[index: 0]!.GetValue<string>());
+        Assert.Equal(expected: "4_i32", actual: innerArray2[index: 1]!.GetValue<string>());
     }
 
     [Fact]
@@ -404,12 +275,10 @@ public class CollectionFormatterTreeTests
         Assert.Equal(expected: 2, actual: actualJson[propertyName: "count"]!.GetValue<int>());
 
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
-        var one = JsonNode.Parse(json: 1.ReprTree())!;
-        var two = JsonNode.Parse(json: 2.ReprTree())!;
         Assert.Contains(collection: valueArray,
-            filter: item => JsonNode.DeepEquals(node1: item, node2: one));
+            filter: item => JsonNode.DeepEquals(node1: item, node2: "1_i32"));
         Assert.Contains(collection: valueArray,
-            filter: item => JsonNode.DeepEquals(node1: item, node2: two));
+            filter: item => JsonNode.DeepEquals(node1: item, node2: "2_i32"));
     }
 
     [Fact]
@@ -428,25 +297,13 @@ public class CollectionFormatterTreeTests
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 3, actual: valueArray.Count);
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
+            node1: "1_i32",
             node2: valueArray[index: 0]));
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
+            node1: "2_i32",
             node2: valueArray[index: 1]));
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "3"
-            },
+            node1: "3_i32",
             node2: valueArray[index: 2]));
     }
 
@@ -507,18 +364,10 @@ public class CollectionFormatterTreeTests
         var valueArray = actualJson[propertyName: "value"]!.AsArray();
         Assert.Equal(expected: 2, actual: valueArray.Count);
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "2"
-            },
+            node1: "2_i32",
             node2: valueArray[index: 0]));
         Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "int", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "1"
-            },
+            node1: "1_i32",
             node2: valueArray[index: 1]));
     }
 
@@ -549,16 +398,16 @@ public class CollectionFormatterTreeTests
         Assert.Contains(collection: valueArray, filter: item =>
             item![propertyName: "element"]![propertyName: "value"]!.GetValue<string>() ==
             "first" &&
-            item[propertyName: "priority"]![propertyName: "value"]!.GetValue<string>() == "1");
+            item[propertyName: "priority"]!.GetValue<string>() == "1_i32");
 
         Assert.Contains(collection: valueArray, filter: item =>
             item![propertyName: "element"]![propertyName: "value"]!.GetValue<string>() ==
             "second" &&
-            item[propertyName: "priority"]![propertyName: "value"]!.GetValue<string>() == "2");
+            item[propertyName: "priority"]!.GetValue<string>() == "2_i32");
 
         Assert.Contains(collection: valueArray, filter: item =>
             item![propertyName: "element"]![propertyName: "value"]!.GetValue<string>() ==
             "third" &&
-            item[propertyName: "priority"]![propertyName: "value"]!.GetValue<string>() == "3");
+            item[propertyName: "priority"]!.GetValue<string>() == "3_i32");
     }
 }

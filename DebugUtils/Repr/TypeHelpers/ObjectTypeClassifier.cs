@@ -41,7 +41,7 @@ internal static class ObjectTypeClassifier
     {
         // Check the generic parameter first
         var compileType = typeof(T);
-        // For cases where T is object but obj is actually nullable
+        // For cases where T is an object but obj is actually nullable
         var runtimeType = obj?.GetType();
         return compileType.IsNullableStructType() ||
                (runtimeType?.IsNullableStructType() ?? false);

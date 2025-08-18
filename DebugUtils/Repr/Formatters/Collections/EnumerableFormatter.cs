@@ -36,8 +36,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         var hitLimit = false;
         foreach (var item in list)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -51,7 +51,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         {
             if (itemCount is not null)
             {
-                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
                 if (remainingCount > 0)
                 {
                     items.Add(item: $"... ({remainingCount} more items)");
@@ -111,8 +111,8 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
 
         foreach (var item in list)
         {
-            if (context.Config.MaxElementsPerCollection >= 0 &&
-                i >= context.Config.MaxElementsPerCollection)
+            if (context.Config.MaxItemsPerContainer >= 0 &&
+                i >= context.Config.MaxItemsPerContainer)
             {
                 hitLimit = true;
                 break;
@@ -126,7 +126,7 @@ internal class EnumerableFormatter : IReprFormatter, IReprTreeFormatter
         {
             if (itemCount is not null)
             {
-                var remainingCount = itemCount - context.Config.MaxElementsPerCollection;
+                var remainingCount = itemCount - context.Config.MaxItemsPerContainer;
                 if (remainingCount > 0)
                 {
                     entries.Add(value: $"... ({remainingCount} more items)");

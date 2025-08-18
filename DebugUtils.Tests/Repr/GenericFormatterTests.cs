@@ -13,14 +13,14 @@ public class GenericFormatterTests
     public void TestCustomStructRepr_NoToString()
     {
         var point = new Point { X = 10, Y = 20 };
-        Assert.Equal(expected: "Point(X: int(10), Y: int(20))", actual: point.Repr());
+        Assert.Equal(expected: "Point(X: 10_i32, Y: 20_i32)", actual: point.Repr());
     }
 
     [Fact]
     public void TestCustomStructRepr_WithToString()
     {
         var custom = new CustomStruct { Name = "test", Value = 42 };
-        Assert.Equal(expected: "CustomStruct(Name: \"test\", Value: int(42))",
+        Assert.Equal(expected: "CustomStruct(Name: \"test\", Value: 42_i32)",
             actual: custom.Repr());
     }
 
@@ -28,14 +28,14 @@ public class GenericFormatterTests
     public void TestClassRepr_WithToString()
     {
         var person = new Person(name: "Alice", age: 30);
-        Assert.Equal(expected: "Person(Age: int(30), Name: \"Alice\")", actual: person.Repr());
+        Assert.Equal(expected: "Person(Age: 30_i32, Name: \"Alice\")", actual: person.Repr());
     }
 
     [Fact]
     public void TestClassRepr_NoToString()
     {
         var noToString = new NoToStringClass(data: "data", number: 123);
-        Assert.Equal(expected: "NoToStringClass(Data: \"data\", Number: int(123))",
+        Assert.Equal(expected: "NoToStringClass(Data: \"data\", Number: 123_i32)",
             actual: noToString.Repr());
     }
 
@@ -45,67 +45,17 @@ public class GenericFormatterTests
         var settings = new TestSettings(EquipmentName: "Printer",
             EquipmentSettings: new Dictionary<string, double>
                 { [key: "Temp (C)"] = 200.0, [key: "PrintSpeed (mm/s)"] = 30.0 });
-        var actualJson = JsonNode.Parse(json: settings.ReprTree())!;
-
-        Assert.Equal(expected: "TestSettings", actual: actualJson[propertyName: "type"]
-          ?.ToString());
-        Assert.Equal(expected: "record class", actual: actualJson[propertyName: "kind"]
-          ?.ToString());
-        Assert.NotNull(@object: actualJson[propertyName: "hashCode"]);
-
-        var equipmentName = actualJson[propertyName: "EquipmentName"]!.AsObject();
-        Assert.Equal(expected: "string", actual: equipmentName[propertyName: "type"]
-          ?.ToString());
-        Assert.Equal(expected: "class", actual: equipmentName[propertyName: "kind"]
-          ?.ToString());
-        Assert.NotNull(@object: equipmentName[propertyName: "hashCode"]);
-        Assert.Equal(expected: 7, actual: equipmentName[propertyName: "length"]!.GetValue<int>());
-        Assert.Equal(expected: "Printer", actual: equipmentName[propertyName: "value"]
-          ?.ToString());
-
-        var equipmentSettings = actualJson[propertyName: "EquipmentSettings"]!.AsObject();
-        Assert.Equal(expected: "Dictionary", actual: equipmentSettings[propertyName: "type"]
-          ?.ToString());
-        Assert.Equal(expected: "class", actual: equipmentSettings[propertyName: "kind"]
-          ?.ToString());
-        Assert.NotNull(@object: equipmentSettings[propertyName: "hashCode"]);
-        Assert.Equal(expected: 2,
-            actual: equipmentSettings[propertyName: "count"]!.GetValue<int>());
-
-        var settingsArray = equipmentSettings[propertyName: "value"]!.AsArray();
-        Assert.Equal(expected: 2, actual: settingsArray.Count);
-
-        // Since dictionary order isn't guaranteed, we check for presence of keys
-        var tempSetting =
-            settingsArray.FirstOrDefault(predicate: s =>
-                s![propertyName: "key"]![propertyName: "value"]!.ToString() == "Temp (C)");
-        Assert.NotNull(@object: tempSetting);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "200"
-            },
-            node2: tempSetting[propertyName: "value"]));
-
-        var speedSetting =
-            settingsArray.FirstOrDefault(predicate: s =>
-                s![propertyName: "key"]![propertyName: "value"]!.ToString() ==
-                "PrintSpeed (mm/s)");
-        Assert.NotNull(@object: speedSetting);
-        Assert.True(condition: JsonNode.DeepEquals(
-            node1: new JsonObject
-            {
-                [propertyName: "type"] = "double", [propertyName: "kind"] = "struct",
-                [propertyName: "value"] = "30"
-            },
-            node2: speedSetting[propertyName: "value"]));
+        var result = settings.Repr();
+        Assert.Equal(
+            expected:
+            "TestSettings({ EquipmentName: \"Printer\", EquipmentSettings: {\"Temp (C)\": 200_f64, \"PrintSpeed (mm/s)\": 30_f64} })",
+            actual: result);
     }
 
     [Fact]
     public void TestEnumRepr()
     {
-        Assert.Equal(expected: "Colors.GREEN (int(1))", actual: Colors.GREEN.Repr());
+        Assert.Equal(expected: "Colors.GREEN (1_i32)", actual: Colors.GREEN.Repr());
     }
 
     [Fact]

@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace DebugUtils.Repr.Extensions;
 
-internal static class DecimalExactExtensions
+internal static class DecimalFormattingExtensions
 {
     // PERFORMANCE CONSTRAINT: Using base-10^9 instead of base-10^18 because:
     // 1. Minimum supported .NET version is 2.1 (Unity) which lacks UInt128
@@ -107,47 +107,22 @@ internal static class DecimalExactExtensions
             isNegative: isNegative);
     }
 
-    public static string FormatAsExact_Old(this decimal value)
+    public static string FormatAsHexPower(this decimal value)
     {
         // Get the internal bits
         var bits = Decimal.GetBits(d: value);
-
         // Extract components
         var lo = (uint)bits[0]; // Low 32 bits of 96-bit integer
         var mid = (uint)bits[1]; // Middle 32 bits  
         var hi = (uint)bits[2]; // High 32 bits
         var flags = bits[3]; // Scale and sign
-
-        var isNegative = (flags & 0x80000000) != 0;
-        var scale = flags >> 16 & 0xFF; // How many digits after decimal
-
-        // Reconstruct the 96-bit integer value
-        var low64 = (ulong)mid << 32 | lo;
-        var integerValue = (BigInteger)hi << 64 | low64;
-
+        var scale = (byte)(flags >> 16); // How many digits after decimal
+        var isNegative = (flags & 0x80000000) != 0 && !(hi == 0 && mid == 0 && lo == 0);
         var sign = isNegative
             ? "-"
             : "";
-
-        if (value == 0)
-        {
-            return "0.0E+000";
-        }
-
-        var valueStr = integerValue.ToString();
-        var realPowerOf10 = valueStr.Length - (scale + 1);
-        var integerPart = valueStr.Substring(startIndex: 0, length: 1);
-        var fractionalPart = valueStr.Substring(startIndex: 1)
-                                     .TrimEnd(trimChar: '0')
-                                     .PadLeft(totalWidth: 1, paddingChar: '0');
-        var expSign = realPowerOf10 >= 0
-            ? "+"
-            : "-";
-        if (realPowerOf10 < 0)
-        {
-            realPowerOf10 = -realPowerOf10;
-        }
-
-        return $"{sign}{integerPart}.{fractionalPart}E{expSign}{realPowerOf10:D3}";
+        return scale == 0
+            ? $"{sign}0x{hi:X8}_{mid:X8}_{lo:X8}" // All 24 hex digits
+            : $"{sign}0x{hi:X8}_{mid:X8}_{lo:X8}p10-{scale:D3}"; // All 24 hex digits + scale
     }
 }

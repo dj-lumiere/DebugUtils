@@ -85,7 +85,7 @@ internal static class MethodModifiersExtensions
     }
     public static bool IsAsyncMethod(this MethodInfo method)
     {
-        // Check if method is marked with AsyncStateMachine attribute
+        // Check if a method is marked with an AsyncStateMachine attribute
         return method.IsDefined(
             attributeType: typeof(AsyncStateMachineAttribute));
     }
