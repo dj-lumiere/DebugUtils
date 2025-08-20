@@ -25,8 +25,8 @@ public enum TypeReprMode
     /// where understanding exact types is crucial. Can produce verbose output.
     /// </remarks>
     /// <example>
-    /// "hello" → string("hello")
-    /// [1, 2, 3] → List([1_i32, 2_i32, 3_i32])
+    /// "hello" -> string("hello")
+    /// [1, 2, 3] -> List([1_i32, 2_i32, 3_i32])
     /// </example>
     AlwaysShow,
 
@@ -44,9 +44,9 @@ public enum TypeReprMode
     /// <para>Still shows type information for complex, ambiguous, or less common types.</para>
     /// </remarks>
     /// <example>
-    /// "hello" → "hello"  (strings are self-explaining)
-    /// [1, 2, 3] → [1_i32, 2_i32, 3_i32]  (Lists are self-explaining)
-    /// myCustomObject → MyCustomType(field1: value1)  (custom type shown)
+    /// "hello" -> "hello"  (strings are self-explaining)
+    /// [1, 2, 3] -> [1_i32, 2_i32, 3_i32]  (Lists are self-explaining)
+    /// myCustomObject -> MyCustomType(field1: value1)  (custom type shown)
     /// </example>
     HideObvious,
 
@@ -60,9 +60,9 @@ public enum TypeReprMode
     /// that expect minimal formatting.
     /// </remarks>
     /// <example>
-    /// "hello" → "hello"
-    /// [1, 2, 3] → [1, 2, 3]
-    /// myCustomObject → field1: value1, field2: value2
+    /// "hello" -> "hello"
+    /// [1, 2, 3] -> [1, 2, 3]
+    /// myCustomObject -> field1: value1, field2: value2
     /// </example>
     AlwaysHide
 }
@@ -288,7 +288,7 @@ public enum MemberReprMode
 /// );
 /// </code>
 /// </example>
-public record ReprConfig(
+public sealed record ReprConfig(
     string FloatFormatString = "EX",
     string IntFormatString = "D",
     TypeReprMode TypeMode = TypeReprMode.HideObvious,
@@ -300,5 +300,10 @@ public record ReprConfig(
     int MaxStringLength = 120,
     int MaxMemberTimeMs = 1,
     bool EnablePrettyPrintForReprTree = false,
-    CultureInfo? Culture = null
-);
+    CultureInfo? Culture = null)
+{
+    public static ReprConfigBuilder Configure()
+    {
+        return new ReprConfigBuilder();
+    }
+}

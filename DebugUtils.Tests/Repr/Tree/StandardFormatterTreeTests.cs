@@ -222,7 +222,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Negative()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         var timeSpan = TimeSpan.FromMinutes(minutes: -30);
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -244,7 +244,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Zero()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         var timeSpan = TimeSpan.Zero;
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -266,7 +266,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestTimeSpanRepr_Positive()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         var timeSpan = TimeSpan.FromMinutes(minutes: 30);
         var actualJson = JsonNode.Parse(json: timeSpan.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -288,9 +288,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestDateTimeOffsetRepr()
     {
-        var dateTimeOffset = new DateTimeOffset(dateTime: new DateTime(
-            date: new DateOnly(year: 2025, month: 1, day: 1),
-            time: new TimeOnly(hour: 0, minute: 0, second: 0), kind: DateTimeKind.Utc));
+        var dateTimeOffset = new DateTimeOffset(dateTime: new DateTime(2025, 1, 1, 0, 0, 0, kind: DateTimeKind.Utc));
         var actualJson = JsonNode.Parse(json: dateTimeOffset.ReprTree());
         var expectedJson = new JsonObject
         {
@@ -325,9 +323,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestDateTimeOffsetRepr_WithOffset()
     {
-        var dateTimeOffset =
-            new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
-                offset: TimeSpan.FromHours(hours: 1));
+        var dateTimeOffset = new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1), offset: TimeSpan.FromHours(hours: 1));
         var actualJson = JsonNode.Parse(json: dateTimeOffset.ReprTree());
         var expectedJson = new JsonObject
         {
@@ -362,9 +358,7 @@ public class StandardFormatterTreeTests
     [Fact]
     public void TestDateTimeOffsetRepr_WithNegativeOffset()
     {
-        var dateTimeOffset =
-            new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1),
-                offset: TimeSpan.FromHours(hours: -1));
+        var dateTimeOffset = new DateTimeOffset(dateTime: new DateTime(year: 2025, month: 1, day: 1), offset: TimeSpan.FromHours(hours: -1));
         var actualJson = JsonNode.Parse(json: dateTimeOffset.ReprTree());
         var expectedJson = new JsonObject
         {

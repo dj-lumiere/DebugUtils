@@ -71,7 +71,7 @@ public class ConfigurationTreeTests
     public void TestReprConfig_MaxDepth_ReprTree()
     {
         var nestedList = new List<object> { 1, new List<object> { 2, new List<object> { 3 } } };
-        var config = new ReprConfig(MaxDepth: 1);
+        var config = ReprConfig.Configure().MaxDepth(1).Build();
         var actualJson = JsonNode.Parse(json: nestedList.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -91,7 +91,7 @@ public class ConfigurationTreeTests
             actual: actualJson[propertyName: "value"]![index: 1]![propertyName: "depth"]!
                .GetValue<int>());
 
-        config = new ReprConfig(MaxDepth: 0);
+        config = ReprConfig.Configure().MaxDepth(0).Build();
         actualJson = JsonNode.Parse(json: nestedList.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -106,7 +106,7 @@ public class ConfigurationTreeTests
     public void TestReprConfig_MaxCollectionItems_ReprTree()
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
-        var config = new ReprConfig(MaxItemsPerContainer: 3);
+        var config = ReprConfig.Configure().MaxItems(3).Build();
         var actualJson = JsonNode.Parse(json: list.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -123,7 +123,7 @@ public class ConfigurationTreeTests
             actual: actualJson[propertyName: "value"]![index: 3]
               ?.ToString());
 
-        config = new ReprConfig(MaxItemsPerContainer: 0);
+        config = ReprConfig.Configure().MaxItems(0).Build();
         actualJson = JsonNode.Parse(json: list.ReprTree(config: config))!;
         Assert.Equal(expected: "List", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -136,7 +136,7 @@ public class ConfigurationTreeTests
     public void TestReprConfig_MaxStringLength_ReprTree()
     {
         var longString = "This is a very long string that should be truncated.";
-        var config = new ReprConfig(MaxStringLength: 10);
+        var config = ReprConfig.Configure().MaxStringLength(10).Build();
         var actualJson = JsonNode.Parse(json: longString.ReprTree(config: config))!;
         Assert.Equal(expected: "string", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -144,7 +144,7 @@ public class ConfigurationTreeTests
             actual: actualJson[propertyName: "value"]
               ?.ToString());
 
-        config = new ReprConfig(MaxStringLength: 0);
+        config = ReprConfig.Configure().MaxStringLength(0).Build();
         actualJson = JsonNode.Parse(json: longString.ReprTree(config: config))!;
         Assert.Equal(expected: "string", actual: actualJson[propertyName: "type"]
           ?.ToString());
@@ -157,7 +157,7 @@ public class ConfigurationTreeTests
     {
         var classified =
             new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
-        var config = new ReprConfig(ViewMode: MemberReprMode.PublicFieldAutoProperty);
+        var config = ReprConfig.Configure().ViewMode(MemberReprMode.PublicFieldAutoProperty).Build();
         var actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
         Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]
@@ -174,7 +174,7 @@ public class ConfigurationTreeTests
           ?.ToString());
 
 
-        config = new ReprConfig(ViewMode: MemberReprMode.AllFieldAutoProperty);
+        config = ReprConfig.Configure().ViewMode(MemberReprMode.AllFieldAutoProperty).Build();
         actualJson = JsonNode.Parse(json: classified.ReprTree(config: config));
         Assert.NotNull(@object: actualJson);
         Assert.Equal(expected: "ClassifiedData", actual: actualJson[propertyName: "type"]

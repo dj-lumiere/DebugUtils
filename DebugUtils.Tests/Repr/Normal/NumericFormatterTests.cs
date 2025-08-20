@@ -13,7 +13,7 @@ public class NumericFormatterTests
     [InlineData("X", "0x2A_u8")]
     public void TestByteRepr(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: ((byte)42).Repr(config: config));
     }
 
@@ -23,14 +23,14 @@ public class NumericFormatterTests
     [InlineData("X", "-0x2A_i32")]
     public void TestIntRepr(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: (-42).Repr(config: config));
     }
 
     [Fact]
     public void TestBigIntRepr()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "-42_n",
             actual: new BigInteger(value: -42).Repr(config: config));
     }
@@ -39,7 +39,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatRepr_Exact()
     {
-        var config = new ReprConfig(FloatFormatString: "EX");
+        var config = ReprConfig.Configure().FloatFormat("EX").Build();
         Assert.Equal(expected: "3.1415927410125732421875E+000_f32", actual: Single
            .Parse(s: "3.1415926535")
            .Repr(config: config));
@@ -48,35 +48,21 @@ public class NumericFormatterTests
     [Fact]
     public void TestDoubleRepr_Round()
     {
-        var config = new ReprConfig(FloatFormatString: "F5");
+        var config = ReprConfig.Configure().FloatFormat("F5").Build();
         Assert.Equal(expected: "3.14159_f64", actual: Double.Parse(s: "3.1415926535")
                                                             .Repr(config: config));
     }
 
     [Fact]
-    public void TestHalfRepr_Scientific()
-    {
-        var config = new ReprConfig(FloatFormatString: "E5");
-        Assert.Equal(expected: "3.14062E+000_f16", actual: Half.Parse(s: "3.14159")
-                                                               .Repr(config: config));
-    }
-
-    [Fact]
     public void TestDecimalRepr_HexPower()
     {
-        var config = new ReprConfig(FloatFormatString: "HP");
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
         Assert.Equal(expected: "0x6582A536_0B143885_41B65F29p10-028_m",
             actual: 3.1415926535897932384626433832795m.Repr(
                 config: config));
     }
 
-    [Fact]
-    public void TestHalfRepr_HexPower()
-    {
-        var config = new ReprConfig(FloatFormatString: "HP");
-        Assert.Equal(expected: "0x1.920p+001_f16", actual: Half.Parse(s: "3.14159")
-                                                               .Repr(config: config));
-    }
+
 
     [Fact]
     public void TestFloatRepr_SpecialValues()
@@ -96,6 +82,20 @@ public class NumericFormatterTests
 
     #if NET5_0_OR_GREATER
     [Fact]
+    public void TestHalfRepr_Scientific()
+    {
+        var config = ReprConfig.Configure().FloatFormat("E5").Build();
+        Assert.Equal(expected: "3.14062E+000_f16", actual: Half.Parse(s: "3.14159")
+                                                               .Repr(config: config));
+    }
+    [Fact]
+    public void TestHalfRepr_HexPower()
+    {
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
+        Assert.Equal(expected: "0x1.920p+001_f16", actual: Half.Parse(s: "3.14159")
+                                                               .Repr(config: config));
+    }
+    [Fact]
     public void TestHalfRepr_SpecialValues()
     {
         Assert.Equal(expected: "QuietNaN(0x200)_f16", actual: Half.NaN.Repr());
@@ -113,7 +113,7 @@ public class NumericFormatterTests
     public void TestInt128Repr(string format, string expected)
     {
         var i128 = Int128.MinValue;
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected,
             actual: i128.Repr(config: config));
     }
@@ -126,7 +126,7 @@ public class NumericFormatterTests
     public void TestInt128Repr2(string format, string expected)
     {
         var i128 = Int128.MaxValue;
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected,
             actual: i128.Repr(config: config));
     }
@@ -145,7 +145,7 @@ public class NumericFormatterTests
     [InlineData("b", "0b101010")]
     public void TestIntFormatString_PositiveValues(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected + "_i32", actual: 42.Repr(config: config));
     }
 
@@ -157,7 +157,7 @@ public class NumericFormatterTests
     [InlineData("b", "-0b101010")]
     public void TestIntFormatString_NegativeValues(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected + "_i32", actual: (-42).Repr(config: config));
     }
 
@@ -167,7 +167,7 @@ public class NumericFormatterTests
     [InlineData("B", "0b11111111_u8")]
     public void TestIntFormatString_ByteValues(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: ((byte)255).Repr(config: config));
     }
 
@@ -176,7 +176,7 @@ public class NumericFormatterTests
     [InlineData("X", "0x7FFFFFFFFFFFFFFF_i64")]
     public void TestIntFormatString_LongValues(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: Int64.MaxValue.Repr(config: config));
     }
 
@@ -184,7 +184,7 @@ public class NumericFormatterTests
     public void TestIntFormatString_DefaultBehavior()
     {
         // Default format string should use decimal
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "42_i32", actual: 42.Repr(config: config));
     }
 
@@ -199,7 +199,7 @@ public class NumericFormatterTests
     [InlineData("N2", "3.14_f32")]
     public void TestFloatFormatString_StandardFormats(string format, string expected)
     {
-        var config = new ReprConfig(FloatFormatString: format);
+        var config = ReprConfig.Configure().FloatFormat(format).Build();
         var actual = 3.14159f.Repr(config: config);
         Assert.Equal(expected: expected, actual: actual);
     }
@@ -207,7 +207,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatFormatString_ExactMode()
     {
-        var config = new ReprConfig(FloatFormatString: "EX");
+        var config = ReprConfig.Configure().FloatFormat("EX").Build();
         var result = 3.14159f.Repr(config: config);
         Assert.Equal(expected: "3.141590118408203125E+000_f32", actual: result);
     }
@@ -215,7 +215,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatFormatString_HexPower()
     {
-        var config = new ReprConfig(FloatFormatString: "HP");
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
         var result = 3.14159f.Repr(config: config);
         Assert.Equal(expected: "0x1.921FA0p+001_f32", actual: result);
     }
@@ -228,7 +228,7 @@ public class NumericFormatterTests
         "3.14158999999999988261834005243144929409027099609375E+000_f64")] // EX should produce exact representation
     public void TestFloatFormatString_DoubleValues(string format, string exact)
     {
-        var config = new ReprConfig(FloatFormatString: format);
+        var config = ReprConfig.Configure().FloatFormat(format).Build();
         var result = 3.14159.Repr(config: config);
         Assert.Equal(expected: exact, actual: result);
     }
@@ -236,7 +236,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatFormatString_SpecialValues()
     {
-        var config = new ReprConfig(FloatFormatString: "F2");
+        var config = ReprConfig.Configure().FloatFormat("F2").Build();
         Assert.Equal(expected: "QuietNaN(0x400000)_f32", actual: Single.NaN.Repr(config: config));
         Assert.Equal(expected: "Infinity_f32",
             actual: Single.PositiveInfinity.Repr(config: config));
@@ -248,7 +248,7 @@ public class NumericFormatterTests
     public void TestFloatFormatString_FallbackToString()
     {
         // Empty format string should fall back to toString behavior
-        var config = new ReprConfig(FloatFormatString: "");
+        var config = ReprConfig.Configure().FloatFormat("").Build();
         var result = 3.14159.Repr(config: config);
         Assert.Equal(expected: "3.14159_f64", actual: result);
     }
@@ -259,7 +259,7 @@ public class NumericFormatterTests
     [InlineData("HP", "0x1.920p+001_f16")] // HP should produce hex power representation
     public void TestFloatFormatString_HalfValues(string format, string expectedOrSpecial)
     {
-        var config = new ReprConfig(FloatFormatString: format);
+        var config = ReprConfig.Configure().FloatFormat(format).Build();
         var result = ((Half)3.14159f).Repr(config: config);
         Assert.Equal(expected: expectedOrSpecial, actual: result);
     }
@@ -274,7 +274,7 @@ public class NumericFormatterTests
     [InlineData("Q", "0q222_i32")] // Quaternary with 0q prefix
     public void TestIntFormatString_NewCustomFormats(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: 42.Repr(config: config));
     }
 
@@ -283,14 +283,14 @@ public class NumericFormatterTests
     [InlineData("Q", "0q3333_u8")] // Quaternary 255
     public void TestIntFormatString_NewCustomFormats_Byte(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         Assert.Equal(expected: expected, actual: ((byte)255).Repr(config: config));
     }
 
     [Fact]
     public void TestFloatFormatString_HexPower_Detailed()
     {
-        var config = new ReprConfig(FloatFormatString: "HP");
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
 
         // Test positive number - should use IEEE 754 hex notation
         var result = 3.14159f.Repr(config: config);
@@ -305,7 +305,7 @@ public class NumericFormatterTests
     [Fact]
     public void TestFloatFormatString_HexPower_SpecialValues()
     {
-        var config = new ReprConfig(FloatFormatString: "HP");
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
 
         // Special values should still work with HP format
         Assert.Equal(expected: "QuietNaN(0x400000)_f32", actual: Single.NaN.Repr(config: config));
@@ -322,14 +322,14 @@ public class NumericFormatterTests
     [Fact]
     public void TestIntFormatString_WithPrefixes()
     {
-        var config = new ReprConfig(IntFormatString: "X4");
+        var config = ReprConfig.Configure().IntFormat("X4").Build();
         Assert.Equal(expected: "0x002A_i32", actual: 42.Repr(config: config));
     }
 
     [Fact]
     public void TestIntFormatString_BinaryStartsWith()
     {
-        var config = new ReprConfig(IntFormatString: "B8");
+        var config = ReprConfig.Configure().IntFormat("B8").Build();
         var result = 42.Repr(config: config);
         Assert.Equal(expected: "0b00101010_i32",
             actual: result); // Should use C# binary formatter with prefix.
@@ -342,7 +342,7 @@ public class NumericFormatterTests
     [InlineData("b8", "0b00101010_i32")]
     public void TestIntFormatString_StartsWithHandling(string format, string expected)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         var result = 42.Repr(config: config);
         Assert.Equal(expected: expected,
             actual: result); // Should use C# binary formatter with prefix.
@@ -355,10 +355,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_InvariantCulture()
     {
-        var config = new ReprConfig(
-            FloatFormatString: "F2",
-            Culture: CultureInfo.InvariantCulture
-        );
+        var config = ReprConfig.Configure()
+            .FloatFormat("F2")
+            .Culture(CultureInfo.InvariantCulture)
+            .Build();
 
         // Should use period as decimal separator regardless of system culture
         Assert.Equal(expected: "3.14_f32", actual: 3.14159f.Repr(config: config));
@@ -367,10 +367,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_GermanCulture()
     {
-        var config = new ReprConfig(
-            FloatFormatString: "F2",
-            Culture: new CultureInfo(name: "de-DE")
-        );
+        var config = ReprConfig.Configure()
+            .FloatFormat("F2")
+            .Culture(new CultureInfo(name: "de-DE"))
+            .Build();
 
         // German culture uses comma as decimal separator
         Assert.Equal(expected: "3,14_f32", actual: 3.14159f.Repr(config: config));
@@ -379,10 +379,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_NumberFormatting()
     {
-        var config = new ReprConfig(
-            FloatFormatString: "N2",
-            Culture: CultureInfo.InvariantCulture
-        );
+        var config = ReprConfig.Configure()
+            .FloatFormat("N2")
+            .Culture(CultureInfo.InvariantCulture)
+            .Build();
 
         // Number format with thousand separators
         Assert.Equal(expected: "1,234.57_f32", actual: 1234.5678f.Repr(config: config));
@@ -391,10 +391,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_DefaultBehavior()
     {
-        var config = new ReprConfig(
-            FloatFormatString: "F2",
-            Culture: null // Should use current culture
-        );
+        var config = ReprConfig.Configure()
+            .FloatFormat("F2")
+            .Culture(null) // Should use current culture
+            .Build();
 
         // Should not throw and produce some valid output
         var result = 3.14159f.Repr(config: config);
@@ -405,10 +405,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_CustomFormatsIgnoreCulture()
     {
-        var config = new ReprConfig(
-            FloatFormatString: "EX",
-            Culture: new CultureInfo(name: "de-DE")
-        );
+        var config = ReprConfig.Configure()
+            .FloatFormat("EX")
+            .Culture(new CultureInfo(name: "de-DE"))
+            .Build();
 
         // EX format should ignore culture and always use invariant formatting
         var result = 3.14159f.Repr(config: config);
@@ -420,10 +420,10 @@ public class NumericFormatterTests
     [Fact]
     public void TestCultureInfo_IntegerFormattingWithCulture()
     {
-        var config = new ReprConfig(
-            IntFormatString: "N0",
-            Culture: CultureInfo.InvariantCulture
-        );
+        var config = ReprConfig.Configure()
+            .IntFormat("N0")
+            .Culture(CultureInfo.InvariantCulture)
+            .Build();
 
         // Integer with thousand separators
         Assert.Equal(expected: "1,234_i32", actual: 1234.Repr(config: config));
@@ -653,15 +653,15 @@ public class NumericFormatterTests
     {
         // Test positive values
         Assert.Equal(expected: "0b101010_i32",
-            actual: 42.Repr(config: new ReprConfig(IntFormatString: "B")));
+            actual: 42.Repr(config: ReprConfig.Configure().IntFormat("B").Build()));
         Assert.Equal(expected: "0b11111111_u8",
-            actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "B")));
+            actual: ((byte)255).Repr(config: ReprConfig.Configure().IntFormat("B").Build()));
         Assert.Equal(expected: "0b0_i32",
-            actual: 0.Repr(config: new ReprConfig(IntFormatString: "B")));
+            actual: 0.Repr(config: ReprConfig.Configure().IntFormat("B").Build()));
 
         // Test negative values
         Assert.Equal(expected: "-0b101010_i32",
-            actual: (-42).Repr(config: new ReprConfig(IntFormatString: "B")));
+            actual: (-42).Repr(config: ReprConfig.Configure().IntFormat("B").Build()));
     }
 
     [Fact]
@@ -669,15 +669,15 @@ public class NumericFormatterTests
     {
         // Test positive values
         Assert.Equal(expected: "0o52_i32",
-            actual: 42.Repr(config: new ReprConfig(IntFormatString: "O")));
+            actual: 42.Repr(config: ReprConfig.Configure().IntFormat("O").Build()));
         Assert.Equal(expected: "0o377_u8",
-            actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "O")));
+            actual: ((byte)255).Repr(config: ReprConfig.Configure().IntFormat("O").Build()));
         Assert.Equal(expected: "0o0_i32",
-            actual: 0.Repr(config: new ReprConfig(IntFormatString: "O")));
+            actual: 0.Repr(config: ReprConfig.Configure().IntFormat("O").Build()));
 
         // Test negative values
         Assert.Equal(expected: "-0o52_i32",
-            actual: (-42).Repr(config: new ReprConfig(IntFormatString: "O")));
+            actual: (-42).Repr(config: ReprConfig.Configure().IntFormat("O").Build()));
     }
 
     [Fact]
@@ -685,15 +685,15 @@ public class NumericFormatterTests
     {
         // Test positive values
         Assert.Equal(expected: "0q222_i32",
-            actual: 42.Repr(config: new ReprConfig(IntFormatString: "Q")));
+            actual: 42.Repr(config: ReprConfig.Configure().IntFormat("Q").Build()));
         Assert.Equal(expected: "0q3333_u8",
-            actual: ((byte)255).Repr(config: new ReprConfig(IntFormatString: "Q")));
+            actual: ((byte)255).Repr(config: ReprConfig.Configure().IntFormat("Q").Build()));
         Assert.Equal(expected: "0q0_i32",
-            actual: 0.Repr(config: new ReprConfig(IntFormatString: "Q")));
+            actual: 0.Repr(config: ReprConfig.Configure().IntFormat("Q").Build()));
 
         // Test negative values
         Assert.Equal(expected: "-0q222_i32",
-            actual: (-42).Repr(config: new ReprConfig(IntFormatString: "Q")));
+            actual: (-42).Repr(config: ReprConfig.Configure().IntFormat("Q").Build()));
     }
 
     #endregion

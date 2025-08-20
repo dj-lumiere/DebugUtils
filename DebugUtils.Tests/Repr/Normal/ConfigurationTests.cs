@@ -9,11 +9,11 @@ public class ConfigurationTests
     public void TestReprConfig_MaxDepth()
     {
         var nestedList = new List<object> { 1, new List<object> { 2, new List<object> { 3 } } };
-        var config = new ReprConfig(MaxDepth: 1);
+        var config = ReprConfig.Configure().MaxDepth(1).Build();
         Assert.Equal(expected: "[1_i32, <Max Depth Reached>]",
             actual: nestedList.Repr(config: config));
 
-        config = new ReprConfig(MaxDepth: 0);
+        config = ReprConfig.Configure().MaxDepth(0).Build();
         Assert.Equal(expected: "<Max Depth Reached>", actual: nestedList.Repr(config: config));
     }
 
@@ -21,11 +21,11 @@ public class ConfigurationTests
     public void TestReprConfig_MaxElementsPerCollection()
     {
         var list = new List<int> { 1, 2, 3, 4, 5 };
-        var config = new ReprConfig(MaxItemsPerContainer: 3);
+        var config = ReprConfig.Configure().MaxItems(3).Build();
         Assert.Equal(expected: "[1_i32, 2_i32, 3_i32, ... (2 more items)]",
             actual: list.Repr(config: config));
 
-        config = new ReprConfig(MaxItemsPerContainer: 0);
+        config = ReprConfig.Configure().MaxItems(0).Build();
         Assert.Equal(expected: "[... (5 more items)]", actual: list.Repr(config: config));
     }
 
@@ -33,11 +33,11 @@ public class ConfigurationTests
     public void TestReprConfig_MaxStringLength()
     {
         var longString = "This is a very long string that should be truncated.";
-        var config = new ReprConfig(MaxStringLength: 10);
+        var config = ReprConfig.Configure().MaxStringLength(10).Build();
         Assert.Equal(expected: "\"This is a ... (42 more letters)\"",
             actual: longString.Repr(config: config));
 
-        config = new ReprConfig(MaxStringLength: 0);
+        config = ReprConfig.Configure().MaxStringLength(0).Build();
         Assert.Equal(expected: "\"... (52 more letters)\"",
             actual: longString.Repr(config: config));
     }
@@ -47,13 +47,13 @@ public class ConfigurationTests
     {
         var classified =
             new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
-        var config = new ReprConfig(ViewMode: MemberReprMode.PublicFieldAutoProperty);
+        var config = ReprConfig.Configure().ViewMode(MemberReprMode.PublicFieldAutoProperty).Build();
         Assert.Equal(
             expected:
             "ClassifiedData(Age: 10_i32, Id: 5_i64, Name: \"Lumi\", Writer: \"writer\")",
             actual: classified.Repr(config: config));
 
-        config = new ReprConfig(ViewMode: MemberReprMode.AllFieldAutoProperty);
+        config = ReprConfig.Configure().ViewMode(MemberReprMode.AllFieldAutoProperty).Build();
         Assert.Equal(
             expected:
             "ClassifiedData(Age: 10_i32, Id: 5_i64, Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
@@ -93,9 +93,9 @@ public class ConfigurationTests
 
         Assert.Equal(expected: "42_i32", actual: 42.Repr());
         Assert.Equal(expected: "0x2A_i32",
-            actual: 42.Repr(config: new ReprConfig(IntFormatString: "X")));
+            actual: 42.Repr(config: ReprConfig.Configure().IntFormat("X").Build()));
         Assert.Equal(expected: "0b101010_i32",
-            actual: 42.Repr(config: new ReprConfig(IntFormatString: "B")));
+            actual: 42.Repr(config: ReprConfig.Configure().IntFormat("B").Build()));
 
         Assert.Equal(
             expected: "3.000000000000000444089209850062616169452667236328125E-001_f64",
@@ -106,15 +106,15 @@ public class ConfigurationTests
             actual: 0.3.Repr());
         Assert.Equal(expected: "0.30000000000000004_f64",
             actual: (0.1 + 0.2)
-           .Repr(config: new ReprConfig(FloatFormatString: "G")));
+           .Repr(config: ReprConfig.Configure().FloatFormat("G").Build()));
 
-        var hideTypes = new ReprConfig(
-            TypeMode: TypeReprMode.AlwaysHide,
-            UseSimpleFormatsInContainers: false
-        );
+        var hideTypes = ReprConfig.Configure()
+            .TypeMode(TypeReprMode.AlwaysHide)
+            .UseSimpleFormatsInContainers(false)
+            .Build();
         Assert.Equal(expected: "[1_i32, 2_i32, 3_i32]", actual: new[] { 1, 2, 3 }.Repr(config: hideTypes));
 
-        var showTypes = new ReprConfig(TypeMode: TypeReprMode.AlwaysShow);
+        var showTypes = ReprConfig.Configure().TypeMode(TypeReprMode.AlwaysShow).Build();
         Assert.Equal(expected: "1DArray([1_i32, 2_i32, 3_i32])",
             actual: new[] { 1, 2, 3 }.Repr(config: showTypes));
     }
@@ -125,7 +125,7 @@ public class ConfigurationTests
         var list = new List<int> { 1, 2, 3 };
         Assert.Equal(expected: "[1_i32, 2_i32, 3_i32]", actual: list.Repr());
 
-        var config = new ReprConfig(FloatFormatString: "EX");
+        var config = ReprConfig.Configure().FloatFormat("EX").Build();
         var f = 3.14f;
         Assert.Equal(expected: "3.1400001049041748046875E+000_f32",
             actual: f.Repr(config: config));

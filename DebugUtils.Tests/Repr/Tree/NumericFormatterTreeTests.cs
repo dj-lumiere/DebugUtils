@@ -12,7 +12,7 @@ public class NumericFormatterTreeTests
     [InlineData("X", "0x2A")]
     public void TestByteRepr(string format, string expectedValue)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         var actualJson = JsonNode.Parse(json: ((byte)42).ReprTree(config: config));
         var expectedJson = new JsonObject
         {
@@ -29,7 +29,7 @@ public class NumericFormatterTreeTests
     [InlineData("X", "-0x2A")]
     public void TestIntRepr(string format, string expectedValue)
     {
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         var actualJson = JsonNode.Parse(json: (-42).ReprTree(config: config));
         var expectedJson = new JsonObject
         {
@@ -43,7 +43,7 @@ public class NumericFormatterTreeTests
     [Fact]
     public void TestBigIntRepr()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         var actualJson = JsonNode.Parse(json: new BigInteger(value: -42).ReprTree(config: config));
         var expectedJson = new JsonObject
         {
@@ -58,7 +58,7 @@ public class NumericFormatterTreeTests
     [Fact]
     public void TestFloatRepr_Exact()
     {
-        var config = new ReprConfig(FloatFormatString: "EX");
+        var config = ReprConfig.Configure().FloatFormat("EX").Build();
         var value = Single.Parse(s: "3.1415926535");
         var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -73,7 +73,7 @@ public class NumericFormatterTreeTests
     [Fact]
     public void TestDoubleRepr_Round()
     {
-        var config = new ReprConfig(FloatFormatString: "F5");
+        var config = ReprConfig.Configure().FloatFormat("F5").Build();
         var value = Double.Parse(s: "3.1415926535");
         var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -86,24 +86,9 @@ public class NumericFormatterTreeTests
     }
 
     [Fact]
-    public void TestHalfRepr_Scientific()
-    {
-        var config = new ReprConfig(FloatFormatString: "E5");
-        var value = Half.Parse(s: "3.14159");
-        var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
-        var expectedJson = new JsonObject
-        {
-            [propertyName: "type"] = "Half",
-            [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "3.14062E+000"
-        };
-        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
-    }
-
-    [Fact]
     public void TestDecimalRepr_HexPower()
     {
-        var config = new ReprConfig(FloatFormatString: "HP");
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
         var value = 3.1415926535897932384626433832795m;
         var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
         var expectedJson = new JsonObject
@@ -115,20 +100,6 @@ public class NumericFormatterTreeTests
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
 
-    [Fact]
-    public void TestHalfRepr_HexPower()
-    {
-        var config = new ReprConfig(FloatFormatString: "HP");
-        var value = Half.Parse(s: "3.14159");
-        var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
-        var expectedJson = new JsonObject
-        {
-            [propertyName: "type"] = "Half",
-            [propertyName: "kind"] = "struct",
-            [propertyName: "value"] = "0x1.920p+001"
-        };
-        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
-    }
 
     [Fact]
     public void TestFloatRepr_SpecialValues()
@@ -193,6 +164,35 @@ public class NumericFormatterTreeTests
     }
 
     #if NET5_0_OR_GREATER
+    
+    [Fact]
+    public void TestHalfRepr_Scientific()
+    {
+        var config = ReprConfig.Configure().FloatFormat("E5").Build();
+        var value = Half.Parse(s: "3.14159");
+        var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
+        var expectedJson = new JsonObject
+        {
+            [propertyName: "type"] = "Half",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "value"] = "3.14062E+000"
+        };
+        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
+    }
+    [Fact]
+    public void TestHalfRepr_HexPower()
+    {
+        var config = ReprConfig.Configure().FloatFormat("HP").Build();
+        var value = Half.Parse(s: "3.14159");
+        var actualJson = JsonNode.Parse(json: value.ReprTree(config: config));
+        var expectedJson = new JsonObject
+        {
+            [propertyName: "type"] = "Half",
+            [propertyName: "kind"] = "struct",
+            [propertyName: "value"] = "0x1.920p+001"
+        };
+        Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
+    }
     [Fact]
     public void TestHalfRepr_SpecialValues()
     {
@@ -235,7 +235,7 @@ public class NumericFormatterTreeTests
     public void TestInt128Repr(string format, string expectedValue)
     {
         var i128 = Int128.MinValue;
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         var actualJson = JsonNode.Parse(json: i128.ReprTree(config: config));
         var expectedJson = new JsonObject
         {
@@ -254,7 +254,7 @@ public class NumericFormatterTreeTests
     public void TestInt128Repr2(string format, string expectedValue)
     {
         var i128 = Int128.MaxValue;
-        var config = new ReprConfig(IntFormatString: format);
+        var config = ReprConfig.Configure().IntFormat(format).Build();
         var actualJson = JsonNode.Parse(json: i128.ReprTree(config: config));
         var expectedJson = new JsonObject
         {
