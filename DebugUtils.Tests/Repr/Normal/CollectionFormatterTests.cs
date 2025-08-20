@@ -112,6 +112,7 @@ public class CollectionFormatterTests
         Assert.Equal(expected: "Stack([2_i32, 1_i32])", actual: stack.Repr());
     }
 
+    #if NET6_0_OR_GREATER
     [Fact]
     public void TestPriorityQueueRepr()
     {
@@ -125,7 +126,7 @@ public class CollectionFormatterTests
         Assert.Contains(expectedSubstring: "\"second\" (priority: 2_i32)", actualString: repr);
         Assert.Contains(expectedSubstring: "\"third\" (priority: 3_i32)", actualString: repr);
     }
-
+    #endif
     [Fact]
     public void TestTupleRepr()
     {

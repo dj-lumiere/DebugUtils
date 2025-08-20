@@ -126,6 +126,7 @@ internal class CharFormatter : IReprFormatter, IReprTreeFormatter
     }
 }
 
+#if NET5_0_OR_GREATER
 [ReprFormatter(typeof(Rune))]
 [ReprOptions(needsPrefix: true)]
 internal class RuneFormatter : IReprFormatter, IReprTreeFormatter
@@ -147,3 +148,4 @@ internal class RuneFormatter : IReprFormatter, IReprTreeFormatter
         };
     }
 }
+#endif

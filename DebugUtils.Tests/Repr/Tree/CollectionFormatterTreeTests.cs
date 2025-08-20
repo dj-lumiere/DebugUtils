@@ -371,6 +371,7 @@ public class CollectionFormatterTreeTests
             node2: valueArray[index: 1]));
     }
 
+    #if NET6_0_OR_GREATER
     [Fact]
     public void TestPriorityQueueRepr()
     {
@@ -410,4 +411,5 @@ public class CollectionFormatterTreeTests
             "third" &&
             item[propertyName: "priority"]!.GetValue<string>() == "3_i32");
     }
+    #endif
 }

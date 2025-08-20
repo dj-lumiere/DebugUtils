@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#if NET6_0_OR_GREATER
+
+using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using DebugUtils.Repr.Attributes;
@@ -144,3 +146,5 @@ internal class PriorityQueueFormatter : IReprFormatter, IReprTreeFormatter
         return result;
     }
 }
+
+#endif

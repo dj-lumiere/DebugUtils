@@ -9,11 +9,9 @@ using DebugUtils.Repr.TypeHelpers;
 
 namespace DebugUtils.Repr.Formatters;
 
-[ReprFormatter(
-    typeof(float),
-    typeof(double),
+[ReprFormatter(typeof(float), typeof(double)
     #if NET5_0_OR_GREATER
-    typeof(Half)
+    , typeof(Half)
     #endif
 )]
 [ReprOptions(needsPrefix: false)]
@@ -59,7 +57,9 @@ internal class FloatFormatter : IReprFormatter, IReprTreeFormatter
     {
         return obj switch
         {
+            #if NET5_0_OR_GREATER
             Half h => h.ToString(format: formatString, provider: culture),
+            #endif
             float f => f.ToString(format: formatString, provider: culture),
             double d => d.ToString(format: formatString, provider: culture),
             _ => throw new InvalidEnumArgumentException(message: "Invalid FloatTypeKind")

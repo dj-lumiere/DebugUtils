@@ -91,6 +91,7 @@ public class StandardFormatterTreeTests
           ?.ToString());
     }
 
+    #if NET5_0_OR_GREATER
     [Fact]
     public void TestRuneRepr()
     {
@@ -106,6 +107,7 @@ public class StandardFormatterTreeTests
         Assert.Equal(expected: "0x0001F49C", actual: actualJson[propertyName: "unicodeValue"]
           ?.ToString());
     }
+    #endif
 
     [Fact]
     public void TestBoolRepr()
@@ -394,6 +396,7 @@ public class StandardFormatterTreeTests
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
 
+    #if NET6_0_OR_GREATER
     [Fact]
     public void TestDateOnly()
     {
@@ -428,6 +431,7 @@ public class StandardFormatterTreeTests
         };
         Assert.True(condition: JsonNode.DeepEquals(node1: actualJson, node2: expectedJson));
     }
+    #endif
 
     [Fact]
     public void TestNullableStructRepr()

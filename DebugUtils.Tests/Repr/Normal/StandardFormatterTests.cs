@@ -28,11 +28,13 @@ public class StandardFormatterTests
         Assert.Equal(expected: "'아'", actual: '아'.Repr());
     }
 
+    #if NET5_0_OR_GREATER
     [Fact]
     public void TestRuneRepr()
     {
         Assert.Equal(expected: "Rune(💜 @ \\U0001F49C)", actual: new Rune(value: 0x1f49c).Repr());
     }
+    #endif
 
     [Fact]
     public void TestBoolRepr()
@@ -64,7 +66,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Negative()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "TimeSpan(-00:30:00.0000000)", actual: TimeSpan
            .FromMinutes(minutes: -30)
            .Repr(config: config));
@@ -73,7 +75,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Negative_WithDays()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "TimeSpan(-1D-01:00:00.0000000)",
             actual: new TimeSpan(days: -1, hours: -1, minutes: 0, seconds: 0)
                .Repr(config: config));
@@ -82,7 +84,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Zero()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "TimeSpan(00:00:00.0000000)",
             actual: TimeSpan.Zero.Repr(config: config));
     }
@@ -90,7 +92,7 @@ public class StandardFormatterTests
     [Fact]
     public void TestTimeSpanRepr_Positive()
     {
-        var config = new ReprConfig();
+        var config = ReprConfig.Configure().Build();
         Assert.Equal(expected: "TimeSpan(00:30:00.0000000)", actual: TimeSpan
            .FromMinutes(minutes: 30)
            .Repr(config: config));
@@ -115,6 +117,7 @@ public class StandardFormatterTests
                 offset: TimeSpan.FromHours(hours: 1)).Repr());
     }
 
+    #if NET6_0_OR_GREATER
     [Fact]
     public void TestDateOnly()
     {
@@ -128,6 +131,7 @@ public class StandardFormatterTests
         Assert.Equal(expected: "TimeOnly(01:02:03.0000000)",
             actual: new TimeOnly(hour: 1, minute: 2, second: 3).Repr());
     }
+    #endif
 
     [Fact]
     public void TestGuidRepr()

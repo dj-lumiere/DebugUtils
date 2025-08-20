@@ -88,10 +88,12 @@ internal static class TypeClassifier
                genericDef == typeof(Tuple<,,,,,,>) ||
                genericDef == typeof(Tuple<,,,,,,,>);
     }
+    #if NET6_0_OR_GREATER
     public static bool IsPriorityQueueType(this Type type)
     {
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(PriorityQueue<,>);
     }
+    #endif
     public static bool IsEnumType(this Type type)
     {
         return type.IsEnum;

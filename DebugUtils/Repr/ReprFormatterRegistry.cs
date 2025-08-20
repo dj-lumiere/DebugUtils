@@ -77,7 +77,9 @@ internal static class ReprFormatterRegistry
             (t => t.IsTupleType(), new TupleFormatter()),
             (t => t.IsArray, new ArrayFormatter()),
             (t => t.IsSetType(), new SetFormatter()),
+            #if NET6_0_OR_GREATER
             (t => t.IsPriorityQueueType(), new PriorityQueueFormatter()),
+            #endif
             (t => t.IsAssignableTo(targetType: typeof(Delegate)), new FunctionFormatter()),
             (t => t.IsAssignableTo(targetType: typeof(IEnumerable)), new EnumerableFormatter()),
             (t => t.IsAnonymousType(), new ObjectFormatter()),
@@ -92,7 +94,9 @@ internal static class ReprFormatterRegistry
                 (t => t.IsDictionaryType(), new DictionaryFormatter()),
                 (t => t.IsTupleType(), new TupleFormatter()),
                 (t => t.IsArray, new ArrayFormatter()),
+                #if NET6_0_OR_GREATER
                 (t => t.IsPriorityQueueType(), new PriorityQueueFormatter()),
+                #endif
                 (t => t.IsAssignableTo(targetType: typeof(Delegate)), new FunctionFormatter()),
                 (t => t.IsAssignableTo(targetType: typeof(IEnumerable)),
                     new EnumerableFormatter()),
