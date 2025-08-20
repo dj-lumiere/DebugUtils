@@ -474,7 +474,7 @@ public static class ReprExtensions
         return context.Config.TypeMode switch
         {
             TypeReprMode.AlwaysHide => result,
-            _ => $"ReadOnlySpan({result})"
+            _ => $"Span({result})"
         };
     }
     /// <summary>

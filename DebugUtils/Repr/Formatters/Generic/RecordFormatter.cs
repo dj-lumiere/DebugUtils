@@ -23,27 +23,27 @@ internal class RecordFormatter : IReprFormatter
         var members = obj.GetObjectMembers(context: context);
         var parts = new List<string>();
 
-        foreach (var member in members.publicFields)
+        foreach (var member in members.PublicFields)
         {
             parts.Add(item: obj.ToReprParts(f: member, context: context));
         }
 
-        foreach (var member in members.publicAutoProps)
+        foreach (var member in members.PublicAutoProps)
         {
             parts.Add(item: obj.ToReprParts(pair: member, context: context));
         }
 
-        foreach (var member in members.privateFields)
+        foreach (var member in members.PrivateFields)
         {
             parts.Add(item: obj.ToPrivateReprParts(f: member, context: context));
         }
 
-        foreach (var member in members.privateAutoProps)
+        foreach (var member in members.PrivateAutoProps)
         {
             parts.Add(item: obj.ToPrivateReprParts(pair: member, context: context));
         }
 
-        if (members.truncated)
+        if (members.Truncated)
         {
             parts.Add(item: "...");
         }

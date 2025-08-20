@@ -302,6 +302,28 @@ public sealed record ReprConfig(
     bool EnablePrettyPrintForReprTree = false,
     CultureInfo? Culture = null)
 {
+    /// <summary>
+    /// Creates a new <see cref="ReprConfigBuilder"/> for fluent configuration of Repr settings.
+    /// </summary>
+    /// <returns>A new instance of <see cref="ReprConfigBuilder"/> to configure Repr settings.</returns>
+    /// <remarks>
+    /// This method provides an entry point to the builder pattern for creating ReprConfig instances
+    /// with a fluent, chainable API that improves discoverability and readability.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Create a custom configuration using the builder pattern
+    /// var config = ReprConfig.Configure()
+    ///     .WithMaxDepth(5)
+    ///     .WithViewMode(MemberReprMode.AllPublic)
+    ///     .WithFloatFormatString("F2")
+    ///     .WithIntFormatString("X")
+    ///     .Build();
+    /// 
+    /// // Use the configuration
+    /// var repr = myObject.Repr(config);
+    /// </code>
+    /// </example>
     public static ReprConfigBuilder Configure()
     {
         return new ReprConfigBuilder();

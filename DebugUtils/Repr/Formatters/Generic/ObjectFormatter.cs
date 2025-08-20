@@ -27,43 +27,43 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
         var members = obj.GetObjectMembers(context: context);
         var parts = new List<string>();
 
-        foreach (var member in members.publicFields)
+        foreach (var member in members.PublicFields)
         {
             parts.Add(item: obj.ToReprParts(f: member, context: context));
         }
 
-        foreach (var member in members.publicAutoProps)
+        foreach (var member in members.PublicAutoProps)
         {
             parts.Add(item: obj.ToReprParts(pair: member, context: context));
         }
 
         if (context.Config.MaxMemberTimeMs > 0)
         {
-            foreach (var member in members.publicProperties)
+            foreach (var member in members.PublicProperties)
             {
                 parts.Add(item: obj.ToReprParts(p: member, context: context));
             }
         }
 
-        foreach (var member in members.privateFields)
+        foreach (var member in members.PrivateFields)
         {
             parts.Add(item: obj.ToPrivateReprParts(f: member, context: context));
         }
 
-        foreach (var member in members.privateAutoProps)
+        foreach (var member in members.PrivateAutoProps)
         {
             parts.Add(item: obj.ToPrivateReprParts(pair: member, context: context));
         }
 
         if (context.Config.MaxMemberTimeMs > 0)
         {
-            foreach (var member in members.privateProperties)
+            foreach (var member in members.PrivateProperties)
             {
                 parts.Add(item: obj.ToPrivateReprParts(p: member, context: context));
             }
         }
 
-        if (members.truncated)
+        if (members.Truncated)
         {
             parts.Add(item: "...");
         }
@@ -91,32 +91,32 @@ internal class ObjectFormatter : IReprFormatter, IReprTreeFormatter
 
         var members = obj.GetObjectMembers(context: context);
 
-        foreach (var member in members.publicFields)
+        foreach (var member in members.PublicFields)
         {
             result.Add(property: obj.ToReprTreeParts(f: member, context: context));
         }
 
-        foreach (var member in members.publicAutoProps)
+        foreach (var member in members.PublicAutoProps)
         {
             result.Add(property: obj.ToReprTreeParts(pair: member, context: context));
         }
 
-        foreach (var member in members.publicProperties)
+        foreach (var member in members.PublicProperties)
         {
             result.Add(property: obj.ToReprTreeParts(p: member, context: context));
         }
 
-        foreach (var member in members.privateFields)
+        foreach (var member in members.PrivateFields)
         {
             result.Add(property: obj.ToPrivateReprTreeParts(f: member, context: context));
         }
 
-        foreach (var member in members.privateAutoProps)
+        foreach (var member in members.PrivateAutoProps)
         {
             result.Add(property: obj.ToPrivateReprTreeParts(pair: member, context: context));
         }
 
-        foreach (var member in members.privateProperties)
+        foreach (var member in members.PrivateProperties)
         {
             result.Add(property: obj.ToPrivateReprTreeParts(p: member, context: context));
         }

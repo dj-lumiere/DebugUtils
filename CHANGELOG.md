@@ -1,5 +1,34 @@
 # Changelog
 
+# [v1.8.0] - Released at 2025.08.20
+
+## 🚀 Major Features
+
+### Builder Pattern Implementation
+- **NEW**: Added `ReprConfigBuilder` for fluent configuration
+
+## 📋 Breaking Changes
+- **BREAKING**: CallStack classes moved from `DebugUtils.CallStack` namespace to `DebugUtils`
+- **Migration**: Update using statements from `using DebugUtils.CallStack;` to `using DebugUtils;`
+
+## 💡 Migration Guide
+```csharp
+// OLD: Direct namespace usage
+using DebugUtils.CallStack;
+var callerInfo = CallStack.GetCallerInfo();
+
+// NEW: Simplified namespace  
+using DebugUtils;
+var callerInfo = CallStack.GetCallerInfo();
+
+// NEW: Builder pattern (optional)
+var config = ReprConfig.Configure()
+    .WithMaxDepth(5)
+    .WithViewMode(MemberReprMode.AllPublic)
+    .WithFloatFormatString("F2")
+    .Build();
+```
+
 # [v1.7.0] Released at 2025.08.14
 
 ## 🚀 Major Features

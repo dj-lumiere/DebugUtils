@@ -73,7 +73,7 @@ internal static class FloatFormattingExtensions
         //
         // CASE 2: realExponent < 0  
         //   significand * 2^(-k) = significand * (5^k / 10^k) = (significand * 5^k) / 10^k
-        //   KEY INSIGHT: 2^(-k) * 5^k = 10^(-k), so we can represent exact fractions in decimal
+        //   KEY INSIGHT: 2^k * 5^k = 10^k, so we can represent exact fractions in decimal
         //
         // RESULT: numerator / 10^powerOf10Denominator represents the exact decimal value
         int powerOf10Denominator;

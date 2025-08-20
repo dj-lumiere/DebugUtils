@@ -7,6 +7,59 @@ namespace DebugUtils.Repr.Extensions;
 
 internal static class ObjectExtensions
 {
+    /// <summary>
+    /// Executes a property getter with optional timeout protection.
+    /// </summary>
+    /// <typeparam name="T">The return type of the operation.</typeparam>
+    /// <param name="obj">The object to get the property value from.</param>
+    /// <param name="property">The property to access.</param>
+    /// <param name="timeoutMs">Timeout in milliseconds. Negative values disable timeout protection.</param>
+    /// <param name="onSuccess">Function to execute when property access succeeds.</param>
+    /// <param name="onTimeout">Function to execute when property access times out.</param>
+    /// <param name="onError">Function to execute when property access throws an exception.</param>
+    /// <returns>The result from the appropriate handler function.</returns>
+    private static T ExecutePropertyWithTimeout<T>(
+        object obj,
+        PropertyInfo property,
+        int timeoutMs,
+        Func<object?, T> onSuccess,
+        Func<T> onTimeout,
+        Func<Exception, T> onError)
+    {
+        if (timeoutMs < 0)
+        {
+            // Timeout disabled - call directly without protection
+            try
+            {
+                var value = property.GetValue(obj);
+                return onSuccess(value);
+            }
+            catch (Exception e)
+            {
+                var actualException = e.GetRootException();
+                return onError(actualException);
+            }
+        }
+
+        // Use timeout protection
+        try
+        {
+            var task = Task.Run(() => property.GetValue(obj));
+            if (task.Wait(timeoutMs))
+            {
+                var value = task.Result;
+                return onSuccess(value);
+            }
+
+            return onTimeout();
+        }
+        catch (Exception e)
+        {
+            var actualException = e.GetRootException();
+            return onError(actualException);
+        }
+    }
+
     public static bool TryGetAutoPropInfo(this FieldInfo f, out string propName)
     {
         propName = null!;
@@ -78,38 +131,14 @@ internal static class ObjectExtensions
     }
     public static string ToReprParts(this object obj, PropertyInfo p, ReprContext context)
     {
-        if (context.Config.MaxMemberTimeMs < 0)
-        {
-            // Timeout disabled - call directly without protection
-            try
-            {
-                var value = p.GetValue(obj: obj);
-                return $"{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}";
-            }
-            catch (Exception e)
-            {
-                var actualException = e.GetRootException();
-                return $"{p.Name}: [{actualException.GetType().Name}: {actualException.Message}]";
-            }
-        }
-
-        // Use timeout protection
-        try
-        {
-            var task = Task.Run(function: () => p.GetValue(obj: obj));
-            if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
-            {
-                var value = task.Result;
-                return $"{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}";
-            }
-
-            return $"{p.Name}: [Timed Out]";
-        }
-        catch (Exception e)
-        {
-            var actualException = e.GetRootException();
-            return $"{p.Name}: [{actualException.GetType().Name}: {actualException.Message}]";
-        }
+        return ExecutePropertyWithTimeout(
+            obj: obj,
+            property: p,
+            timeoutMs: context.Config.MaxMemberTimeMs,
+            onSuccess: value => $"{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}",
+            onTimeout: () => $"{p.Name}: [Timed Out]",
+            onError: ex => $"{p.Name}: [{ex.GetType().Name}: {ex.Message}]"
+        );
     }
 
     public static KeyValuePair<string, JsonNode?> ToReprTreeParts(this object obj, FieldInfo f,
@@ -129,42 +158,16 @@ internal static class ObjectExtensions
     public static KeyValuePair<string, JsonNode?> ToReprTreeParts(this object obj, PropertyInfo p,
         ReprContext context)
     {
-        if (context.Config.MaxMemberTimeMs < 0)
-        {
-            // Timeout disabled - call directly without protection
-            try
-            {
-                var value = p.GetValue(obj: obj);
-                return new KeyValuePair<string, JsonNode?>(key: p.Name,
-                    value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
-            }
-            catch (Exception e)
-            {
-                var actualException = e.GetRootException();
-                return new KeyValuePair<string, JsonNode?>(key: p.Name,
-                    value: $"[{actualException.GetType().Name}: {actualException.Message}]");
-            }
-        }
-
-        // Use timeout protection
-        try
-        {
-            var task = Task.Run(function: () => p.GetValue(obj: obj));
-            if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
-            {
-                var value = task.Result;
-                return new KeyValuePair<string, JsonNode?>(key: p.Name,
-                    value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
-            }
-
-            return new KeyValuePair<string, JsonNode?>(key: p.Name, value: "[Timed Out]");
-        }
-        catch (Exception e)
-        {
-            var actualException = e.GetRootException();
-            return new KeyValuePair<string, JsonNode?>(key: p.Name,
-                value: $"[{actualException.GetType().Name}: {actualException.Message}]");
-        }
+        return ExecutePropertyWithTimeout(
+            obj: obj,
+            property: p,
+            timeoutMs: context.Config.MaxMemberTimeMs,
+            onSuccess: value => new KeyValuePair<string, JsonNode?>(key: p.Name,
+                value: value.FormatAsJsonNode(context: context.WithIncrementedDepth())),
+            onTimeout: () => new KeyValuePair<string, JsonNode?>(key: p.Name, value: "[Timed Out]"),
+            onError: ex => new KeyValuePair<string, JsonNode?>(key: p.Name,
+                value: $"[{ex.GetType().Name}: {ex.Message}]")
+        );
     }
 
 
@@ -181,40 +184,14 @@ internal static class ObjectExtensions
     }
     public static string ToPrivateReprParts(this object obj, PropertyInfo p, ReprContext context)
     {
-        if (context.Config.MaxMemberTimeMs < 0)
-        {
-            // Timeout disabled - call directly without protection
-            try
-            {
-                var value = p.GetValue(obj: obj);
-                return $"private_{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}";
-            }
-            catch (Exception e)
-            {
-                var actualException = e.GetRootException();
-                return
-                    $"private_{p.Name}: [{actualException.GetType().Name}: {actualException.Message}]";
-            }
-        }
-
-        // Use timeout protection
-        try
-        {
-            var task = Task.Run(function: () => p.GetValue(obj: obj));
-            if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
-            {
-                var value = task.Result;
-                return $"private_{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}";
-            }
-
-            return $"private_{p.Name}: [Timed Out]";
-        }
-        catch (Exception e)
-        {
-            var actualException = e.GetRootException();
-            return
-                $"private_{p.Name}: [{actualException.GetType().Name}: {actualException.Message}]";
-        }
+        return ExecutePropertyWithTimeout(
+            obj: obj,
+            property: p,
+            timeoutMs: context.Config.MaxMemberTimeMs,
+            onSuccess: value => $"private_{p.Name}: {value.Repr(context: context.WithIncrementedDepth())}",
+            onTimeout: () => $"private_{p.Name}: [Timed Out]",
+            onError: ex => $"private_{p.Name}: [{ex.GetType().Name}: {ex.Message}]"
+        );
     }
     public static KeyValuePair<string, JsonNode?> ToPrivateReprTreeParts(this object obj,
         FieldInfo f, ReprContext context)
@@ -233,49 +210,20 @@ internal static class ObjectExtensions
     public static KeyValuePair<string, JsonNode?> ToPrivateReprTreeParts(this object obj,
         PropertyInfo p, ReprContext context)
     {
-        if (context.Config.MaxMemberTimeMs < 0)
-        {
-            // Timeout disabled - call directly without protection
-            try
-            {
-                var value = p.GetValue(obj: obj);
-                return new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
-                    value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
-            }
-            catch (Exception e)
-            {
-                var actualException = e.GetRootException();
-                return new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
-                    value: $"[{actualException.GetType().Name}: {actualException.Message}]");
-            }
-        }
-
-        // Use timeout protection
-        try
-        {
-            var task = Task.Run(function: () => p.GetValue(obj: obj));
-            if (task.Wait(millisecondsTimeout: context.Config.MaxMemberTimeMs))
-            {
-                var value = task.Result;
-                return new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
-                    value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
-            }
-
-            return new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
-                value: "[Timed Out]");
-        }
-        catch (Exception e)
-        {
-            var actualException = e.GetRootException();
-            return new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
-                value: $"[{actualException.GetType().Name}: {actualException.Message}]");
-        }
+        return ExecutePropertyWithTimeout(
+            obj: obj,
+            property: p,
+            timeoutMs: context.Config.MaxMemberTimeMs,
+            onSuccess: value => new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
+                value: value.FormatAsJsonNode(context: context.WithIncrementedDepth())),
+            onTimeout: () => new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
+                value: "[Timed Out]"),
+            onError: ex => new KeyValuePair<string, JsonNode?>(key: $"private_{p.Name}",
+                value: $"[{ex.GetType().Name}: {ex.Message}]")
+        );
     }
 
-    public static ( List<FieldInfo> publicFields, List<(PropertyInfo prop, FieldInfo backing)>
-        publicAutoProps, List<PropertyInfo> publicProperties, List<FieldInfo> privateFields,
-        List<(PropertyInfo prop, FieldInfo backing)> privateAutoProps, List<PropertyInfo>
-        privateProperties, bool truncated ) GetObjectMembers(this object obj, ReprContext context)
+    public static ObjectMembers GetObjectMembers(this object obj, ReprContext context)
     {
         var type = obj.GetType();
         var publicFields = new List<FieldInfo>();
@@ -410,8 +358,8 @@ internal static class ObjectExtensions
             }
         }
 
-        return (publicFields, publicAutoProps, publicProperties, privateFields, privateAutoProps,
-            privateProperties, truncated);
+        return new ObjectMembers(publicFields, publicAutoProps, publicProperties, privateFields,
+            privateAutoProps, privateProperties, truncated);
     }
 
     public static bool ShouldIncludePublicFields(MemberReprMode mode)
@@ -513,5 +461,31 @@ internal static class ObjectExtensions
             _ when exception.InnerException != null => exception.InnerException.GetRootException(),
             _ => exception
         };
+    }
+
+    public readonly struct ObjectMembers
+    {
+        public List<FieldInfo> PublicFields { get; }
+        public List<(PropertyInfo prop, FieldInfo backing)> PublicAutoProps { get; }
+        public List<PropertyInfo> PublicProperties { get; }
+        public List<FieldInfo> PrivateFields { get; }
+        public List<(PropertyInfo prop, FieldInfo backing)> PrivateAutoProps { get; }
+        public List<PropertyInfo> PrivateProperties { get; }
+        public bool Truncated { get; }
+
+        public ObjectMembers(List<FieldInfo> publicFields,
+            List<(PropertyInfo prop, FieldInfo backing)> publicAutoProps,
+            List<PropertyInfo> publicProperties, List<FieldInfo> privateFields,
+            List<(PropertyInfo prop, FieldInfo backing)> privateAutoProps,
+            List<PropertyInfo> privateProperties, bool truncated)
+        {
+            PublicFields = publicFields;
+            PublicAutoProps = publicAutoProps;
+            PublicProperties = publicProperties;
+            PrivateFields = privateFields;
+            PrivateAutoProps = privateAutoProps;
+            PrivateProperties = privateProperties;
+            Truncated = truncated;
+        }
     }
 }
