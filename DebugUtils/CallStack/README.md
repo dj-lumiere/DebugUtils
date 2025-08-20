@@ -39,7 +39,7 @@ Use `GetCallerName()` for a clean, simple `ClassName.MethodName` string.
 
 ```csharp
 // OrderProcessor.cs
-using DebugUtils.CallStack;
+using DebugUtils;
 
 public class OrderProcessor
 {
@@ -78,7 +78,7 @@ Use `GetCallerInfo()` to get a rich `CallerInfo` object with the file, line, and
 
 ```csharp
 // OrderProcessor.cs
-using DebugUtils.CallStack;
+using DebugUtils;
 
 public class OrderProcessor
 {
