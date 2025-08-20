@@ -46,11 +46,6 @@ internal static class ObjectTypeClassifier
         return compileType.IsNullableStructType() ||
                (runtimeType?.IsNullableStructType() ?? false);
     }
-    public static bool OverridesToString<T>(this T obj)
-    {
-        var type = obj?.GetType() ?? typeof(T);
-        return type.OverridesToStringType();
-    }
     public static bool NeedsTypePrefix<T>(this T obj)
     {
         var type = obj?.GetType() ?? typeof(T);

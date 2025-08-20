@@ -8,7 +8,6 @@ internal static class FloatFormattingExtensions
 {
     // PRE-COMPUTED POWERS OF 5: 5^0 through 5^16 for efficient scaling
     // CONSTRAINT: Using chunks of 5^14 because 5^15 = 30,517,578,125 * 999,999,999 would overflow ulong
-    // OPTIMIZATION: Avoids BigInteger.Pow calls in hot path
 
     private static readonly ulong[] PowersOf5 =
     {
@@ -36,9 +35,9 @@ internal static class FloatFormattingExtensions
         // Maximum intermediate value: (2^(1+mantissaBits)-1) * 5^(-minRealExponent+mantissaBits)
         //
         // CALCULATED MAXIMUMS:
-        // Half (1+10=11 bits): (2^11-1) * 5^(14+10) ≈ 1.2×10^20  → needs 3 uint digits
-        // Float (1+23=24 bits): (2^24-1) * 5^(126+23) ≈ 2.3×10^111 → needs 13 uint digits  
-        // Double (1+52=53 bits): (2^53-1) * 5^(1022+52) ≈ 4.4×10^766 → needs 86 uint digits
+        // Half (1+10=11 bits): (2^11-1) * 5^(14+10) ≈ 1.2×10^20 -> needs 3 uint digits
+        // Float (1+23=24 bits): (2^24-1) * 5^(126+23) ≈ 2.3×10^111 -> needs 13 uint digits  
+        // Double (1+52=53 bits): (2^53-1) * 5^(1022+52) ≈ 4.4×10^766 -> needs 86 uint digits
         // 
         // CONSTRAINT: Using base-10^9 (uint can hold ≤ 4.29×10^9), so each uint = 9 decimal digits
         var digits = info.TypeName switch
@@ -69,7 +68,7 @@ internal static class FloatFormattingExtensions
         //
         // IEEE 754 value = significand * 2^realExponent
         //
-        // CASE 1: realExponent ≥ 0
+        // CASE 1: realExponent >= 0
         //   significand * 2^realExponent = exact integer (no denominator needed)
         //
         // CASE 2: realExponent < 0  
@@ -88,7 +87,7 @@ internal static class FloatFormattingExtensions
         else
         {
             // Convert a binary fraction to an exact decimal fraction
-            // significand * 2^(-k) → (significand * 5^k) / 10^k
+            // significand * 2^(-k) -> (significand * 5^k) / 10^k
             powerOf10Denominator = -realExponent;
             length = digits.ScalePow5(len: length, k: powerOf10Denominator);
         }
@@ -118,10 +117,8 @@ internal static class FloatFormattingExtensions
 
         return info.TypeName switch
         {
-            #if NET5_0_OR_GREATER
             FloatTypeKind.Half =>
                 $"{sign}{frontPart}{mantissaNibbleAligned:X3}p{(power >= 0 ? "+" : "")}{power:D3}",
-            #endif
             FloatTypeKind.Float =>
                 $"{sign}{frontPart}{mantissaNibbleAligned:X6}p{(power >= 0 ? "+" : "")}{power:D3}",
             FloatTypeKind.Double =>

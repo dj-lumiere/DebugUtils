@@ -120,8 +120,7 @@ internal static class ObjectExtensions
             value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
     }
     public static KeyValuePair<string, JsonNode?> ToReprTreeParts(this object obj,
-        (PropertyInfo p, FieldInfo f) pair,
-        ReprContext context)
+        (PropertyInfo p, FieldInfo f) pair, ReprContext context)
     {
         var value = pair.f.GetValue(obj: obj);
         return new KeyValuePair<string, JsonNode?>(key: pair.p.Name,
@@ -158,8 +157,7 @@ internal static class ObjectExtensions
                     value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
             }
 
-            return new KeyValuePair<string, JsonNode?>(key: p.Name,
-                value: "[Timed Out]");
+            return new KeyValuePair<string, JsonNode?>(key: p.Name, value: "[Timed Out]");
         }
         catch (Exception e)
         {
@@ -219,24 +217,21 @@ internal static class ObjectExtensions
         }
     }
     public static KeyValuePair<string, JsonNode?> ToPrivateReprTreeParts(this object obj,
-        FieldInfo f,
-        ReprContext context)
+        FieldInfo f, ReprContext context)
     {
         var value = f.GetValue(obj: obj);
         return new KeyValuePair<string, JsonNode?>(key: $"private_{f.Name}",
             value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
     }
     public static KeyValuePair<string, JsonNode?> ToPrivateReprTreeParts(this object obj,
-        (PropertyInfo p, FieldInfo f) pair,
-        ReprContext context)
+        (PropertyInfo p, FieldInfo f) pair, ReprContext context)
     {
         var value = pair.f.GetValue(obj: obj);
         return new KeyValuePair<string, JsonNode?>(key: $"private_{pair.p.Name}",
             value: value.FormatAsJsonNode(context: context.WithIncrementedDepth()));
     }
     public static KeyValuePair<string, JsonNode?> ToPrivateReprTreeParts(this object obj,
-        PropertyInfo p,
-        ReprContext context)
+        PropertyInfo p, ReprContext context)
     {
         if (context.Config.MaxMemberTimeMs < 0)
         {
@@ -277,15 +272,10 @@ internal static class ObjectExtensions
         }
     }
 
-    public static (
-        List<FieldInfo> publicFields,
-        List<(PropertyInfo prop, FieldInfo backing)> publicAutoProps,
-        List<PropertyInfo> publicProperties,
-        List<FieldInfo> privateFields,
-        List<(PropertyInfo prop, FieldInfo backing)> privateAutoProps,
-        List<PropertyInfo> privateProperties,
-        bool truncated
-        ) GetObjectMembers(this object obj, ReprContext context)
+    public static ( List<FieldInfo> publicFields, List<(PropertyInfo prop, FieldInfo backing)>
+        publicAutoProps, List<PropertyInfo> publicProperties, List<FieldInfo> privateFields,
+        List<(PropertyInfo prop, FieldInfo backing)> privateAutoProps, List<PropertyInfo>
+        privateProperties, bool truncated ) GetObjectMembers(this object obj, ReprContext context)
     {
         var type = obj.GetType();
         var publicFields = new List<FieldInfo>();
@@ -339,9 +329,9 @@ internal static class ObjectExtensions
 
         if (ShouldIncludePublicProperties(mode: context.Config.ViewMode))
         {
-            var publicProps = GetPublicProperties(type: type,
-                publicAutoProps: publicAutoProps.Select(selector: p => p.prop.Name)
-                                                .ToHashSet());
+            var publicProps = GetPublicProperties(type: type, publicAutoProps: publicAutoProps
+               .Select(selector: p => p.prop.Name)
+               .ToHashSet());
 
             foreach (var pair in publicProps)
             {
@@ -371,8 +361,7 @@ internal static class ObjectExtensions
             // Add remaining private fields (not auto-property backing fields)
             foreach (var field in nonPubFields.OrderBy(keySelector: f => f.Name))
             {
-                if (usedBackers.Contains(item: field) ||
-                    field.Name.IsCompilerGeneratedName() ||
+                if (usedBackers.Contains(item: field) || field.Name.IsCompilerGeneratedName() ||
                     field.Name == "EqualityContract")
                 {
                     continue;
@@ -404,9 +393,9 @@ internal static class ObjectExtensions
 
         if (ShouldIncludePrivateProperties(mode: context.Config.ViewMode))
         {
-            var privateProps = GetPrivateProperties(type: type,
-                privateAutoProps: publicAutoProps.Select(selector: p => p.prop.Name)
-                                                 .ToHashSet());
+            var privateProps = GetPrivateProperties(type: type, privateAutoProps: publicAutoProps
+               .Select(selector: p => p.prop.Name)
+               .ToHashSet());
 
             foreach (var pair in privateProps)
             {
@@ -428,15 +417,13 @@ internal static class ObjectExtensions
     public static bool ShouldIncludePublicFields(MemberReprMode mode)
     {
         return mode == MemberReprMode.PublicFieldAutoProperty ||
-               mode == MemberReprMode.AllPublic ||
-               mode == MemberReprMode.AllFieldAutoProperty ||
+               mode == MemberReprMode.AllPublic || mode == MemberReprMode.AllFieldAutoProperty ||
                mode == MemberReprMode.Everything;
     }
     public static bool ShouldIncludePublicAutoProps(MemberReprMode mode)
     {
         return mode == MemberReprMode.PublicFieldAutoProperty ||
-               mode == MemberReprMode.AllPublic ||
-               mode == MemberReprMode.AllFieldAutoProperty ||
+               mode == MemberReprMode.AllPublic || mode == MemberReprMode.AllFieldAutoProperty ||
                mode == MemberReprMode.Everything;
     }
     public static bool ShouldIncludePublicProperties(MemberReprMode mode)
@@ -445,8 +432,7 @@ internal static class ObjectExtensions
     }
     public static bool ShouldIncludePrivateAutoProps(MemberReprMode mode)
     {
-        return mode == MemberReprMode.AllFieldAutoProperty ||
-               mode == MemberReprMode.Everything;
+        return mode == MemberReprMode.AllFieldAutoProperty || mode == MemberReprMode.Everything;
     }
     public static bool ShouldIncludePrivateProperties(MemberReprMode mode)
     {
@@ -498,8 +484,8 @@ internal static class ObjectExtensions
                    .OrderBy(keySelector: f => f.Name);
     }
 
-    public static List<(PropertyInfo prop, FieldInfo backing)> GetAutoPropPairs(
-        FieldInfo[] fields, Dictionary<string, PropertyInfo> properties)
+    public static List<(PropertyInfo prop, FieldInfo backing)> GetAutoPropPairs(FieldInfo[] fields,
+        Dictionary<string, PropertyInfo> properties)
     {
         var pairs = new List<(PropertyInfo prop, FieldInfo backing)>();
         foreach (var field in fields)
@@ -520,10 +506,10 @@ internal static class ObjectExtensions
     {
         return exception switch
         {
-            AggregateException { InnerExceptions.Count: 1 } aggEx => GetRootException(
-                exception: aggEx.InnerException!),
-            TargetInvocationException { InnerException: not null } targetEx => GetRootException(
-                exception: targetEx.InnerException!),
+            AggregateException aggEx when aggEx.InnerExceptions.Count == 1 => aggEx.InnerException!
+               .GetRootException(),
+            TargetInvocationException { InnerException: not null } targetEx => targetEx
+               .InnerException!.GetRootException(),
             _ when exception.InnerException != null => exception.InnerException.GetRootException(),
             _ => exception
         };

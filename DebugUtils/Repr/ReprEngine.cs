@@ -21,7 +21,7 @@ internal static class ReprEngine
             return "null";
         }
 
-        // Handle circular references HERE - single place
+        // Handle circular references HERE
         var id = RuntimeHelpers.GetHashCode(o: obj);
         if (!obj.GetType()
                 .IsValueType)

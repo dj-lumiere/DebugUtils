@@ -44,8 +44,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         if (context.Config.MaxItemsPerContainer >= 0 &&
             tuple.Length > context.Config.MaxItemsPerContainer)
         {
-            var truncatedItemCount = tuple.Length -
-                                     context.Config.MaxItemsPerContainer;
+            var truncatedItemCount = tuple.Length - context.Config.MaxItemsPerContainer;
             sb.Append(value: $"... {truncatedItemCount} more items");
         }
 
@@ -93,8 +92,7 @@ internal class TupleFormatter : IReprFormatter, IReprTreeFormatter
         if (context.Config.MaxItemsPerContainer >= 0 &&
             tuple.Length > context.Config.MaxItemsPerContainer)
         {
-            var truncatedItemCount = tuple.Length -
-                                     context.Config.MaxItemsPerContainer;
+            var truncatedItemCount = tuple.Length - context.Config.MaxItemsPerContainer;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 

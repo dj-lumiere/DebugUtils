@@ -12,8 +12,7 @@ internal readonly record struct FloatInfo(
     long Bits,
     int RealExponent,
     ulong Significand,
-    FloatTypeKind TypeName
-)
+    FloatTypeKind TypeName)
 {
     public bool IsNegative => Bits < 0;
 

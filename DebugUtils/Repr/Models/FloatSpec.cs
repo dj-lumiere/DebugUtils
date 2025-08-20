@@ -10,5 +10,4 @@ internal readonly record struct FloatSpec(
     long MantissaMask,
     long MantissaMsbMask,
     long ExpMask,
-    int ExpOffset
-);
+    int ExpOffset);

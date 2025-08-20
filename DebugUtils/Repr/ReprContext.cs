@@ -29,7 +29,7 @@ public record ReprContext
     /// The <c>Depth</c> property is used to prevent stack overflow and infinite loops while processing object relationships
     /// by maintaining the current nesting level. When depth exceeds MaxDepth, traversal is halted.
     /// </remarks>
-    public int Depth { get; }
+    public int Depth { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the ReprContext class with the specified configuration.
@@ -148,30 +148,24 @@ public record ReprContext
     /// }
     /// 
     /// // The depth tracking prevents issues like:
-    /// // Manager → Manager → Manager → ... (infinite recursion)
-    /// // Instead produces: Manager → Manager → &lt;Max Depth Reached&gt;
+    /// // Manager -> Manager -> Manager -> ... (infinite recursion)
+    /// // Instead produces: Manager -> Manager -> &lt;Max Depth Reached&gt;
     /// </code>
     /// </example>
     public ReprContext WithIncrementedDepth()
     {
-        return new ReprContext(
-            config: Config,
-            visited: Visited, // Share the same visited set
-            depth: Depth + 1
-        );
+        return new ReprContext(config: Config, visited: Visited, // Share the same visited set
+            depth: Depth + 1);
     }
 
 
     internal ReprContext WithTypeHide()
     {
-        return new ReprContext(
-            config: Config with
+        return new ReprContext(config: Config with
             {
                 TypeMode = TypeReprMode.AlwaysHide
-            },
-            visited: Visited, // Share the same visited set
-            depth: Depth
-        );
+            }, visited: Visited, // Share the same visited set
+            depth: Depth);
     }
 
     /// <summary>
@@ -193,11 +187,7 @@ public record ReprContext
     /// </remarks>
     internal ReprContext WithContainerConfig()
     {
-        return new ReprContext(
-            config: GetContainerConfig(),
-            visited: Visited,
-            depth: Depth
-        );
+        return new ReprContext(config: GetContainerConfig(), visited: Visited, depth: Depth);
     }
 
     private ReprConfig GetContainerConfig()

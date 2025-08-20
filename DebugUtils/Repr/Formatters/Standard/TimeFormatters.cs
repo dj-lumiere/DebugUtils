@@ -78,8 +78,7 @@ internal class DateTimeOffsetFormatter : IReprFormatter, IReprTreeFormatter
             (false, 0) => $"+{subDayPart}",
             (false, _) => $"+{ts.Days}D+{subDayPart}"
         };
-        return
-            $"{dtoTime}{tsString}";
+        return $"{dtoTime}{tsString}";
     }
 
 

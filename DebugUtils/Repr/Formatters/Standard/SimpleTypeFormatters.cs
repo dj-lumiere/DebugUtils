@@ -42,8 +42,7 @@ internal class EnumFormatter : IReprFormatter, IReprTreeFormatter
         var e = (Enum)obj;
         var underlyingType = Enum.GetUnderlyingType(enumType: e.GetType());
         var numericValue = Convert.ChangeType(value: e, conversionType: underlyingType);
-        return
-            $"{e.GetReprTypeName()}.{e} ({numericValue.Repr(context: context)})";
+        return $"{e.GetReprTypeName()}.{e} ({numericValue.Repr(context: context)})";
     }
 
     public JsonNode ToReprTree(object obj, ReprContext context)

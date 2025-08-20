@@ -35,11 +35,12 @@ internal class IntegerFormatter : IReprFormatter, IReprTreeFormatter
                 obj.FormatAsQuaternaryWithPadding(format: formatString),
             _ when formatString.StartsWith(value: 'O') || formatString.StartsWith(value: 'o') =>
                 obj.FormatAsOctalWithPadding(format: formatString),
-            _ when formatString.StartsWith(value: 'X') =>
-                obj.FormatAsHexWithPadding(format: formatString),
-            _ when formatString.StartsWith(value: 'x') =>
-                obj.FormatAsHexWithPadding(format: formatString)
-                   .ToLowerInvariant(),
+            _ when formatString.StartsWith(value: 'X') => obj.FormatAsHexWithPadding(
+                format: formatString),
+            _ when formatString.StartsWith(value: 'x') => obj
+                                                         .FormatAsHexWithPadding(
+                                                              format: formatString)
+                                                         .ToLowerInvariant(),
             _ => FormatWithBuiltInToString(obj: obj, formatString: formatString, culture: culture)
         };
     }

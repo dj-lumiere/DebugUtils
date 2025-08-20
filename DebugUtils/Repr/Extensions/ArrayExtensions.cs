@@ -35,8 +35,8 @@ internal static class ArrayExtensions
                 else
                 {
                     // Otherwise, format the element normally.
-                    items.Add(
-                        item: value?.Repr(context: context.WithIncrementedDepth()) ?? "null");
+                    items.Add(item: value?.Repr(context: context.WithIncrementedDepth()) ??
+                                    "null");
                 }
             }
 
@@ -64,8 +64,7 @@ internal static class ArrayExtensions
     }
 
     public static JsonNode ArrayToHierarchicalReprRecursive(this Array array, int[] indices,
-        int dimension,
-        ReprContext context)
+        int dimension, ReprContext context)
     {
         if (dimension == array.Rank - 1)
         {

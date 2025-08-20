@@ -70,8 +70,7 @@ internal class TypeFormatter : IReprFormatter, IReprTreeFormatter
                                     .GetProperties(bindingAttr: BindingFlags.Public |
                                                                 BindingFlags.Instance)
                                     .Where(predicate: p =>
-                                         p.CanRead &&
-                                         p.PropertyType == typeof(bool) &&
+                                         p.CanRead && p.PropertyType == typeof(bool) &&
                                          !p.Name.IsCompilerGeneratedName() &&
                                          p.Name.StartsWith(value: "Is"))
                                     .OrderByDescending(keySelector: p =>

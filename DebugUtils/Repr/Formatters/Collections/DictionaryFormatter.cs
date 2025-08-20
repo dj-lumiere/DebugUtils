@@ -47,8 +47,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         if (context.Config.MaxItemsPerContainer >= 0 &&
             dict.Count > context.Config.MaxItemsPerContainer)
         {
-            var truncatedItemCount = dict.Count -
-                                     context.Config.MaxItemsPerContainer;
+            var truncatedItemCount = dict.Count - context.Config.MaxItemsPerContainer;
             items.Add(item: $"... {truncatedItemCount} more items");
         }
 
@@ -88,7 +87,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
                 [propertyName: "key"] =
                     entry.Key.FormatAsJsonNode(context: context.WithIncrementedDepth()),
                 [propertyName: "value"] =
-                    entry.Value?.FormatAsJsonNode(context: context.WithIncrementedDepth()) ?? null
+                    entry.Value.FormatAsJsonNode(context: context.WithIncrementedDepth())
             };
             entries.Add(value: entryJson);
             count += 1;
@@ -97,8 +96,7 @@ internal class DictionaryFormatter : IReprFormatter, IReprTreeFormatter
         if (context.Config.MaxItemsPerContainer >= 0 &&
             dict.Count > context.Config.MaxItemsPerContainer)
         {
-            var truncatedItemCount = dict.Count -
-                                     context.Config.MaxItemsPerContainer;
+            var truncatedItemCount = dict.Count - context.Config.MaxItemsPerContainer;
             entries.Add(item: $"... ({truncatedItemCount} more items)");
         }
 

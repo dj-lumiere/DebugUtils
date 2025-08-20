@@ -80,14 +80,12 @@ internal static class MethodModifiersExtensions
     public static bool IsOverrideMethod(this MethodInfo method)
     {
         // A method is override if it's virtual and has a base definition
-        return method.IsVirtual &&
-               method.GetBaseDefinition() != method;
+        return method.IsVirtual && method.GetBaseDefinition() != method;
     }
     public static bool IsAsyncMethod(this MethodInfo method)
     {
         // Check if a method is marked with an AsyncStateMachine attribute
-        return method.IsDefined(
-            attributeType: typeof(AsyncStateMachineAttribute));
+        return method.IsDefined(attributeType: typeof(AsyncStateMachineAttribute));
     }
     public static bool IsExternMethod(this MethodInfo method)
     {

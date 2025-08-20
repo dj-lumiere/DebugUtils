@@ -215,7 +215,7 @@ public static class ReprExtensions
     /// Generates a detailed string representation of a Span&lt;T&gt;.
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="config">Optional configuration. See <see cref="Repr{T}(T, ReprConfig?)"/> for details.</param>
     /// <returns>A string representation in the format "Span([element1, element2, ...])"</returns>
     /// <remarks>
@@ -223,12 +223,12 @@ public static class ReprExtensions
     /// For detailed behavior and configuration options, see <see cref="ReprExtensions.Repr{T}(T, ReprConfig?)"/>.
     /// </remarks>
     /// <seealso cref="ReprExtensions.Repr{T}(T, ReprConfig?)"/>
-    public static string Repr<T>(this Span<T> span, ReprConfig? config = null)
+    public static string Repr<T>(this Span<T> obj, ReprConfig? config = null)
     {
         var context = config == null
             ? new ReprContext()
             : new ReprContext(config: config);
-        var result = SpanFormatter.ToRepr(obj: span, context: context);
+        var result = SpanFormatter.ToRepr(obj: obj, context: context);
 
         // Apply type prefix
         return context.Config.TypeMode switch
@@ -241,7 +241,7 @@ public static class ReprExtensions
     /// Generates a detailed string representation of a ReadOnlySpan&lt;T&gt;.
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="config">Optional configuration. See <see cref="Repr{T}(T, ReprConfig?)"/> for details.</param>
     /// <returns>A string representation in the format "ReadOnlySpan([element1, element2, ...])"</returns>
     /// <remarks>
@@ -249,12 +249,12 @@ public static class ReprExtensions
     /// For detailed behavior and configuration options, see <see cref="ReprExtensions.Repr{T}(T, ReprConfig?)"/>.
     /// </remarks>
     /// <seealso cref="ReprExtensions.Repr{T}(T, ReprConfig?)"/>
-    public static string Repr<T>(this ReadOnlySpan<T> span, ReprConfig? config = null)
+    public static string Repr<T>(this ReadOnlySpan<T> obj, ReprConfig? config = null)
     {
         var context = config == null
             ? new ReprContext()
             : new ReprContext(config: config);
-        var result = ReadOnlySpanFormatter.ToRepr(obj: span, context: context);
+        var result = ReadOnlySpanFormatter.ToRepr(obj: obj, context: context);
 
         // Apply type prefix
         return context.Config.TypeMode switch
@@ -267,14 +267,14 @@ public static class ReprExtensions
     /// Generates a hierarchical JSON representation of a Span&lt;T&gt;
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="config">Optional configuration. See <see cref="ReprTree{T}(T, ReprConfig?)"/> for details.</param>
     /// <returns>A JSON string with complete Span structure and metadata.</returns>
     /// <remarks>
     /// For JSON structure details and configuration options, see <see cref="ReprExtensions.ReprTree{T}(T, ReprConfig?)"/>.
     /// </remarks>
     /// <seealso cref="ReprExtensions.ReprTree{T}(T, ReprConfig?)"/>
-    public static string ReprTree<T>(this Span<T> span, ReprConfig? config = null)
+    public static string ReprTree<T>(this Span<T> obj, ReprConfig? config = null)
     {
         var context = config == null
             ? new ReprContext()
@@ -284,21 +284,21 @@ public static class ReprExtensions
             WriteIndented = config?.EnablePrettyPrintForReprTree ?? false,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
-        return SpanFormatter.ToReprTree(obj: span, context: context)
+        return SpanFormatter.ToReprTree(obj: obj, context: context)
                             .ToJsonString(options: formatOption);
     }
     /// <summary>
     /// Generates a hierarchical JSON representation of a ReadOnlySpan&lt;T&gt;
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="config">Optional configuration. See <see cref="ReprTree{T}(T, ReprConfig?)"/> for details.</param>
     /// <returns>A JSON string with complete Span structure and metadata.</returns>
     /// <remarks>
     /// For JSON structure details and configuration options, see <see cref="ReprExtensions.ReprTree{T}(T, ReprConfig?)"/>.
     /// </remarks>
     /// <seealso cref="ReprExtensions.ReprTree{T}(T, ReprConfig?)"/>
-    public static string ReprTree<T>(this ReadOnlySpan<T> span, ReprConfig? config = null)
+    public static string ReprTree<T>(this ReadOnlySpan<T> obj, ReprConfig? config = null)
     {
         var context = config == null
             ? new ReprContext()
@@ -308,7 +308,7 @@ public static class ReprExtensions
             WriteIndented = config?.EnablePrettyPrintForReprTree ?? false,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
-        return ReadOnlySpanFormatter.ToReprTree(obj: span, context: context)
+        return ReadOnlySpanFormatter.ToReprTree(obj: obj, context: context)
                                     .ToJsonString(options: formatOption);
     }
 
@@ -483,7 +483,7 @@ public static class ReprExtensions
     /// over state management and circular reference tracking.
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="context">
     /// The context controlling formatting behavior and tracking state. Must not be null.
     /// Contains configuration settings, circular reference tracking, and depth management.
@@ -501,10 +501,10 @@ public static class ReprExtensions
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     /// <seealso cref="Repr{T}(ReadOnlySpan{T}, ReprConfig?)"/>
     /// <seealso cref="Repr{T}(T, ReprContext)"/>
-    public static string Repr<T>(this ReadOnlySpan<T> span, ReprContext context)
+    public static string Repr<T>(this ReadOnlySpan<T> obj, ReprContext context)
     {
         ArgumentNullException.ThrowIfNull(argument: context);
-        var result = ReadOnlySpanFormatter.ToRepr(obj: span, context: context);
+        var result = ReadOnlySpanFormatter.ToRepr(obj: obj, context: context);
 
         // Apply type prefix
         return context.Config.TypeMode switch
@@ -519,7 +519,7 @@ public static class ReprExtensions
     /// build complex hierarchical structures with precise state control.
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="context">
     /// The context controlling formatting behavior and tracking state. Must not be null.
     /// Contains configuration settings, circular reference tracking, and depth management.
@@ -540,10 +540,10 @@ public static class ReprExtensions
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     /// <seealso cref="ReprTree{T}(Span{T}, ReprConfig?)"/>
     /// <seealso cref="FormatAsJsonNode{T}(T, ReprContext)"/>
-    public static JsonNode FormatAsJsonNode<T>(this Span<T> span, ReprContext context)
+    public static JsonNode FormatAsJsonNode<T>(this Span<T> obj, ReprContext context)
     {
         ArgumentNullException.ThrowIfNull(argument: context);
-        return SpanFormatter.ToReprTree(obj: span, context: context);
+        return SpanFormatter.ToReprTree(obj: obj, context: context);
     }
     /// <summary>
     /// Gets the JsonNode representation of a ReadOnlySpan&lt;T&gt; for use in custom tree formatters.
@@ -551,7 +551,7 @@ public static class ReprExtensions
     /// build complex hierarchical structures with precise state control.
     /// </summary>
     /// <typeparam name="T">The element type of the span.</typeparam>
-    /// <param name="span">The span to represent.</param>
+    /// <param name="obj">The span to represent.</param>
     /// <param name="context">
     /// The context controlling formatting behavior and tracking state. Must not be null.
     /// Contains configuration settings, circular reference tracking, and depth management.
@@ -572,10 +572,10 @@ public static class ReprExtensions
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="context"/> is null.</exception>
     /// <seealso cref="ReprTree{T}(ReadOnlySpan{T}, ReprConfig?)"/>
     /// <seealso cref="FormatAsJsonNode{T}(T, ReprContext)"/>
-    public static JsonNode FormatAsJsonNode<T>(this ReadOnlySpan<T> span, ReprContext context)
+    public static JsonNode FormatAsJsonNode<T>(this ReadOnlySpan<T> obj, ReprContext context)
     {
         ArgumentNullException.ThrowIfNull(argument: context);
-        return ReadOnlySpanFormatter.ToReprTree(obj: span, context: context);
+        return ReadOnlySpanFormatter.ToReprTree(obj: obj, context: context);
     }
 
     #endregion

@@ -75,8 +75,7 @@ internal static class FunctionDetailsExtensions
         return unsanitizedName;
     }
 
-    public static ParameterDetails[] GetParameterDetails(
-        this MethodInfo methodInfo)
+    public static ParameterDetails[] GetParameterDetails(this MethodInfo methodInfo)
     {
         return methodInfo.GetParameters()
                          .Select(selector: p => p.ToParameterDetails())
