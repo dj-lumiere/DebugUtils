@@ -1,4 +1,4 @@
-namespace DebugUtils.CallStack;
+namespace DebugUtils;
 
 /// <summary>
 /// Represents information about the caller of a method, including class name, method name,

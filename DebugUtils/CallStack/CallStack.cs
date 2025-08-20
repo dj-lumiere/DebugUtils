@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace DebugUtils.CallStack;
+namespace DebugUtils;
 
 /// <summary>
 /// Provides utilities for inspecting the call stack and retrieving caller information.
@@ -87,11 +87,8 @@ public static class CallStack
             var methodName = method?.Name;
             var column = frame?.GetFileColumnNumber() ?? 0;
 
-            var result = new CallerInfo(
-                className: className,
-                methodName: methodName,
-                fileName: Path.GetFileName(path: filePath),
-                lineNumber: lineNumber,
+            var result = new CallerInfo(className: className, methodName: methodName,
+                fileName: Path.GetFileName(path: filePath), lineNumber: lineNumber,
                 columnNumber: column);
 
             return result;
