@@ -341,7 +341,7 @@ internal static class ObjectExtensions
 
         if (ShouldIncludePrivateProperties(mode: context.Config.ViewMode))
         {
-            var privateProps = GetPrivateProperties(type: type, privateAutoProps: publicAutoProps
+            var privateProps = GetPrivateProperties(type: type, privateAutoProps: privateAutoProps
                .Select(selector: p => p.prop.Name)
                .ToHashSet());
 

@@ -46,7 +46,7 @@ public class ConfigurationTests
     public void TestReprConfig_ShowNonPublicProperties()
     {
         var classified =
-            new ClassifiedData(writer: "writer", data: "secret", password: "REDACTED");
+            new ClassifiedData(writer: "writer", dataValue: "secret", password: "REDACTED");
         var config = ReprConfig.Configure().ViewMode(MemberReprMode.PublicFieldAutoProperty).Build();
         Assert.Equal(
             expected:
@@ -58,6 +58,61 @@ public class ConfigurationTests
             expected:
             "ClassifiedData(Age: 10_i32, Id: 5_i64, Name: \"Lumi\", Writer: \"writer\", private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC), private_Password: \"REDACTED\", private_Data: \"secret\", private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9))",
             actual: classified.Repr(config: config));
+    }
+
+    [Fact]
+    public void TestReprConfig_AllPublicMode()
+    {
+        var classified = new ClassifiedData(
+            writer: "Lumi",
+            dataValue: "Now Top Secret Accessing",
+            password: "REDACTED"
+        );
+        
+        var config = new ReprConfig(ViewMode: MemberReprMode.AllPublic);
+        var actual = classified.Repr(config);
+        
+        // Should include all public fields and properties (including computed)
+        Assert.Contains("Age: 10_i32", actual);
+        Assert.Contains("Id: 5_i64", actual);
+        Assert.Contains("Name: \"Lumi\"", actual);
+        Assert.Contains("Writer: \"Lumi\"", actual);
+        Assert.Contains("RealDate: DateTimeOffset(1970.01.01 00:00:00.0000000Z)", actual);
+        
+        // Should NOT include private members
+        Assert.DoesNotContain("private_", actual);
+        Assert.DoesNotContain("REDACTED", actual);
+        Assert.DoesNotContain("Now Top Secret Accessing", actual);
+    }
+
+    [Fact]
+    public void TestReprConfig_EverythingMode()
+    {
+        var classified = new ClassifiedData(
+            writer: "Lumi",
+            dataValue: "Now Top Secret Accessing", 
+            password: "REDACTED"
+        );
+        
+        var config = new ReprConfig(ViewMode: MemberReprMode.Everything);
+        var actual = classified.Repr(config);
+        
+        // Should include all public fields and properties
+        Assert.Contains("Age: 10_i32", actual);
+        Assert.Contains("Id: 5_i64", actual);
+        Assert.Contains("Name: \"Lumi\"", actual);
+        Assert.Contains("Writer: \"Lumi\"", actual);
+        
+        // Should include private fields
+        Assert.Contains("private_Date: DateTime(1970.01.01 00:00:00.0000000 UTC)", actual);
+        Assert.Contains("private_Password: \"REDACTED\"", actual);
+        Assert.Contains("private_Data: \"Now Top Secret Accessing\"", actual);
+        Assert.Contains("private_Key: Guid(9a374b45-3771-4e91-b5e9-64bfa545efe9)", actual);
+        
+        // Should include private computed properties
+        Assert.Contains("private_DataChecksum:", actual);
+        Assert.Contains("private_Hash:", actual);
+        Assert.Contains("private_keyInt:", actual);
     }
 
     [Fact]
