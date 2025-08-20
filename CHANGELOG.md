@@ -10,6 +10,9 @@
 ## 📋 Breaking Changes
 - **BREAKING**: CallStack classes moved from `DebugUtils.CallStack` namespace to `DebugUtils`
 - **Migration**: Update using statements from `using DebugUtils.CallStack;` to `using DebugUtils;`
+- 
+## 🐛 Bug Fixes
+- Fixed not able to finding private properties
 
 ## 💡 Migration Guide
 ```csharp
